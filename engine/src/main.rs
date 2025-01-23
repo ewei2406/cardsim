@@ -1,37 +1,36 @@
 use std::io::{self, Write};
 
-use command::command::parse_command;
-
-mod command;
-mod game_objects;
-mod table;
+mod entity;
+mod game_controller;
+mod game_table;
 
 fn main() {
-    let mut table = table::table::Table::new(0);
+    let mut table = game_table::GameTable::new();
 
     loop {
-        print!("Enter command: ");
+        print!("# ");
         io::stdout().flush().unwrap();
 
         let mut command = String::new();
         io::stdin().read_line(&mut command).unwrap();
-        let command = command.trim();
 
-        if command == "exit" {
-            break;
+        let command = game_controller::parse(command.trim());
+        match command {
+            Ok(command) => {
+                let updates = game_controller::translate_command(command, &table);
+                match updates {
+                    Ok(updates) => {
+                        for update in updates {
+                            println!("[update]: {}", update.serialize());
+                            table.apply_update(update);
+                        }
+                    }
+                    Err(e) => println!("[update error]: {}", e),
+                }
+            }
+            Err(e) => println!("[error]: {}", e),
         }
 
-        let command = parse_command(command);
-
-        let result = match command {
-            Ok(command) => table.apply_command(command),
-            Err(e) => Err(e),
-        };
-
-        if let Err(e) = result {
-            println!("Error: {}", e);
-        } else {
-            println!("{}", table.describe());
-        }
+        println!("[table state]: {}", table.serialize());
     }
 }
