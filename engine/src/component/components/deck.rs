@@ -1,7 +1,12 @@
 use rand::{seq::SliceRandom, thread_rng};
 use serde::{Deserialize, Serialize};
 
-use super::card::Suit::{self, *};
+use crate::{entity::Entity, gamestate::GameState};
+
+use super::{
+    card::Suit::{self, *},
+    Position,
+};
 
 pub type DeckId = usize;
 
@@ -57,5 +62,12 @@ impl Deck {
 
     pub fn shuffle(&mut self) {
         self.card_inits.shuffle(&mut thread_rng());
+    }
+
+    pub fn add_deck(gamestate: &mut GameState, deck: Deck, position: Position) -> Entity {
+        let entity = gamestate.get_entity();
+        gamestate.decks.register(entity, deck);
+        gamestate.positions.register(entity, position);
+        entity
     }
 }

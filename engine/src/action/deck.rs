@@ -2,11 +2,12 @@ use crate::{
     component::{Card, Deck, Position},
     entity::Entity,
     gamestate::GameState,
+    util::get_id,
 };
 
 pub fn create_deck(gamestate: &mut GameState, position: Position) -> Entity {
-    let deck = Deck::new(gamestate.get_entity());
-    gamestate.add_deck(deck, position)
+    let deck = Deck::new(get_id());
+    Deck::add_deck(gamestate, deck, position)
 }
 
 // Move the top n cards of a deck onto another spot
@@ -30,7 +31,6 @@ pub fn cut_deck(
     }
 
     if flipped.is_empty() {
-        gamestate.mark_dead(deck);
         return None;
     }
 
@@ -39,7 +39,7 @@ pub fn cut_deck(
         deck_id: orig_id,
         card_inits: flipped,
     };
-    Some(gamestate.add_deck(new_deck, position))
+    Some(Deck::add_deck(gamestate, new_deck, position))
 }
 
 pub fn flip_cards_from_deck(
@@ -73,7 +73,7 @@ pub fn flip_cards_from_deck(
 
     let card_entities: Vec<Entity> = cards
         .into_iter()
-        .map(|card| gamestate.add_card(card, position.clone()))
+        .map(|card| Card::add_card(gamestate, card, position.clone()))
         .collect();
 
     Some(card_entities)
