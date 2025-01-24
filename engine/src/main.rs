@@ -1,36 +1,14 @@
-use std::io::{self, Write};
-
+mod action;
+mod component;
 mod entity;
-mod game_controller;
-mod game_table;
+mod gamestate;
 
 fn main() {
-    let mut table = game_table::GameTable::new();
+    let mut gamestate = gamestate::GameState::new();
+    println!("{}", gamestate.describe());
 
-    loop {
-        print!("# ");
-        io::stdout().flush().unwrap();
+    let position = action::util::empty_position(&gamestate);
+    let deck = action::deck::create_deck(&mut gamestate, position);
 
-        let mut command = String::new();
-        io::stdin().read_line(&mut command).unwrap();
-
-        let command = game_controller::parse(command.trim());
-        match command {
-            Ok(command) => {
-                let updates = game_controller::translate_command(command, &table);
-                match updates {
-                    Ok(updates) => {
-                        for update in updates {
-                            println!("[update]: {}", update.serialize());
-                            table.apply_update(update);
-                        }
-                    }
-                    Err(e) => println!("[update error]: {}", e),
-                }
-            }
-            Err(e) => println!("[error]: {}", e),
-        }
-
-        println!("[table state]: {}", table.serialize());
-    }
+    println!("{}", gamestate.describe());
 }
