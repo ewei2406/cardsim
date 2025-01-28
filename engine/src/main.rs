@@ -1,4 +1,4 @@
-use action::{Action, Actionable};
+use action::{Action, Actionable, Outcome};
 use serde_json;
 mod action;
 mod component;
@@ -22,10 +22,23 @@ fn main() {
         let action: Action = serde_json::from_str(&input).unwrap();
 
         let outcome = gamestate.apply(action);
-        let outcome = serde_json::to_string(&outcome).unwrap();
-        println!("{}", outcome);
+        let serialized_outcome = serde_json::to_string(&outcome).unwrap();
+        println!("\n\nOUTCOME: \n{}", serialized_outcome);
+
+        match outcome {
+            Outcome::Delta { changed, .. } => {
+                let serialized_changes = changed.anonymize(0);
+                println!(
+                    "\n\nChanges: \n{}",
+                    serde_json::to_string(&serialized_changes).unwrap()
+                );
+            }
+            Outcome::None => {
+                println!("Outcome: None");
+            }
+        }
 
         let serialized_gamestate = serde_json::to_string(&gamestate).unwrap();
-        println!("{}", serialized_gamestate);
+        println!("\n\nGAMESTATE: \n{}", serialized_gamestate);
     }
 }

@@ -9,7 +9,12 @@ pub struct ComponentStorage<T> {
     components: HashMap<Entity, T>,
 }
 
-impl<T: Clone + Debug + Serialize> ComponentStorage<T> {
+pub trait Anonymize {
+    type Anon;
+    fn anonymize(&self, as_entity: Entity, perspective: Entity) -> Self::Anon;
+}
+
+impl<T: Clone + Debug + Serialize + Anonymize> ComponentStorage<T> {
     pub fn new() -> Self {
         Self {
             components: HashMap::new(),
@@ -45,5 +50,12 @@ impl<T: Clone + Debug + Serialize> ComponentStorage<T> {
         if let Some(component) = other.get(entity) {
             self.register(entity, component.clone());
         }
+    }
+
+    pub fn anonymize(&self, perspective: Entity) -> Vec<T::Anon> {
+        self.components
+            .iter()
+            .map(|(entity, component)| component.anonymize(*entity, perspective))
+            .collect()
     }
 }

@@ -6,3 +6,4 @@ mod util;
 
 pub use action::Action;
 pub use action::Actionable;
+pub use action::Outcome;

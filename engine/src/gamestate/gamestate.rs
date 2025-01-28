@@ -1,12 +1,7 @@
 use std::collections::HashSet;
 
+use crate::{component::*, entity::Entity, util::get_id};
 use serde::Serialize;
-
-use crate::{
-    component::*,
-    entity::{self, Entity},
-    util::get_id,
-};
 
 #[derive(Serialize)]
 pub struct GameState {
@@ -15,6 +10,15 @@ pub struct GameState {
     pub cards: ComponentStorage<Card>,
     pub decks: ComponentStorage<Deck>,
     pub hands: ComponentStorage<Hand>,
+}
+
+#[derive(Serialize)]
+pub struct AnonGameState {
+    pub entities: HashSet<Entity>,
+    pub positions: Vec<Position>,
+    pub cards: Vec<AnonCard>,
+    pub decks: Vec<AnonDeck>,
+    pub hands: Vec<AnonHand>,
 }
 
 impl GameState {
@@ -41,5 +45,15 @@ impl GameState {
         self.cards.clone_component_from(&mut other.cards, entity);
         self.decks.clone_component_from(&mut other.decks, entity);
         self.hands.clone_component_from(&mut other.hands, entity);
+    }
+
+    pub fn anonymize(&self, perspective: Entity) -> AnonGameState {
+        AnonGameState {
+            entities: self.entities.clone(),
+            positions: self.positions.anonymize(perspective),
+            cards: self.cards.anonymize(perspective),
+            decks: self.decks.anonymize(perspective),
+            hands: self.hands.anonymize(perspective),
+        }
     }
 }

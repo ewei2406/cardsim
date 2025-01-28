@@ -1,7 +1,7 @@
 use rand::{seq::SliceRandom, thread_rng};
 use serde::{Deserialize, Serialize};
 
-use crate::{entity::Entity, gamestate::GameState};
+use crate::{component::component::Anonymize, entity::Entity, gamestate::GameState};
 
 use super::{
     card::Suit::{self, *},
@@ -17,12 +17,6 @@ pub struct CardInit(pub Suit, pub u8);
 pub struct Deck {
     pub deck_id: DeckId,
     pub card_inits: Vec<CardInit>,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct AnonDeck {
-    pub deck_id: DeckId,
-    pub card_count: usize,
 }
 
 impl Deck {
@@ -61,8 +55,17 @@ impl Deck {
         gamestate.positions.register(entity, position);
         entity
     }
+}
 
-    pub fn anonymize(&self) -> AnonDeck {
+#[derive(Serialize)]
+pub struct AnonDeck {
+    pub deck_id: DeckId,
+    pub card_count: usize,
+}
+
+impl Anonymize for Deck {
+    type Anon = AnonDeck;
+    fn anonymize(&self, _as_entity: Entity, _perspective: Entity) -> Self::Anon {
         AnonDeck {
             deck_id: self.deck_id,
             card_count: self.card_inits.len(),
