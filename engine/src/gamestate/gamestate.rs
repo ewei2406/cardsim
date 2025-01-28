@@ -2,7 +2,11 @@ use std::collections::HashSet;
 
 use serde::Serialize;
 
-use crate::{component::*, entity::Entity, util::get_id};
+use crate::{
+    component::*,
+    entity::{self, Entity},
+    util::get_id,
+};
 
 #[derive(Serialize)]
 pub struct GameState {
@@ -28,5 +32,14 @@ impl GameState {
         let entity = get_id();
         self.entities.insert(entity);
         entity
+    }
+
+    pub fn clone_entity_from(&mut self, other: &mut GameState, entity: Entity) {
+        self.entities.insert(entity);
+        self.positions
+            .clone_component_from(&mut other.positions, entity);
+        self.cards.clone_component_from(&mut other.cards, entity);
+        self.decks.clone_component_from(&mut other.decks, entity);
+        self.hands.clone_component_from(&mut other.hands, entity);
     }
 }

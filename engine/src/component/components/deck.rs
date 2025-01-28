@@ -11,10 +11,7 @@ use super::{
 pub type DeckId = usize;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct CardInit {
-    pub suit: Suit,
-    pub rank: u8,
-}
+pub struct CardInit(pub Suit, pub u8);
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Deck {
@@ -22,26 +19,23 @@ pub struct Deck {
     pub card_inits: Vec<CardInit>,
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct AnonDeck {
+    pub deck_id: DeckId,
+    pub card_count: usize,
+}
+
 impl Deck {
     pub fn new(deck_id: DeckId) -> Self {
         let mut cards = Vec::new();
 
-        for suit in [Clubs, Diamonds, Spades, Hearts].iter() {
+        for suit in [C, D, S, H].iter() {
             for rank in 1..=13 {
-                cards.push(CardInit {
-                    suit: suit.clone(),
-                    rank,
-                });
+                cards.push(CardInit(suit.clone(), rank as u8))
             }
         }
-        cards.push(CardInit {
-            suit: Joker,
-            rank: 14,
-        });
-        cards.push(CardInit {
-            suit: Joker,
-            rank: 15,
-        });
+        cards.push(CardInit(Suit::J, 14));
+        cards.push(CardInit(Suit::J, 15));
 
         Self {
             deck_id,
@@ -50,10 +44,7 @@ impl Deck {
     }
 
     pub fn return_card(&mut self, card_init: CardInit) {
-        self.card_inits.push(CardInit {
-            suit: card_init.suit,
-            rank: card_init.rank,
-        });
+        self.card_inits.push(card_init);
     }
 
     pub fn draw_card(&mut self) -> Option<CardInit> {
@@ -69,5 +60,12 @@ impl Deck {
         gamestate.decks.register(entity, deck);
         gamestate.positions.register(entity, position);
         entity
+    }
+
+    pub fn anonymize(&self) -> AnonDeck {
+        AnonDeck {
+            deck_id: self.deck_id,
+            card_count: self.card_inits.len(),
+        }
     }
 }

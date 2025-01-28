@@ -40,4 +40,10 @@ impl<T: Clone + Debug + Serialize> ComponentStorage<T> {
     pub fn get_mut(&mut self, entity: Entity) -> Option<&mut T> {
         self.components.get_mut(&entity)
     }
+
+    pub fn clone_component_from(&mut self, other: &mut ComponentStorage<T>, entity: Entity) {
+        if let Some(component) = other.get(entity) {
+            self.register(entity, component.clone());
+        }
+    }
 }

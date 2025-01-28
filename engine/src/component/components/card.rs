@@ -6,18 +6,22 @@ use super::{deck::DeckId, Position};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub enum Suit {
-    Clubs,
-    Diamonds,
-    Hearts,
-    Spades,
-    Joker,
+    C,
+    D,
+    H,
+    S,
+    J,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Card {
-    pub rank: u8,
     pub suit: Suit,
+    pub rank: u8,
     pub faceup: bool,
+    pub deck_id: DeckId,
+}
+
+pub struct AnonCard {
     pub deck_id: DeckId,
 }
 

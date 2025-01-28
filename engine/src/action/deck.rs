@@ -15,8 +15,13 @@ pub fn create_deck(gamestate: &mut GameState, x: i64, y: i64) -> Outcome {
         rotation: 0,
     };
     let deck = Deck::new(get_id());
-    Deck::add_deck(gamestate, deck, position);
-    Outcome::None
+    let entity = Deck::add_deck(gamestate, deck, position);
+    let mut dstate = GameState::new();
+    dstate.clone_entity_from(gamestate, entity);
+    Outcome::Delta {
+        changed: dstate,
+        deleted: vec![],
+    }
 }
 
 // Move the top n cards of a deck onto another spot
@@ -83,8 +88,8 @@ pub fn flip_cards_from_deck(
     let cards: Vec<Card> = flipped
         .iter()
         .map(|card_init| Card {
-            rank: card_init.rank,
-            suit: card_init.suit.clone(),
+            rank: card_init.1,
+            suit: card_init.0.clone(),
             faceup: true,
             deck_id: deck_component.deck_id,
         })
