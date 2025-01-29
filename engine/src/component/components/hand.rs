@@ -1,21 +1,46 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{component::component::Anonymize, entity::Entity};
+use crate::{
+    component::{component::Anonymize, GroupedComponent},
+    entity::Entity,
+};
 
 use super::{card::Suit, deck::DeckId};
 
+pub type HandCardId = usize;
+
 #[derive(Serialize, Deserialize, Clone, Debug)]
-struct HandCard {
-    rank: u8,
-    suit: Suit,
-    shown: bool,
-    deck_id: DeckId,
+pub struct HandCard {
+    pub id: HandCardId,
+    pub rank: u8,
+    pub suit: Suit,
+    pub shown: bool,
+    pub deck_id: DeckId,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Hand {
-    nickname: String,
-    cards: Vec<HandCard>,
+    pub nickname: String,
+    pub cards: Vec<HandCard>,
+}
+
+impl GroupedComponent for Hand {
+    type Params = String;
+    fn add(gamestate: &mut crate::gamestate::GameState, params: Self::Params) -> Entity {
+        let entity = gamestate.get_entity();
+        gamestate.hands.register(
+            entity,
+            Hand {
+                nickname: params,
+                cards: Vec::new(),
+            },
+        );
+        entity
+    }
+
+    fn remove(gamestate: &mut crate::gamestate::GameState, entity: Entity) {
+        gamestate.hands.unregister(entity);
+    }
 }
 
 #[derive(Serialize)]

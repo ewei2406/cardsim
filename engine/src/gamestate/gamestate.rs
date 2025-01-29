@@ -15,10 +15,10 @@ pub struct GameState {
 #[derive(Serialize)]
 pub struct AnonGameState {
     pub entities: HashSet<Entity>,
-    pub positions: Vec<Position>,
-    pub cards: Vec<AnonCard>,
-    pub decks: Vec<AnonDeck>,
-    pub hands: Vec<AnonHand>,
+    pub positions: ComponentStorage<Position>,
+    pub cards: ComponentStorage<AnonCard>,
+    pub decks: ComponentStorage<AnonDeck>,
+    pub hands: ComponentStorage<AnonHand>,
 }
 
 impl GameState {
@@ -30,6 +30,14 @@ impl GameState {
             decks: ComponentStorage::new(),
             hands: ComponentStorage::new(),
         }
+    }
+
+    pub fn remove_entity(&mut self, entity: Entity) {
+        self.positions.unregister(entity);
+        self.cards.unregister(entity);
+        self.decks.unregister(entity);
+        self.hands.unregister(entity);
+        self.entities.remove(&entity);
     }
 
     pub fn get_entity(&mut self) -> Entity {

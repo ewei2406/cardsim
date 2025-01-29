@@ -1,5 +1,6 @@
 mod action;
 
+mod hand;
 mod deck;
 mod entity;
 mod util;

@@ -1,7 +1,11 @@
 use rand::{seq::SliceRandom, thread_rng};
 use serde::{Deserialize, Serialize};
 
-use crate::{component::component::Anonymize, entity::Entity, gamestate::GameState};
+use crate::{
+    component::component::{Anonymize, GroupedComponent},
+    entity::Entity,
+    gamestate::GameState,
+};
 
 use super::{
     card::Suit::{self, *},
@@ -20,20 +24,10 @@ pub struct Deck {
 }
 
 impl Deck {
-    pub fn new(deck_id: DeckId) -> Self {
-        let mut cards = Vec::new();
-
-        for suit in [C, D, S, H].iter() {
-            for rank in 1..=13 {
-                cards.push(CardInit(suit.clone(), rank as u8))
-            }
-        }
-        cards.push(CardInit(Suit::J, 14));
-        cards.push(CardInit(Suit::J, 15));
-
+    pub fn new(deck_id: DeckId, card_inits: Vec<CardInit>) -> Self {
         Self {
             deck_id,
-            card_inits: cards,
+            card_inits,
         }
     }
 
@@ -48,12 +42,19 @@ impl Deck {
     pub fn shuffle(&mut self) {
         self.card_inits.shuffle(&mut thread_rng());
     }
+}
 
-    pub fn add_deck(gamestate: &mut GameState, deck: Deck, position: Position) -> Entity {
+impl GroupedComponent for Deck {
+    type Params = (Deck, Position);
+    fn add(gamestate: &mut GameState, params: Self::Params) -> Entity {
         let entity = gamestate.get_entity();
-        gamestate.decks.register(entity, deck);
-        gamestate.positions.register(entity, position);
+        gamestate.decks.register(entity, params.0);
+        gamestate.positions.register(entity, params.1);
         entity
+    }
+    fn remove(gamestate: &mut GameState, entity: Entity) {
+        gamestate.decks.unregister(entity);
+        gamestate.positions.unregister(entity);
     }
 }
 

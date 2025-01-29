@@ -2,9 +2,10 @@ use std::{collections::HashMap, fmt::Debug};
 
 use serde::Serialize;
 
-use crate::entity::Entity;
+use crate::{entity::Entity, gamestate::GameState};
 
 #[derive(Serialize, Debug)]
+#[serde(transparent)]
 pub struct ComponentStorage<T> {
     components: HashMap<Entity, T>,
 }
@@ -12,6 +13,12 @@ pub struct ComponentStorage<T> {
 pub trait Anonymize {
     type Anon;
     fn anonymize(&self, as_entity: Entity, perspective: Entity) -> Self::Anon;
+}
+
+pub trait GroupedComponent {
+    type Params;
+    fn add(gamestate: &mut GameState, params: Self::Params) -> Entity;
+    fn remove(gamestate: &mut GameState, entity: Entity);
 }
 
 impl<T: Clone + Debug + Serialize + Anonymize> ComponentStorage<T> {
@@ -23,6 +30,10 @@ impl<T: Clone + Debug + Serialize + Anonymize> ComponentStorage<T> {
 
     pub fn register(&mut self, entity: Entity, component: T) {
         self.components.insert(entity, component);
+    }
+
+    pub fn unregister(&mut self, entity: Entity) {
+        self.components.remove(&entity);
     }
 
     pub fn get(&self, entity: Entity) -> Option<&T> {
@@ -52,10 +63,13 @@ impl<T: Clone + Debug + Serialize + Anonymize> ComponentStorage<T> {
         }
     }
 
-    pub fn anonymize(&self, perspective: Entity) -> Vec<T::Anon> {
-        self.components
-            .iter()
-            .map(|(entity, component)| component.anonymize(*entity, perspective))
-            .collect()
+    pub fn anonymize(&self, perspective: Entity) -> ComponentStorage<T::Anon> {
+        ComponentStorage {
+            components: self
+                .components
+                .iter()
+                .map(|(&entity, component)| (entity, component.anonymize(entity, perspective)))
+                .collect(),
+        }
     }
 }

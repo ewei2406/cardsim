@@ -1,6 +1,10 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{component::component::Anonymize, entity::Entity, gamestate::GameState};
+use crate::{
+    component::component::{Anonymize, GroupedComponent},
+    entity::Entity,
+    gamestate::GameState,
+};
 
 use super::{deck::DeckId, Position};
 
@@ -21,12 +25,17 @@ pub struct Card {
     pub deck_id: DeckId,
 }
 
-impl Card {
-    pub fn add_card(gamestate: &mut GameState, card: Card, position: Position) -> Entity {
+impl GroupedComponent for Card {
+    type Params = (Card, Position);
+    fn add(gamestate: &mut GameState, params: Self::Params) -> Entity {
         let entity = gamestate.get_entity();
-        gamestate.cards.register(entity, card);
-        gamestate.positions.register(entity, position);
+        gamestate.cards.register(entity, params.0);
+        gamestate.positions.register(entity, params.1);
         entity
+    }
+    fn remove(gamestate: &mut GameState, entity: Entity) {
+        gamestate.cards.unregister(entity);
+        gamestate.positions.unregister(entity);
     }
 }
 
