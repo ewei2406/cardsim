@@ -2,8 +2,9 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     component::{CardInit, DeckId, HandCardId},
+    connection_manager::ConnectionId,
     entity::Entity,
-    gamestate::GameState,
+    gamestate::{AnonGameState, GameState},
 };
 
 use super::{deck::*, entity::*, hand::*};
@@ -65,6 +66,7 @@ pub enum Action {
         entity: Entity,
     },
     AddHand {
+        client_id: ConnectionId,
         nickname: String,
     },
     PlayHandCards {
@@ -85,7 +87,7 @@ pub enum Action {
         shown: bool,
     },
     RemoveHand {
-        hand: Entity,
+        client_id: ConnectionId,
     },
 }
 
@@ -122,7 +124,10 @@ impl Actionable for GameState {
             CollectDeck { deck_id, x1, y1 } => collect_deck(self, deck_id, x1, y1),
             DrawCardFromTable { hand, card } => draw_card_from_table(self, hand, card),
             DrawCardFromDeck { hand, deck } => draw_card_from_deck(self, hand, deck),
-            AddHand { nickname } => add_hand(self, nickname),
+            AddHand {
+                nickname,
+                client_id,
+            } => add_hand(self, nickname, client_id),
             PlayHandCards {
                 hand,
                 cards,
@@ -130,7 +135,7 @@ impl Actionable for GameState {
                 y,
                 faceup,
             } => play_hand_cards(self, hand, cards, x, y, faceup),
-            RemoveHand { hand } => remove_hand(self, hand),
+            RemoveHand { client_id } => remove_hand(self, client_id),
             DrawCardsFromLocation { hand, x, y } => draw_cards_from_location(self, hand, x, y),
             ShowHandCards { hand, cards, shown } => show_hand_cards(self, hand, cards, shown),
             PlayHandCardsToDeck { hand, cards, deck } => {

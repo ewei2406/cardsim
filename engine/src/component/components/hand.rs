@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     component::{component::Anonymize, GroupedComponent},
+    connection_manager::ConnectionId,
     entity::Entity,
 };
 
@@ -21,17 +22,19 @@ pub struct HandCard {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Hand {
     pub nickname: String,
+    pub client_id: ConnectionId,
     pub cards: Vec<HandCard>,
 }
 
 impl GroupedComponent for Hand {
-    type Params = String;
+    type Params = (String, ConnectionId);
     fn add(gamestate: &mut crate::gamestate::GameState, params: Self::Params) -> Entity {
         let entity = gamestate.get_entity();
         gamestate.hands.register(
             entity,
             Hand {
-                nickname: params,
+                nickname: params.0,
+                client_id: params.1,
                 cards: Vec::new(),
             },
         );
@@ -58,6 +61,7 @@ pub enum AnonHandCard {
 #[derive(Serialize)]
 pub struct AnonHand {
     nickname: String,
+    client_id: ConnectionId,
     cards: Vec<AnonHandCard>,
 }
 
@@ -66,6 +70,7 @@ impl Anonymize for Hand {
     fn anonymize(&self, as_entity: Entity, perspective: Entity) -> Self::Anon {
         if as_entity == perspective {
             return AnonHand {
+                client_id: self.client_id,
                 nickname: self.nickname.clone(),
                 cards: self
                     .cards
@@ -93,6 +98,7 @@ impl Anonymize for Hand {
             })
             .collect();
         AnonHand {
+            client_id: self.client_id,
             nickname: self.nickname.clone(),
             cards: cards,
         }

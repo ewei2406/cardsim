@@ -4,7 +4,7 @@ use serde::Serialize;
 
 use crate::{entity::Entity, gamestate::GameState};
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, Clone)]
 #[serde(transparent)]
 pub struct ComponentStorage<T> {
     components: HashMap<Entity, T>,
@@ -28,6 +28,10 @@ impl<T: Clone + Debug + Serialize + Anonymize> ComponentStorage<T> {
         }
     }
 
+    pub fn is_empty(&self) -> bool {
+        self.components.is_empty()
+    }
+
     pub fn register(&mut self, entity: Entity, component: T) {
         self.components.insert(entity, component);
     }
@@ -42,6 +46,16 @@ impl<T: Clone + Debug + Serialize + Anonymize> ComponentStorage<T> {
 
     pub fn get_mut(&mut self, entity: Entity) -> Option<&mut T> {
         self.components.get_mut(&entity)
+    }
+
+    pub fn get_entity_match(&self, filter: impl Fn(&T) -> bool) -> Option<Entity> {
+        self.components.iter().find_map(|(entity, component)| {
+            if filter(component) {
+                Some(*entity)
+            } else {
+                None
+            }
+        })
     }
 
     pub fn clone_component_from(&mut self, other: &mut ComponentStorage<T>, entity: Entity) {

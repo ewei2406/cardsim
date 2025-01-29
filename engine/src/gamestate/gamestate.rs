@@ -1,9 +1,9 @@
 use std::collections::HashSet;
 
-use crate::{component::*, entity::Entity, util::get_id};
+use crate::{action::Actionable, component::*, entity::Entity, util::get_id};
 use serde::Serialize;
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 pub struct GameState {
     pub entities: HashSet<Entity>,
     pub positions: ComponentStorage<Position>,
@@ -30,6 +30,10 @@ impl GameState {
             decks: ComponentStorage::new(),
             hands: ComponentStorage::new(),
         }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.hands.is_empty()
     }
 
     pub fn remove_entity(&mut self, entity: Entity) {

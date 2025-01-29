@@ -1,68 +1,52 @@
-use action::{Action, Actionable, Outcome};
-use serde_json;
+use action::Action;
+use connection_manager::ConnectionManager;
+use futures_util::StreamExt;
+use game_controller::GameController;
+use tokio::net::TcpListener;
 mod action;
 mod component;
+mod connection_manager;
+mod constants;
 mod entity;
+mod game_controller;
 mod gamestate;
 mod util;
 
-fn main() {
-    let mut gamestate = gamestate::GameState::new();
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let connection_manager = std::sync::Arc::new(ConnectionManager::new());
+    let game_controller = std::sync::Arc::new(GameController::new(&connection_manager));
+    let listener = TcpListener::bind("127.0.0.1:8080").await?;
+    println!("Listening on ws://127.0.0.1:8080");
 
-    let create_deck_action = Action::CreateStandardDecks {
-        x: 0,
-        y: 0,
-        n: 1,
-        jokers: false,
-    };
-    gamestate.apply(create_deck_action.clone());
+    while let Ok((stream, _)) = listener.accept().await {
+        // Spawn a new thread to handle the connection
+        let connection_manager = connection_manager.clone();
+        tokio::spawn(async move {
+            match connection_manager.handle_connection(stream).await {
+                Ok((client_id, rx)) => {
+                    println!("Client {} connected", client_id);
 
-    let serialized_action = serde_json::to_string(&create_deck_action).unwrap();
-    println!("{}", serialized_action);
-
-    loop {
-        let serialized_gamestate = serde_json::to_string(&gamestate).unwrap();
-        println!("\nGAMESTATE: \n{}", serialized_gamestate);
-
-        let anon_gamestate = gamestate.anonymize(0);
-        let serialized_anon_gamestate = serde_json::to_string(&anon_gamestate).unwrap();
-        println!("\nANON GAMESTATE: \n{}\n", serialized_anon_gamestate);
-
-        println!("Input action:");
-        let mut input = String::new();
-        std::io::stdin().read_line(&mut input).unwrap();
-        if input.eq("show\n") {
-            continue;
-        }
-
-        let action: Action = serde_json::from_str(&input).unwrap();
-
-        let outcome = gamestate.apply(action);
-        let serialized_outcome = serde_json::to_string(&outcome).unwrap();
-        println!("\nOUTCOME: \n{}", serialized_outcome);
-
-        match outcome {
-            Outcome::Delta { changed, deleted } => {
-                match changed {
-                    Some(changes) => println!(
-                        "\nChanges: \n{}",
-                        serde_json::to_string(&changes.anonymize(0)).unwrap()
-                    ),
-                    None => {}
-                }
-                match deleted {
-                    Some(deleted) => {
-                        println!("\nDeleted: \n{}", serde_json::to_string(&deleted).unwrap())
+                    // Handle messages from the client
+                    while let Some(message) = rx.next().await {
+                        match message {
+                            Ok(message) => {
+                                let action: Action = serde_json::from_str(&message).unwrap();
+                                println!("Received action: {:?}", action);
+                            }
+                            Err(e) => {
+                                eprintln!("Error receiving message: {:?}", e);
+                                break;
+                            }
+                        }
                     }
-                    None => {}
+
+                    println!("Client {} disconnected", client_id);
                 }
+                Err(e) => eprintln!("Error handling connection: {:?}", e),
             }
-            Outcome::None => {
-                println!("Outcome: None");
-            }
-            Outcome::Invalid(error) => {
-                println!("Outcome: {:?}", error);
-            }
-        }
+        });
     }
+
+    Ok(())
 }

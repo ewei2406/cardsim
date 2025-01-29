@@ -201,6 +201,7 @@ pub fn collect_deck(gamestate: &mut GameState, deck_id: DeckId, x1: i64, y1: i64
                 entity,
                 Hand {
                     cards: hand_cards,
+                    client_id: hand.client_id,
                     nickname: hand.nickname.clone(),
                 },
             );

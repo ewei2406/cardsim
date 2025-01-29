@@ -1,11 +1,14 @@
 use std::vec;
 
-use crate::{component::*, entity::Entity, gamestate::GameState, util::get_id};
+use crate::{
+    component::*, connection_manager::ConnectionId, entity::Entity, gamestate::GameState,
+    util::get_id,
+};
 
 use super::{action::InvalidOutcomeError, Outcome};
 
-pub fn add_hand(gamestate: &mut GameState, nickname: String) -> Outcome {
-    let hand = Hand::add(gamestate, nickname);
+pub fn add_hand(gamestate: &mut GameState, nickname: String, client_id: ConnectionId) -> Outcome {
+    let hand = Hand::add(gamestate, (nickname, client_id));
     let mut dstate = GameState::new();
     dstate.clone_entity_from(gamestate, hand);
     Outcome::Delta {
@@ -135,15 +138,23 @@ pub fn show_hand_cards(
     }
 }
 
-pub fn remove_hand(gamestate: &mut GameState, hand: Entity) -> Outcome {
-    let hand_component = match gamestate.hands.get(hand) {
+pub fn remove_hand(gamestate: &mut GameState, client_id: ConnectionId) -> Outcome {
+    let hand_entity = match gamestate
+        .hands
+        .get_entity_match(|hand| hand.client_id == client_id)
+    {
+        Some(hand) => hand,
+        None => return Outcome::Invalid(InvalidOutcomeError::EntityNotFound),
+    };
+
+    let hand_component = match gamestate.hands.get(hand_entity) {
         Some(hand) => hand,
         None => return Outcome::Invalid(InvalidOutcomeError::EntityNotFound),
     };
 
     let play_outcome = play_hand_cards(
         gamestate,
-        hand,
+        hand_entity,
         hand_component.cards.iter().map(|hc| hc.id).collect(),
         0,
         0,
@@ -154,10 +165,10 @@ pub fn remove_hand(gamestate: &mut GameState, hand: Entity) -> Outcome {
         _ => return play_outcome,
     };
 
-    Hand::remove(gamestate, hand);
+    Hand::remove(gamestate, hand_entity);
     Outcome::Delta {
         changed: play_delta,
-        deleted: Some(vec![hand]),
+        deleted: Some(vec![hand_entity]),
     }
 }
 
