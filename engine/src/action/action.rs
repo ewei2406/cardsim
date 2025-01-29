@@ -74,6 +74,11 @@ pub enum Action {
         y: i64,
         faceup: bool,
     },
+    PlayHandCardsToDeck {
+        hand: Entity,
+        cards: Vec<HandCardId>,
+        deck: Entity,
+    },
     ShowHandCards {
         hand: Entity,
         cards: Vec<HandCardId>,
@@ -128,6 +133,9 @@ impl Actionable for GameState {
             RemoveHand { hand } => remove_hand(self, hand),
             DrawCardsFromLocation { hand, x, y } => draw_cards_from_location(self, hand, x, y),
             ShowHandCards { hand, cards, shown } => show_hand_cards(self, hand, cards, shown),
+            PlayHandCardsToDeck { hand, cards, deck } => {
+                play_hand_cards_to_deck(self, hand, cards, deck)
+            }
         }
     }
 }

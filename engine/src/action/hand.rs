@@ -2,7 +2,7 @@ use std::vec;
 
 use crate::{component::*, entity::Entity, gamestate::GameState, util::get_id};
 
-use super::{action::InvalidOutcomeError, entity, Outcome};
+use super::{action::InvalidOutcomeError, Outcome};
 
 pub fn add_hand(gamestate: &mut GameState, nickname: String) -> Outcome {
     let hand = Hand::add(gamestate, nickname);
@@ -63,6 +63,46 @@ pub fn play_hand_cards(
     for entity in new_cards {
         dstate.clone_entity_from(gamestate, entity);
     }
+    Outcome::Delta {
+        changed: Some(dstate),
+        deleted: None,
+    }
+}
+
+pub fn play_hand_cards_to_deck(
+    gamestate: &mut GameState,
+    hand: Entity,
+    cards: Vec<HandCardId>,
+    deck: Entity,
+) -> Outcome {
+    let hand_component = match gamestate.hands.get_mut(hand) {
+        Some(hand) => hand,
+        None => return Outcome::Invalid(InvalidOutcomeError::EntityNotFound),
+    };
+    let deck_component = match gamestate.decks.get_mut(deck) {
+        Some(deck) => deck,
+        None => return Outcome::Invalid(InvalidOutcomeError::EntityNotFound),
+    };
+    let cards_set: std::collections::HashSet<HandCardId> = cards.iter().cloned().collect();
+
+    let mut remaining = Vec::new();
+    let mut played = Vec::new();
+    hand_component
+        .cards
+        .iter()
+        .for_each(|hand_card| match cards_set.contains(&hand_card.id) {
+            true => played.push(hand_card.clone()),
+            false => remaining.push(hand_card.clone()),
+        });
+
+    hand_component.cards = remaining;
+    for played_card in played {
+        deck_component.return_card(CardInit(played_card.suit, played_card.rank));
+    }
+
+    let mut dstate = GameState::new();
+    dstate.clone_entity_from(gamestate, hand);
+    dstate.clone_entity_from(gamestate, deck);
     Outcome::Delta {
         changed: Some(dstate),
         deleted: None,

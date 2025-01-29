@@ -1,9 +1,8 @@
 mod action;
 
-mod hand;
 mod deck;
 mod entity;
-mod util;
+mod hand;
 
 pub use action::Action;
 pub use action::Actionable;

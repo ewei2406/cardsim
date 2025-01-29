@@ -40,19 +40,6 @@ impl<T: Clone + Debug + Serialize + Anonymize> ComponentStorage<T> {
         self.components.get(&entity)
     }
 
-    pub fn get_filter(&self, filter: impl Fn(&T) -> bool) -> Vec<&T> {
-        self.components
-            .values()
-            .filter(|component| filter(component))
-            .collect()
-    }
-
-    pub fn has(&self, filter: impl Fn(Entity, &T) -> bool) -> bool {
-        self.components
-            .iter()
-            .any(|(entity, component)| filter(*entity, component))
-    }
-
     pub fn get_mut(&mut self, entity: Entity) -> Option<&mut T> {
         self.components.get_mut(&entity)
     }

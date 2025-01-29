@@ -7,10 +7,7 @@ use crate::{
     gamestate::GameState,
 };
 
-use super::{
-    card::Suit::{self, *},
-    Position,
-};
+use super::{card::Suit, Position};
 
 pub type DeckId = usize;
 
