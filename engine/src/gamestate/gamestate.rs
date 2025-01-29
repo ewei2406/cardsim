@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use crate::{action::Actionable, component::*, entity::Entity, util::get_id};
+use crate::{component::*, entity::Entity, util::get_id};
 use serde::Serialize;
 
 #[derive(Serialize, Clone)]
@@ -30,10 +30,6 @@ impl GameState {
             decks: ComponentStorage::new(),
             hands: ComponentStorage::new(),
         }
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.hands.is_empty()
     }
 
     pub fn remove_entity(&mut self, entity: Entity) {

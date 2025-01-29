@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use action::Action;
 use connection_manager::ConnectionManager;
 use futures_util::StreamExt;
@@ -15,24 +17,34 @@ mod util;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let connection_manager = std::sync::Arc::new(ConnectionManager::new());
-    let game_controller = std::sync::Arc::new(GameController::new(&connection_manager));
+    let game_controller = std::sync::Arc::new(GameController::new(Arc::clone(&connection_manager)));
     let listener = TcpListener::bind("127.0.0.1:8080").await?;
     println!("Listening on ws://127.0.0.1:8080");
 
+    let gc = Arc::clone(&game_controller);
+    tokio::spawn(async move {
+        let mut interval = tokio::time::interval(tokio::time::Duration::from_secs(30));
+        loop {
+            interval.tick().await;
+            gc.cleanup_stale_games().await;
+        }
+    });
+
     while let Ok((stream, _)) = listener.accept().await {
         // Spawn a new thread to handle the connection
-        let connection_manager = connection_manager.clone();
+        let cm = Arc::clone(&connection_manager);
+        let gc = Arc::clone(&game_controller);
         tokio::spawn(async move {
-            match connection_manager.handle_connection(stream).await {
-                Ok((client_id, rx)) => {
+            match cm.handle_connection(stream).await {
+                Ok((client_id, mut rx)) => {
                     println!("Client {} connected", client_id);
 
                     // Handle messages from the client
                     while let Some(message) = rx.next().await {
                         match message {
                             Ok(message) => {
-                                let action: Action = serde_json::from_str(&message).unwrap();
-                                println!("Received action: {:?}", action);
+                                println!("Received message: {:?}", message);
+                                gc.handle_message(client_id, message).await;
                             }
                             Err(e) => {
                                 eprintln!("Error receiving message: {:?}", e);
@@ -47,6 +59,5 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         });
     }
-
     Ok(())
 }

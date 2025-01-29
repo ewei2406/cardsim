@@ -28,10 +28,6 @@ impl<T: Clone + Debug + Serialize + Anonymize> ComponentStorage<T> {
         }
     }
 
-    pub fn is_empty(&self) -> bool {
-        self.components.is_empty()
-    }
-
     pub fn register(&mut self, entity: Entity, component: T) {
         self.components.insert(entity, component);
     }

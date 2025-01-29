@@ -4,7 +4,7 @@ use crate::{
     component::{CardInit, DeckId, HandCardId},
     connection_manager::ConnectionId,
     entity::Entity,
-    gamestate::{AnonGameState, GameState},
+    gamestate::GameState,
 };
 
 use super::{deck::*, entity::*, hand::*};
