@@ -4,11 +4,14 @@ use crate::{
     action::Outcome, connection_manager::ConnectionId, entity::Entity, gamestate::AnonGameState,
 };
 
-use super::GameId;
+use super::{GameDesc, GameId};
 
 #[derive(Serialize, Debug)]
 #[serde(tag = "type")]
 pub enum ServerResponse {
+    AvailableGames {
+        games: Vec<GameDesc>,
+    },
     GameCreated {
         game_id: GameId,
     },

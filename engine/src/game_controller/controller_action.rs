@@ -27,13 +27,32 @@ impl GameController {
             }
             Command::LeaveGame => self.leave_game(client_id).await,
             Command::ChatMessage { message } => self.chat_message(client_id, message).await,
+            Command::ListGames => self.send_available_games(client_id).await,
         }
+    }
+
+    async fn send_available_games(&self, client_id: ConnectionId) {
+        let games = self.list_games().await;
+        let message = ServerResponse::AvailableGames { games };
+        self.send_to_client(client_id, &message).await;
     }
 
     pub async fn handle_message(&self, client_id: ConnectionId, message: Message) {
         if let Ok(request) = serde_json::from_str::<ClientRequest>(&message.to_string()) {
             match request {
                 ClientRequest::Action(action) => {
+                    // Restrict specific actions
+                    match action {
+                        Action::AddHand { .. } => {
+                            self.error(client_id, "Invalid action.".to_string()).await;
+                            return;
+                        }
+                        Action::RemoveHand => {
+                            self.error(client_id, "Invalid action.".to_string()).await;
+                        }
+                        _ => {}
+                    }
+
                     if let Some(game_id) = self.get_client_game_id(client_id).await {
                         log::info!(
                             "Client {} sent (to game {}) the game action: {:?}",

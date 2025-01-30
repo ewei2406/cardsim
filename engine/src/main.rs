@@ -93,8 +93,8 @@ fn use_cli(gc: Arc<GameController>) {
                 "list" => {
                     let games = gc.list_games().await;
                     println!("Found {} games: ", games.len());
-                    for game_id in games {
-                        println!("- {}", game_id);
+                    for game_desc in games {
+                        println!("- {:?}", game_desc);
                     }
                 }
                 "message" => {

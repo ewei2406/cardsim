@@ -62,9 +62,6 @@ pub enum Action {
     RemoveEntity {
         entity: Entity,
     },
-    AddHand {
-        nickname: String,
-    },
     PlayHandCards {
         cards: Vec<HandCardId>,
         x: i64,
@@ -78,6 +75,9 @@ pub enum Action {
     ShowHandCards {
         cards: Vec<HandCardId>,
         shown: bool,
+    },
+    AddHand {
+        nickname: String,
     },
     RemoveHand,
 }

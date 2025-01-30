@@ -7,6 +7,7 @@ use super::GameId;
 #[derive(Deserialize, Debug)]
 #[serde(tag = "command")]
 pub enum Command {
+    ListGames,
     CreateGame { nickname: String },
     JoinGame { game_id: GameId, nickname: String },
     ChatMessage { message: String },

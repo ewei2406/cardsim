@@ -1,3 +1,4 @@
+use serde::Serialize;
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 use tokio::sync::{Mutex, RwLock};
@@ -20,6 +21,12 @@ pub struct GameController {
     pub games: RwLock<HashMap<GameId, Arc<Mutex<Game>>>>,
     pub client_map: RwLock<HashMap<usize, GameId>>,
     pub connection_manager: Arc<ConnectionManager>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct GameDesc {
+    pub game_id: GameId,
+    pub player_count: usize,
 }
 
 impl GameController {
@@ -90,9 +97,17 @@ impl GameController {
         }
     }
 
-    pub async fn list_games(&self) -> Vec<GameId> {
+    pub async fn list_games(&self) -> Vec<GameDesc> {
         let games = self.games.read().await;
-        games.keys().cloned().collect()
+        let mut game_descs = Vec::new();
+        for (game_id, game) in games.iter() {
+            let player_count = game.lock().await.player_ids.len();
+            game_descs.push(GameDesc {
+                game_id: *game_id,
+                player_count,
+            });
+        }
+        game_descs
     }
 
     pub async fn delete_game(&self, game_id: GameId) {
