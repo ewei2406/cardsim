@@ -1,98 +1,60 @@
 use std::{collections::HashSet, sync::Arc};
 
-use serde::{Deserialize, Serialize};
 use tokio::sync::Mutex;
 use tokio_tungstenite::tungstenite::Message;
 
 use crate::{
-    action::*, connection_manager::ConnectionId, entity::Entity, game_controller::Game,
-    gamestate::*, util,
+    action::*,
+    connection_manager::ConnectionId,
+    game_controller::{responses::ServerResponse, Game},
+    gamestate::*,
+    util,
 };
 
-use super::{GameController, GameId};
-
-#[derive(Deserialize, Debug)]
-#[serde(tag = "command")]
-pub enum ControllerAction {
-    CreateGame { nickname: String },
-    JoinGame { game_id: GameId, nickname: String },
-    ChatMessage { message: String },
-    LeaveGame,
-}
-
-#[derive(Serialize, Debug)]
-#[serde(tag = "type")]
-pub enum ControllerResponse {
-    GameCreated {
-        game_id: GameId,
-    },
-    Ok,
-    Error {
-        message: String,
-    },
-    Delta {
-        changed: Option<AnonGameState>,
-        deleted: Option<Vec<Entity>>,
-    },
-    ChatMessage {
-        client_id: ConnectionId,
-        message: String,
-    },
-}
-
-impl ControllerResponse {
-    pub fn from_outcome(outcome: &Outcome, perspective: ConnectionId) -> Self {
-        match outcome {
-            Outcome::Delta { changed, deleted } => ControllerResponse::Delta {
-                changed: changed.as_ref().map(|gs| gs.anonymize(perspective)),
-                deleted: deleted.clone(),
-            },
-            Outcome::Invalid(err) => ControllerResponse::Error {
-                message: format!("{:?}", err),
-            },
-            Outcome::None => ControllerResponse::Ok,
-        }
-    }
-}
+use super::{
+    requests::{ClientRequest, Command},
+    GameController, GameId,
+};
 
 impl GameController {
-    async fn apply_action(&self, client_id: ConnectionId, action: ControllerAction) {
-        match action {
-            ControllerAction::CreateGame { nickname } => {
+    async fn apply_action(&self, client_id: ConnectionId, command: Command) {
+        match command {
+            Command::CreateGame { nickname } => {
                 let _ = self.create_game(client_id, nickname).await;
             }
-            ControllerAction::JoinGame { game_id, nickname } => {
+            Command::JoinGame { game_id, nickname } => {
                 self.join_game(game_id, client_id, nickname).await
             }
-            ControllerAction::LeaveGame => self.leave_game(client_id).await,
-            ControllerAction::ChatMessage { message } => {
-                self.chat_message(client_id, message).await
-            }
+            Command::LeaveGame => self.leave_game(client_id).await,
+            Command::ChatMessage { message } => self.chat_message(client_id, message).await,
         }
     }
 
     pub async fn handle_message(&self, client_id: ConnectionId, message: Message) {
-        // A controller action
-        if let Ok(action) = serde_json::from_str::<ControllerAction>(&message.to_string()) {
-            log::info!("Client {} sent controller action: {:?}", client_id, action);
-            self.apply_action(client_id, action).await;
-        // A game action
-        } else if let Ok(action) = serde_json::from_str::<Action>(&message.to_string()) {
-            if let Some(game_id) = self.get_client_game_id(client_id).await {
-                log::info!(
-                    "Client {} sent (to game {}) the game action: {:?}",
-                    client_id,
-                    game_id,
-                    action
-                );
-                let _ = self.update_game_and_sync(game_id, action, client_id).await;
-            } else {
-                log::warn!(
-                    "Client {} tried to send a game action but is not in a game.",
-                    client_id
-                );
-                self.error(client_id, "Client not in a game.".to_string())
-                    .await;
+        if let Ok(request) = serde_json::from_str::<ClientRequest>(&message.to_string()) {
+            match request {
+                ClientRequest::Action(action) => {
+                    if let Some(game_id) = self.get_client_game_id(client_id).await {
+                        log::info!(
+                            "Client {} sent (to game {}) the game action: {:?}",
+                            client_id,
+                            game_id,
+                            action
+                        );
+                        let _ = self.update_game_and_sync(game_id, action, client_id).await;
+                    } else {
+                        log::warn!(
+                            "Client {} tried to send a game action but is not in a game.",
+                            client_id
+                        );
+                        self.error(client_id, "Client not in a game.".to_string())
+                            .await;
+                    }
+                }
+                ClientRequest::Command(action) => {
+                    log::info!("Client {} sent command: {:?}", client_id, action);
+                    self.apply_action(client_id, action).await;
+                }
             }
         } else {
             log::warn!("Client {} sent invalid message: {:?}", client_id, message);
@@ -123,10 +85,9 @@ impl GameController {
 
         match outcome {
             Outcome::Delta { .. } => {
-                for game_client in game.player_ids.iter() {
-                    let anonymized = ControllerResponse::from_outcome(&outcome, *game_client);
-                    let message = serde_json::to_string(&anonymized).unwrap().into();
-                    let _ = self.send_to_client(*game_client, message).await;
+                for &game_client in game.player_ids.iter() {
+                    let anonymized = ServerResponse::from_outcome(&outcome, game_client);
+                    let _ = self.send_to_client(game_client, &anonymized).await;
                 }
             }
             Outcome::Invalid(err) => {
@@ -157,9 +118,8 @@ impl GameController {
             player_ids: HashSet::new(),
             game_state: GameState::new(),
         };
-        let msg = ControllerResponse::GameCreated { game_id };
-        self.send_to_client(client_id, serde_json::to_string(&msg).unwrap().into())
-            .await;
+        let message = ServerResponse::GameCreated { game_id };
+        self.send_to_client(client_id, &message).await;
 
         // Update game records
         self.games
@@ -219,12 +179,11 @@ impl GameController {
         }
 
         // Send the entire game state to catch them up
-        let message = ControllerResponse::Delta {
+        let message = ServerResponse::Delta {
             changed: Some(game.lock().await.game_state.anonymize(client_id)),
             deleted: None,
         };
-        self.send_to_client(client_id, serde_json::to_string(&message).unwrap().into())
-            .await;
+        self.send_to_client(client_id, &message).await;
 
         // Update game record
         self.client_map.write().await.insert(client_id, game_id);
@@ -291,13 +250,8 @@ impl GameController {
                     .await;
             }
         };
-        self.send_to_game_clients(
-            game_id,
-            serde_json::to_string(&ControllerResponse::ChatMessage { client_id, message })
-                .unwrap()
-                .into(),
-        )
-        .await;
+        self.send_to_game_clients(game_id, &ServerResponse::ChatMessage { client_id, message })
+            .await;
         log::info!(
             "Client {} sent a chat message to game {}.",
             client_id,

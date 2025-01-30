@@ -1,10 +1,11 @@
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 use tokio::sync::{Mutex, RwLock};
-use tokio_tungstenite::tungstenite::Message;
 
 use crate::connection_manager::*;
 use crate::gamestate::GameState;
+
+use super::ServerResponse;
 
 pub type GameId = usize;
 
@@ -31,11 +32,8 @@ impl GameController {
     }
 
     pub async fn error(&self, client_id: ConnectionId, err: String) {
-        self.send_to_client(
-            client_id,
-            format!("{{\"type\":\"error\",\"error\":\"{}\"}}", err).into(),
-        )
-        .await;
+        self.send_to_client(client_id, &ServerResponse::Error { message: err })
+            .await;
     }
 
     pub async fn get_client_game_id(&self, client_id: ConnectionId) -> Option<GameId> {
@@ -59,20 +57,20 @@ impl GameController {
         }
     }
 
-    pub async fn send_to_game_clients(&self, game_id: GameId, message: Message) {
+    pub async fn send_to_game_clients(&self, game_id: GameId, message: &ServerResponse) {
         let games = self.games.read().await;
         if let Some(game) = games.get(&game_id) {
             let game = game.lock().await;
             for client_id in &game.player_ids {
                 let _ = self
                     .connection_manager
-                    .send_message(*client_id, message.clone())
+                    .send_message(*client_id, message)
                     .await;
             }
         }
     }
 
-    pub async fn send_to_client(&self, client_id: ConnectionId, message: Message) {
+    pub async fn send_to_client(&self, client_id: ConnectionId, message: &ServerResponse) {
         let _ = self
             .connection_manager
             .send_message(client_id, message)
@@ -118,7 +116,7 @@ impl GameController {
         }
 
         // Send a message to all clients in the game
-        self.send_to_game_clients(game_id, "{\"type\":\"game_closed\"}".into())
+        self.send_to_game_clients(game_id, &ServerResponse::GameClosed)
             .await;
     }
 }

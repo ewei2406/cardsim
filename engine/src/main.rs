@@ -5,8 +5,7 @@ use action::Action;
 use connection_manager::ConnectionManager;
 use constants::CLEANUP_STALE_INTERVAL_SECONDS;
 use futures_util::StreamExt;
-use game_controller::{ControllerResponse, GameController};
-use log::info;
+use game_controller::{GameController, ServerResponse};
 use tokio::io::{self, AsyncBufReadExt};
 use tokio::net::TcpListener;
 use util::get_id;
@@ -73,9 +72,8 @@ fn handle_stream(
                         }
                     }
                 }
-                log::info!("Client {} disconnected.", client_id);
                 gc.leave_game(client_id).await;
-                info!("1");
+                log::info!("Client {} disconnected.", client_id);
             }
             Err(_) => {
                 log::info!("Client ID setup failed.");
@@ -110,12 +108,10 @@ fn use_cli(gc: Arc<GameController>) {
                                 if let Some(message) = reader.next_line().await.unwrap_or(None) {
                                     gc.send_to_game_clients(
                                         game_id,
-                                        serde_json::to_string(&ControllerResponse::ChatMessage {
+                                        &ServerResponse::ChatMessage {
                                             client_id: 0,
                                             message,
-                                        })
-                                        .unwrap()
-                                        .into(),
+                                        },
                                     )
                                     .await;
                                     println!("Message sent to game {}.", game_id);

@@ -5,11 +5,11 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::net::TcpStream;
 use tokio::sync::{Mutex, RwLock};
-use tokio::time::{timeout, Duration};
 use tokio_tungstenite::tungstenite::protocol::Message;
 use tokio_tungstenite::WebSocketStream;
 
-use crate::constants::ID_REQUEST_TIMEOUT_SECONDS;
+use crate::game_controller::ServerResponse;
+use crate::util;
 
 pub type ConnectionId = usize;
 
@@ -29,13 +29,20 @@ impl ConnectionManager {
     pub async fn send_message(
         &self,
         client_id: ConnectionId,
-        message: Message,
+        message: &ServerResponse,
     ) -> Result<(), String> {
         let connections = self.connections.read().await;
         match connections.get(&client_id) {
             Some(tx) => {
                 let mut tx = tx.lock().await;
-                match tx.send(message).await {
+                match tx
+                    .send(
+                        serde_json::to_string(message)
+                            .map_err(|e| format!("Error serializing message: {:?}", e))?
+                            .into(),
+                    )
+                    .await
+                {
                     Ok(_) => Ok(()),
                     Err(e) => Err(format!("Error sending message: {:?}", e)),
                 }
@@ -50,94 +57,26 @@ impl ConnectionManager {
     ) -> Result<(ConnectionId, SplitStream<WebSocketStream<TcpStream>>), String> {
         let client_addr = stream.get_ref().peer_addr().map_err(|e| e.to_string())?;
         let client_addr = client_addr.ip().to_string();
-        let (mut tx, mut rx) = stream.split();
+        let (mut tx, rx) = stream.split();
 
-        log::info!("Beginning ID setup for {}.", client_addr);
-        let client_id_request =
-            match timeout(Duration::from_secs(ID_REQUEST_TIMEOUT_SECONDS), rx.next()).await {
-                Ok(Some(Ok(msg))) => {
-                    log::info!("{} sent message: {:?}.", client_addr, msg);
-                    match msg.to_text() {
-                        Ok(text) => {
-                            if text.len() == 0 {
-                                log::warn!("{} sent an empty message in ID request.", client_addr);
-                                return Err("Empty message received for ID.".to_string());
-                            }
-                            match text.parse::<ConnectionId>() {
-                                Ok(id) => id,
-                                Err(err) => {
-                                    log::warn!("{} sent malformed ID: {:?}.", client_addr, msg);
-                                    let _ = tx.send("Malformed ID.".into()).await;
-                                    return Err(format!(
-                                        "Error parsing ID from message: {:?}",
-                                        err.to_string()
-                                    ));
-                                }
-                            }
-                        }
-                        Err(_) => {
-                            log::warn!(
-                                "{} sent malformed ID: {:?}.",
-                                client_addr,
-                                msg.clone().into_data()
-                            );
-                            let _ = tx.send("Malformed ID.".into()).await;
-                            return Err(format!(
-                                "Non-text message received for ID: {:?}",
-                                msg.into_data()
-                            ));
-                        }
-                    }
-                }
-                Ok(Some(Err(e))) => {
-                    log::warn!("Error receiving message from {}: {:?}", client_addr, e);
-                    return Err("Error receiving message".to_string());
-                }
-                Ok(None) => {
-                    log::warn!("{} closed the connection before sending ID.", client_addr,);
-                    return Err("Connection closed before receiving ID.".to_string());
-                }
-                Err(_) => {
-                    log::warn!(
-                        "{} timed out in ID setup after {} seconds.",
-                        client_addr,
-                        ID_REQUEST_TIMEOUT_SECONDS
-                    );
-                    let _ = tx
-                        .send("error: Timed out waiting for ID message.".into())
-                        .await;
-                    return Err("Timed out waiting for ID message.".to_string());
-                }
-            };
-        log::info!("{} has requested ID {}.", client_addr, client_id_request);
-
-        if self
-            .connections
-            .read()
-            .await
-            .contains_key(&client_id_request)
-        {
-            log::warn!(
+        let client_id = util::get_id();
+        if self.connections.read().await.contains_key(&client_id) {
+            log::error!(
                 "ID {} requested by {} already in use.",
-                client_id_request,
+                client_id,
                 client_addr
             );
-            let _ = tx.send("ID in use already.".into()).await;
-            return Err(format!("ID {} already in use.", client_id_request));
+            return Err(format!("ID {} already in use.", client_id));
         }
 
-        let _ = tx.send("success".into()).await;
+        let _ = tx.send(client_id.to_string().into()).await;
         self.connections
             .write()
             .await
-            .insert(client_id_request, Arc::new(Mutex::new(tx)));
-        log::info!(
-            "{} has been assigned ID {}.",
-            client_addr,
-            client_id_request
-        );
+            .insert(client_id, Arc::new(Mutex::new(tx)));
+        log::info!("{} has been assigned ID {}.", client_addr, client_id);
 
-        Ok((client_id_request, rx))
+        Ok((client_id, rx))
     }
 
     pub async fn handle_connection(
