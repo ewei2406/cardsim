@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use crate::{component::*, entity::Entity, util::get_id};
 use serde::Serialize;
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Debug)]
 pub struct GameState {
     pub entities: HashSet<Entity>,
     pub positions: ComponentStorage<Position>,
@@ -12,7 +12,7 @@ pub struct GameState {
     pub hands: ComponentStorage<Hand>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct AnonGameState {
     pub entities: HashSet<Entity>,
     pub positions: ComponentStorage<Position>,

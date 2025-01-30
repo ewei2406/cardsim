@@ -1,14 +1,3 @@
-{"action":"CutDeck","entity":1,"n":10,"x1":10,"y1":10}
-
-FlipCardsFromDeck {
-        entity: Entity,
-        n: usize,
-        x1: i64,
-        y1: i64,
-    }
-{"action":"FlipCardsFromDeck","entity":2,"n":5,"x1":15,"y1":20}
-
-ShuffleDeck {
-        entity: Entity,
-    },
-{"action":"ShuffleDeck","entity":1}
+{"command": "JoinGame","game_id": 1,"nickname": "test"}
+{"action":"CreateStandardDecks","x":0,"y":0,"n":1,"jokers":false}
+{"action":"DrawCardFromDeck","deck":6}

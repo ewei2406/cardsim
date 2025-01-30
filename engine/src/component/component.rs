@@ -54,6 +54,19 @@ impl<T: Clone + Debug + Serialize + Anonymize> ComponentStorage<T> {
         })
     }
 
+    pub fn filter_entities(&self, filter: impl Fn((Entity, &T)) -> bool) -> Vec<(Entity, &T)> {
+        self.components
+            .iter()
+            .filter_map(|(entity, component)| {
+                if filter((*entity, component)) {
+                    Some((*entity, component))
+                } else {
+                    None
+                }
+            })
+            .collect()
+    }
+
     pub fn clone_component_from(&mut self, other: &mut ComponentStorage<T>, entity: Entity) {
         if let Some(component) = other.get(entity) {
             self.register(entity, component.clone());

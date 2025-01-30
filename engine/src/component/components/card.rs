@@ -39,7 +39,7 @@ impl GroupedComponent for Card {
     }
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub enum AnonCard {
     Card {
         suit: Suit,

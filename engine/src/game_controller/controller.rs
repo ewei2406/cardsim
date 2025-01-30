@@ -1,4 +1,3 @@
-use log::info;
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 use tokio::sync::{Mutex, RwLock};
@@ -9,6 +8,7 @@ use crate::gamestate::GameState;
 
 pub type GameId = usize;
 
+#[derive(Debug)]
 pub struct Game {
     pub game_id: GameId,
     pub player_ids: HashSet<usize>,
@@ -36,30 +36,26 @@ impl GameController {
             format!("{{\"type\":\"error\",\"error\":\"{}\"}}", err).into(),
         )
         .await;
-        info!("Error: {}", err);
     }
 
     pub async fn get_client_game_id(&self, client_id: ConnectionId) -> Option<GameId> {
         self.client_map.read().await.get(&client_id).copied()
     }
 
-    pub async fn get_client_game(
-        &self,
-        client_id: ConnectionId,
-    ) -> Result<Arc<Mutex<Game>>, String> {
+    pub async fn get_client_game(&self, client_id: ConnectionId) -> Option<Arc<Mutex<Game>>> {
         let game_id = self.get_client_game_id(client_id).await;
         match game_id {
             Some(game_id) => self.get_game(game_id).await,
-            None => Err("Client not in game".into()),
+            None => None,
         }
     }
 
-    pub async fn get_game(&self, game_id: GameId) -> Result<Arc<Mutex<Game>>, String> {
+    pub async fn get_game(&self, game_id: GameId) -> Option<Arc<Mutex<Game>>> {
         let games = self.games.read().await;
         if let Some(game) = games.get(&game_id) {
-            Ok(Arc::clone(game))
+            Some(Arc::clone(game))
         } else {
-            Err("Game not found".into())
+            None
         }
     }
 
@@ -94,5 +90,35 @@ impl GameController {
         for game_id in to_remove {
             games.remove(&game_id);
         }
+    }
+
+    pub async fn list_games(&self) -> Vec<GameId> {
+        let games = self.games.read().await;
+        games.keys().cloned().collect()
+    }
+
+    pub async fn delete_game(&self, game_id: GameId) {
+        {
+            // Get the game
+            let mut games = self.games.write().await;
+            let game = match games.get(&game_id) {
+                Some(game) => game,
+                None => {
+                    log::error!("Game {} not found", game_id);
+                    return;
+                }
+            };
+
+            // Remove the game from the client map
+            for client_id in &game.lock().await.player_ids {
+                let mut client_map = self.client_map.write().await;
+                client_map.remove(client_id);
+            }
+            games.remove(&game_id);
+        }
+
+        // Send a message to all clients in the game
+        self.send_to_game_clients(game_id, "{\"type\":\"game_closed\"}".into())
+            .await;
     }
 }

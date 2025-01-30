@@ -1,3 +1,4 @@
+use log::info;
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -46,7 +47,7 @@ impl GroupedComponent for Hand {
     }
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub enum AnonHandCard {
     HandCard {
         rank: u8,
@@ -58,7 +59,7 @@ pub enum AnonHandCard {
     },
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct AnonHand {
     nickname: String,
     client_id: ConnectionId,
@@ -68,7 +69,11 @@ pub struct AnonHand {
 impl Anonymize for Hand {
     type Anon = AnonHand;
     fn anonymize(&self, as_entity: Entity, perspective: Entity) -> Self::Anon {
-        if as_entity == perspective {
+        info!(
+            "Anonymizing hand: {:?} as {:?} from {:?}",
+            self, as_entity, perspective
+        );
+        if self.client_id == perspective {
             return AnonHand {
                 client_id: self.client_id,
                 nickname: self.nickname.clone(),

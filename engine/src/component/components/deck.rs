@@ -55,7 +55,7 @@ impl GroupedComponent for Deck {
     }
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct AnonDeck {
     pub deck_id: DeckId,
     pub card_count: usize,
