@@ -1,41 +1,23 @@
 import useLobby from "./hooks/useLobby";
 import DarkMode from "./components/DarkMode";
-import GameSelector from "./components/GameSelector";
-import "./App.css";
 import Logger from "./components/Logger";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import "./App.css";
+import Lobby from "./components/Lobby";
+import Game from "./components/Game";
 
 const App = () => {
-	const { availableGames, id, refreshGames } = useLobby();
+	const lobby = useLobby();
 
 	return (
 		<div>
 			<DarkMode />
 			<Logger />
-
-			<div style={{ maxWidth: 600, margin: "100px auto", padding: "5px 10px" }}>
-				<div
-					style={{
-						display: "flex",
-						justifyContent: "space-between",
-						marginBottom: 20,
-					}}
-				>
-					<div>
-						<h3>
-							Simple Card Simulator{" "}
-							<span style={{ color: "var(--light-color)" }}>v1.0.0</span>
-						</h3>
-						<p style={{ color: "var(--light-color)" }}>Client ID: {id}</p>
-					</div>
-					<div>
-						<button>Create Game</button>
-					</div>
-				</div>
-				<GameSelector
-					availableGames={availableGames}
-					refreshGames={refreshGames}
-				/>
-			</div>
+			{lobby.lobbyStatus.status === "lobby" && <Lobby lobby={lobby} />}
+			{lobby.lobbyStatus.status === "ingame" && (
+				<Game lobby={lobby} />
+			)}
 		</div>
 	);
 };

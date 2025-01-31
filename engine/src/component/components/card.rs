@@ -40,6 +40,7 @@ impl GroupedComponent for Card {
 }
 
 #[derive(Serialize, Debug)]
+#[serde(tag = "type")]
 pub enum AnonCard {
     Card {
         suit: Suit,

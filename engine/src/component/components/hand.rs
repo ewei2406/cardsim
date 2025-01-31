@@ -48,6 +48,7 @@ impl GroupedComponent for Hand {
 }
 
 #[derive(Serialize, Debug)]
+#[serde(tag = "type")]
 pub enum AnonHandCard {
     HandCard {
         rank: u8,

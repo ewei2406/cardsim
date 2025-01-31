@@ -1,7 +1,12 @@
-import { useCallback, useEffect, useState } from "react";
-import { HandleMessage } from "../useClient/ServerResponse";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+	HandleChatMessage,
+	HandleDelta,
+	HandleMessage,
+} from "../useClient/ServerResponse";
 import useClient from "../useClient";
 import { useLogger } from "../useLogger";
+import { ClientRequest } from "../useClient/ClientRequest";
 
 type LobbyStatus =
 	| {
@@ -21,6 +26,10 @@ const useLobby = () => {
 	const [lobbyStatus, setLobbyStatus] = useState<LobbyStatus>({
 		status: "lobby",
 	});
+	const [nickname, setNickname] = useState("Player");
+
+	const handleDeltaRef = useRef<HandleDelta | null>(null);
+	const handleChatMessage = useRef<HandleChatMessage | null>(null);
 
 	const handleMessage: HandleMessage = useCallback(
 		(message) => {
@@ -40,8 +49,28 @@ const useLobby = () => {
 					logger.info(`Left game.`);
 					setLobbyStatus({ status: "lobby" });
 					return { variant: "ok", value: undefined };
+				case "Delta":
+					if (handleDeltaRef.current === null) {
+						logger.error("Recieved delta but not in a game!");
+						return { variant: "error", error: "No handleDelta function set" };
+					}
+					return handleDeltaRef.current(message);
+				case "ChatMessage":
+					if (handleChatMessage.current === null) {
+						logger.error("Recieved chat message but not in a game!");
+						return {
+							variant: "error",
+							error: "No handleChatMessage function set",
+						};
+					}
+					return handleChatMessage.current(message);
+				case "GameCreated":
+					logger.success(`Created game ${message.game_id}.`);
+					return { variant: "ok", value: undefined };
+				case "Ok":
+					return { variant: "ok", value: undefined };
 				default:
-					logger.error("An unknown ocurred: " + message);
+					logger.error("An unknown ocurred: " + JSON.stringify(message));
 					return { variant: "error", error: `Unexpected message: ${message}` };
 			}
 		},
@@ -59,38 +88,82 @@ const useLobby = () => {
 		}
 	}, [connected, sendMessage, handleMessage, onMessage, logger]);
 
-	const joinGame = (gameId: number) => {
-		sendMessage({
-			type: "Command",
-			command: "JoinGame",
-			game_id: gameId,
-			nickname: "Test Player",
-		});
-	};
+	const joinGame = useCallback(
+		(gameId: number) => {
+			sendMessage({
+				type: "Command",
+				command: "JoinGame",
+				game_id: gameId,
+				nickname,
+			});
+		},
+		[nickname, sendMessage]
+	);
 
-	const leaveGame = () => {
+	const leaveGame = useCallback(() => {
 		sendMessage({
 			type: "Command",
 			command: "LeaveGame",
 		});
-	};
+	}, [sendMessage]);
 
-	const refreshGames = () => {
+	const refreshGames = useCallback(() => {
 		logger.info("Refreshing games...");
 		sendMessage({
 			type: "Command",
 			command: "ListGames",
 		});
-	};
+	}, [sendMessage, logger]);
+
+	const sendChatMessage = useCallback(
+		(message: string) => {
+			sendMessage({
+				type: "Command",
+				command: "ChatMessage",
+				message,
+			});
+		},
+		[sendMessage]
+	);
+
+	const createGame = useCallback(() => {
+		sendMessage({
+			type: "Command",
+			command: "CreateGame",
+			nickname,
+		});
+	}, [sendMessage, nickname]);
+
+	const onDelta = useCallback((handler: HandleDelta) => {
+		handleDeltaRef.current = handler;
+	}, []);
+
+	const onChatMessage = useCallback((handler: HandleChatMessage) => {
+		handleChatMessage.current = handler;
+	}, []);
+
+	const sendGameAction = useCallback(
+		(action: ClientRequest & { type: "GameAction" }) => {
+			sendMessage(action);
+		},
+		[sendMessage]
+	);
 
 	return {
 		id,
+		nickname,
 		availableGames,
+		lobbyStatus,
+		setNickname,
 		joinGame,
+		createGame,
 		leaveGame,
 		refreshGames,
-		lobbyStatus,
 		handleMessage,
+		onDelta,
+		onChatMessage,
+		sendGameAction,
+		sendChatMessage,
 	};
 };
 

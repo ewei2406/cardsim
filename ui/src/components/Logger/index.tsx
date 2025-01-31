@@ -1,21 +1,23 @@
-import { useLogger } from "../../hooks/useLogger";
+import { useSyncExternalStore } from "react";
+import { logsStore } from "../../hooks/useLogger";
+import { COLORS } from "../../util/colors";
 
 const COLOR_MAP = {
 	success: "green",
-	info: "var(--primary-color)",
+	info: COLORS.PRIMARY,
 	warn: "orange",
 	error: "red",
 };
 
 const Logger = () => {
-	const { logs } = useLogger();
+	const logs = useSyncExternalStore(logsStore.subscribe, logsStore.getLogs);
 
 	return (
 		<div
 			style={{
 				position: "fixed",
 				bottom: 0,
-				right: 0,
+				left: 0,
 			}}
 		>
 			{logs.map((log, index) => (
@@ -23,9 +25,9 @@ const Logger = () => {
 					key={index}
 					style={{
 						width: 200,
-						borderTop: "1px solid var(--lighter-color)",
-						borderLeft: "1px solid var(--lighter-color)",
-						backgroundColor: "var(--lightest-color)",
+						borderTop: `1px solid ${COLORS.LIGHTER}`,
+						borderRight: `1px solid ${COLORS.LIGHTER}`,
+						backgroundColor: COLORS.LIGHTEST,
 						fontSize: "0.9em",
 						color: COLOR_MAP[log.severity],
 					}}

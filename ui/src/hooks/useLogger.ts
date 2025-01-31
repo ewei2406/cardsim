@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useSyncExternalStore } from "react";
+import { useMemo } from "react";
 import { LOG_CLEAR_INTERVAL_MS, LOG_STALE_MS } from "../util/constants";
 
 export type Log = {
@@ -38,30 +38,26 @@ class LogsStore {
 	};
 }
 
-const logsStore = new LogsStore();
+export const logsStore = new LogsStore();
 setInterval(() => {
 	logsStore.clearStale();
 }, LOG_CLEAR_INTERVAL_MS);
 
 export const useLogger = () => {
-	const logs = useSyncExternalStore(logsStore.subscribe, logsStore.getLogs);
-
-	const log = useCallback((message: string, severity: Log["severity"]) => {
+	const log = (message: string, severity: Log["severity"]) => {
 		logsStore.addLog({ message, time: new Date(), severity });
-	}, []);
+	};
 
-	const logger = useMemo(
-		() => ({
+	const logger = useMemo(() => {
+		return {
 			success: (message: string) => log(message, "success"),
 			info: (message: string) => log(message, "info"),
 			warn: (message: string) => log(message, "warn"),
 			error: (message: string) => log(message, "error"),
-		}),
-		[log]
-	);
+		};
+	}, []);
 
 	return {
-		logs,
 		logger,
 	};
 };
