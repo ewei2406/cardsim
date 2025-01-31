@@ -12,9 +12,6 @@ pub enum ServerResponse {
     AvailableGames {
         games: Vec<GameDesc>,
     },
-    GameCreated {
-        game_id: GameId,
-    },
     Ok,
     Error {
         message: String,
@@ -27,7 +24,13 @@ pub enum ServerResponse {
         client_id: ConnectionId,
         message: String,
     },
-    GameClosed,
+    GameCreated {
+        game_id: GameId,
+    },
+    GameJoined {
+        game_id: GameId,
+    },
+    GameLeft,
 }
 
 impl ServerResponse {

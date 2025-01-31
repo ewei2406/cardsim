@@ -1,14 +1,15 @@
-import { useEffect, useRef, useState } from "react";
-import { Result } from "../../util/result";
-import { ClientRequest } from "./ClientRequest";
-import { ServerResponse } from "./ServerResponse";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { HandleMessage, ServerResponse } from "./ServerResponse";
+import { SendMessage } from "./ClientRequest";
 
-const useClient = (onMessage: (message: ServerResponse) => void) => {
+const useClient = () => {
+	const [id, setId] = useState(0);
 	const socketRef = useRef<WebSocket | null>(null);
+	const messageHandlerRef = useRef<HandleMessage | null>(null);
 	const [connected, setConnected] = useState(false);
 
 	useEffect(() => {
-		socketRef.current = new WebSocket("ws://your-websocket-url");
+		socketRef.current = new WebSocket("ws://localhost:8080");
 
 		socketRef.current.onopen = () => {
 			setConnected(true);
@@ -21,8 +22,11 @@ const useClient = (onMessage: (message: ServerResponse) => void) => {
 		};
 
 		socketRef.current.onmessage = (event) => {
-			const message: ServerResponse = JSON.parse(event.data);
-			onMessage(message);
+			setId(event.data);
+			socketRef.current!.onmessage = (event) => {
+				const message: ServerResponse = JSON.parse(event.data);
+				messageHandlerRef.current?.(message);
+			};
 		};
 
 		return () => {
@@ -30,9 +34,9 @@ const useClient = (onMessage: (message: ServerResponse) => void) => {
 				socketRef.current.close();
 			}
 		};
-	}, [onMessage]);
+	}, []);
 
-	const sendMessage = (message: ClientRequest): Result<void, string> => {
+	const sendMessage: SendMessage = useCallback((message) => {
 		if (!socketRef.current) {
 			return { variant: "error", error: "WebSocket not initialized" };
 		}
@@ -46,11 +50,17 @@ const useClient = (onMessage: (message: ServerResponse) => void) => {
 		} catch (error) {
 			return { variant: "error", error: (error as Error).message };
 		}
-	};
+	}, []);
+
+	const onMessage = useCallback((handler: HandleMessage) => {
+		messageHandlerRef.current = handler;
+	}, []);
 
 	return {
+		id,
 		connected,
 		sendMessage,
+		onMessage,
 	};
 };
 

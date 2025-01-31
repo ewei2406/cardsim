@@ -1,0 +1,51 @@
+.theme-light {
+	--darkest-color: #000;
+	--darker-color: #333;
+	--dark-color: #666;
+	--light-color: #999;
+	--lighter-color: #ccc;
+	--lightest-color: #fff;
+	--primary-color: #007bff;
+	--primary-color-darker: #0056b3;
+}
+
+.theme-dark {
+	--darkest-color: #fff;
+	--darker-color: #ccc;
+	--dark-color: #999;
+	--light-color: #666;
+	--lighter-color: #333;
+	--lightest-color: #000;
+	--primary-color: #007bff;
+	--primary-color-darker: #0056b3;
+}
+
+body {
+	background-color: var(--lightest-color);
+	color: var(--darkest-color);
+}
+
+* {
+	font-family: monospace;
+	margin: 0;
+	padding: 0;
+	color: inherit;
+}
+
+button {
+	background-color: var(--primary-color);
+	color: var(--lightest-color);
+	border: none;
+	padding: 0.25rem 0.5rem;
+	cursor: pointer;
+}
+
+button:hover {
+	background-color: var(--primary-color-darker);
+}
+
+.card {
+	background-color: var(--lightest-color);
+	border: 1px solid var(--lighter-color);
+	padding: 0.25em;
+}

@@ -307,8 +307,8 @@ Sent when the client requests a list of available games.
   "type": "AvailableGames",
   "games": [
     {
-      "id": 123,
-      "players": 2
+      "game_id": 123,
+      "player_ids": [2, 3, 4]
     }
   ]
 }
@@ -389,3 +389,24 @@ Sent when the game is closed and no further actions can be taken.
 }
 ```
 
+### GameJoined
+
+Sent when the client successfully joins a game.
+
+**Response Structure:**
+```json
+{
+  "type": "GameJoined",
+  "game_id": 456
+}
+```
+
+### GameLeft
+
+Sent when the client leaves a game or the game is closed.
+
+```json
+{
+  "type": "GameLeft"
+}
+```

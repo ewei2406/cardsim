@@ -26,7 +26,7 @@ pub struct GameController {
 #[derive(Debug, Serialize)]
 pub struct GameDesc {
     pub game_id: GameId,
-    pub player_count: usize,
+    pub player_ids: Vec<ConnectionId>,
 }
 
 impl GameController {
@@ -101,10 +101,10 @@ impl GameController {
         let games = self.games.read().await;
         let mut game_descs = Vec::new();
         for (game_id, game) in games.iter() {
-            let player_count = game.lock().await.player_ids.len();
+            let player_ids = game.lock().await.player_ids.iter().copied().collect();
             game_descs.push(GameDesc {
                 game_id: *game_id,
-                player_count,
+                player_ids,
             });
         }
         game_descs
@@ -131,7 +131,7 @@ impl GameController {
         }
 
         // Send a message to all clients in the game
-        self.send_to_game_clients(game_id, &ServerResponse::GameClosed)
+        self.send_to_game_clients(game_id, &ServerResponse::GameLeft)
             .await;
     }
 }

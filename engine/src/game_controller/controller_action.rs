@@ -197,6 +197,10 @@ impl GameController {
                 .await;
         }
 
+        // Let client know they joined
+        let message = ServerResponse::GameJoined { game_id };
+        self.send_to_client(client_id, &message).await;
+
         // Send the entire game state to catch them up
         let message = ServerResponse::Delta {
             changed: Some(game.lock().await.game_state.anonymize(client_id)),
@@ -212,7 +216,6 @@ impl GameController {
 
     pub async fn leave_game(&self, client_id: usize) {
         // Get the game to leave
-        log::info!("2");
         let game = match self.get_client_game(client_id).await {
             Some(game) => game,
             None => {
@@ -223,7 +226,6 @@ impl GameController {
                 return self.error(client_id, "Client not in game.".into()).await;
             }
         };
-        log::info!("3");
 
         // Apply the action
         let game_id = {
@@ -236,8 +238,6 @@ impl GameController {
             .update_game_and_sync(game_id, remove_action, client_id)
             .await;
 
-        log::info!("5");
-
         if let Err(err) = action_result {
             log::error!(
                 "Client {} failed to leave game {}: {}",
@@ -245,10 +245,12 @@ impl GameController {
                 game_id,
                 err
             );
-            log::info!("6");
             return self.error(client_id, "Failed to leave game.".into()).await;
         }
-        log::info!("4");
+
+        // Let client know they left
+        let message = ServerResponse::GameLeft;
+        self.send_to_client(client_id, &message).await;
 
         // Update records
         self.client_map.write().await.remove(&client_id);

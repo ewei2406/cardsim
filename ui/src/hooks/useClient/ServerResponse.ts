@@ -1,3 +1,7 @@
+import { Result } from "../../util/result";
+
+export type HandleMessage = (message: ServerResponse) => Result<void, string>;
+
 export type ServerResponse =
 	| AvailableGamesResponse
 	| GameCreatedResponse
@@ -5,11 +9,12 @@ export type ServerResponse =
 	| ErrorResponse
 	| DeltaResponse
 	| ChatMessageResponse
-	| GameClosedResponse;
+	| GameJoined
+	| GameLeftResponse;
 
 interface AvailableGamesResponse {
 	type: "AvailableGames";
-	games: { id: number; players: number }[];
+	games: { game_id: number; player_ids: number[] }[];
 }
 
 interface GameCreatedResponse {
@@ -39,6 +44,11 @@ interface ChatMessageResponse {
 	message: string;
 }
 
-interface GameClosedResponse {
-	type: "GameClosed";
+interface GameLeftResponse {
+	type: "GameLeft";
+}
+
+interface GameJoined {
+	type: "GameJoined";
+	game_id: number;
 }

@@ -1,3 +1,7 @@
+import { Result } from "../../util/result";
+
+export type SendMessage = (message: ClientRequest) => Result<void, string>;
+
 export type ClientRequest =
 	| ListGamesRequest
 	| CreateGameRequest
