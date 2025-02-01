@@ -15,9 +15,7 @@ const App = () => {
 			<DarkMode />
 			<Logger />
 			{lobby.lobbyStatus.status === "lobby" && <Lobby lobby={lobby} />}
-			{lobby.lobbyStatus.status === "ingame" && (
-				<Game lobby={lobby} />
-			)}
+			{lobby.lobbyStatus.status !== "lobby" && <Game lobby={lobby} />}
 		</div>
 	);
 };

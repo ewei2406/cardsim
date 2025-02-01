@@ -25,11 +25,8 @@ const GameCard = (props: {
 					)
 				</div>
 				<div>
-					<button
-						onClick={handleClick}
-						style={{ display: "flex", gap: 5, alignItems: "center" }}
-					>
-						<TbDoorEnter style={{ display: "block" }} />
+					<button onClick={handleClick}>
+						<TbDoorEnter />
 						Join
 					</button>
 				</div>

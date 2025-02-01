@@ -75,7 +75,7 @@ Create a new deck at a location with the specified cards.
 ```json
 {
   "type": "GameAction",
-  "action": "CreateDeck"
+  "action": "CreateDeck",
   "x": 0,
   "y": 0,
   "card_inits": [["S", 0], ["S", 1], ["S", 2]]
@@ -267,31 +267,6 @@ Show or hide specific cards in a hand.
   "action": "ShowHandCards",
   "cards": [1, 2, 3],
   "shown": true
-}
-```
-
-### AddHand
-
-Add a new hand to the game with a specified nickname.
-
-**Request Structure:**
-```json
-{
-  "type": "GameAction",
-  "action": "AddHand",
-  "nickname": "Player1"
-}
-```
-
-### RemoveHand
-
-Remove the current player's hand from the game.
-
-**Request Structure:**
-```json
-{
-  "type": "GameAction",
-  "action": "RemoveHand"
 }
 ```
 

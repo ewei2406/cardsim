@@ -18,6 +18,7 @@ const Logger = () => {
 				position: "fixed",
 				bottom: 0,
 				left: 0,
+				zIndex: 1000,
 			}}
 		>
 			{logs.map((log, index) => (

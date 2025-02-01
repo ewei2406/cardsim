@@ -8,7 +8,7 @@ export type ClientRequest =
 	| JoinGameRequest
 	| ChatMessageRequest
 	| LeaveGameRequest
-	| GameActionRequest;
+	| ActionRequest;
 
 interface ListGamesRequest {
 	type: "Command";
@@ -39,7 +39,7 @@ interface LeaveGameRequest {
 	command: "LeaveGame";
 }
 
-type GameActionRequest =
+type ActionRequest =
 	| CreateDeckRequest
 	| CreateStandardDecksRequest
 	| CutDeckRequest
@@ -58,7 +58,7 @@ type GameActionRequest =
 	| RemoveHandRequest;
 
 interface CreateDeckRequest {
-	type: "GameAction";
+	type: "Action";
 	action: "CreateDeck";
 	x: number;
 	y: number;
@@ -66,7 +66,7 @@ interface CreateDeckRequest {
 }
 
 interface CreateStandardDecksRequest {
-	type: "GameAction";
+	type: "Action";
 	action: "CreateStandardDecks";
 	x: number;
 	y: number;
@@ -75,7 +75,7 @@ interface CreateStandardDecksRequest {
 }
 
 interface CutDeckRequest {
-	type: "GameAction";
+	type: "Action";
 	action: "CutDeck";
 	deck: number;
 	n: number;
@@ -84,7 +84,7 @@ interface CutDeckRequest {
 }
 
 interface FlipCardsFromDeckRequest {
-	type: "GameAction";
+	type: "Action";
 	action: "FlipCardsFromDeck";
 	deck: number;
 	n: number;
@@ -93,13 +93,13 @@ interface FlipCardsFromDeckRequest {
 }
 
 interface ShuffleDeckRequest {
-	type: "GameAction";
+	type: "Action";
 	action: "ShuffleDeck";
 	deck: number;
 }
 
 interface CollectDeckRequest {
-	type: "GameAction";
+	type: "Action";
 	action: "CollectDeck";
 	deck_id: number;
 	x1: number;
@@ -107,26 +107,26 @@ interface CollectDeckRequest {
 }
 
 interface DrawCardFromTableRequest {
-	type: "GameAction";
+	type: "Action";
 	action: "DrawCardFromTable";
 	card: number;
 }
 
 interface DrawCardsFromLocationRequest {
-	type: "GameAction";
+	type: "Action";
 	action: "DrawCardsFromLocation";
 	x: number;
 	y: number;
 }
 
 interface DrawCardFromDeckRequest {
-	type: "GameAction";
+	type: "Action";
 	action: "DrawCardFromDeck";
 	deck: number;
 }
 
 interface MoveEntityRequest {
-	type: "GameAction";
+	type: "Action";
 	action: "MoveEntity";
 	entity: number;
 	x1: number;
@@ -134,13 +134,13 @@ interface MoveEntityRequest {
 }
 
 interface RemoveEntityRequest {
-	type: "GameAction";
+	type: "Action";
 	action: "RemoveEntity";
 	entity: number;
 }
 
 interface PlayHandCardsRequest {
-	type: "GameAction";
+	type: "Action";
 	action: "PlayHandCards";
 	cards: number[];
 	x: number;
@@ -149,26 +149,26 @@ interface PlayHandCardsRequest {
 }
 
 interface PlayHandCardsToDeckRequest {
-	type: "GameAction";
+	type: "Action";
 	action: "PlayHandCardsToDeck";
 	cards: number[];
 	deck: number;
 }
 
 interface ShowHandCardsRequest {
-	type: "GameAction";
+	type: "Action";
 	action: "ShowHandCards";
 	cards: number[];
 	shown: boolean;
 }
 
 interface AddHandRequest {
-	type: "GameAction";
+	type: "Action";
 	action: "AddHand";
 	nickname: string;
 }
 
 interface RemoveHandRequest {
-	type: "GameAction";
+	type: "Action";
 	action: "RemoveHand";
 }

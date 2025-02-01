@@ -15,6 +15,10 @@ type LobbyStatus =
 	  }
 	| {
 			status: "lobby";
+	  }
+	| {
+			status: "joining";
+			gameId: number;
 	  };
 
 export type GameDescription = { game_id: number; player_ids: number[] };
@@ -90,6 +94,7 @@ const useLobby = () => {
 
 	const joinGame = useCallback(
 		(gameId: number) => {
+			setLobbyStatus({ status: "joining", gameId });
 			sendMessage({
 				type: "Command",
 				command: "JoinGame",
@@ -143,7 +148,7 @@ const useLobby = () => {
 	}, []);
 
 	const sendGameAction = useCallback(
-		(action: ClientRequest & { type: "GameAction" }) => {
+		(action: ClientRequest & { type: "Action" }) => {
 			sendMessage(action);
 		},
 		[sendMessage]

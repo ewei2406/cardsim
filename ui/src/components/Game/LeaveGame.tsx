@@ -7,15 +7,13 @@ const LeaveGame = (props: { leaveGame: () => void }) => {
 			style={{
 				backgroundColor: COLORS.DANGER,
 				position: "fixed",
-				display: "flex",
-				gap: 5,
-				alignItems: "center",
 				top: 0,
 				right: 0,
+				zIndex: 1000,
 			}}
 			onClick={props.leaveGame}
 		>
-			<TbDoorExit style={{ display: "block" }} />
+			<TbDoorExit />
 			Leave
 		</button>
 	);

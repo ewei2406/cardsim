@@ -8,6 +8,8 @@ export const COLORS = {
 	PRIMARY: "var(--primary-color)",
 	PRIMARY_DARKER: "var(--primary-color-darker)",
 	DANGER: "var(--danger-color)",
+	SELECTION: "var(--selection-color)",
+	GAMEBOARD: "var(--lighter-color)",
 };
 
 export const hashColor = (id: number): string => {

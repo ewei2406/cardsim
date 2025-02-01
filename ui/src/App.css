@@ -8,6 +8,7 @@
 	--primary-color: #007bff;
 	--primary-color-darker: #0056b3;
 	--danger-color: #dc3545;
+	--selection-color: #00b3ff;
 }
 
 .theme-dark {
@@ -20,6 +21,7 @@
 	--primary-color: #007bff;
 	--primary-color-darker: #0056b3;
 	--danger-color: #dc3545;
+	--selection-color: #00b3ff;
 }
 
 body {
@@ -34,12 +36,19 @@ body {
 	color: inherit;
 }
 
+#game-board * {
+	transform-style: preserve-3d;
+}
+
 button {
 	background-color: var(--primary-color);
 	color: var(--lightest-color);
 	border: none;
 	padding: 0.25rem 0.5rem;
 	cursor: pointer;
+	display: flex;
+	align-items: center;
+	gap: 5px;
 }
 
 button:hover {
@@ -57,8 +66,32 @@ input:hover {
 	border-color: var(--primary-color);
 }
 
+select {
+	background-color: var(--lightest-color);
+	color: var(--darkest-color);
+	border: 1px solid var(--light-color);
+	padding: 0.25rem;
+}
+
+select:hover {
+	border-color: var(--primary-color);
+}
+
+input[type="checkbox"] {
+	width: 23px;
+	height: 23px;
+}
+
 .card {
 	background-color: var(--lightest-color);
 	border: 1px solid var(--lighter-color);
 	padding: 0.25em;
+}
+
+.row {
+	display: flex;
+	gap: 5px;
+	min-height: 25px;
+	align-items: center;
+	justify-content: space-between;
 }

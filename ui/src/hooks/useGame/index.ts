@@ -8,12 +8,17 @@ import {
 } from "../useClient/ServerResponse";
 import useLobby from "../useLobby";
 
-const useGame = (onDelta: ReturnType<typeof useLobby>["onDelta"]) => {
+export type Id = { id: number };
+
+const useGame = (
+	onDelta: ReturnType<typeof useLobby>["onDelta"],
+	sendGameAction: ReturnType<typeof useLobby>["sendGameAction"]
+) => {
 	const [updates, setUpdates] = useState(0);
 	const entities = useRef<Set<number>>(new Set());
-	const cardsRef = useRef<Record<number, Card & Position>>({});
-	const decksRef = useRef<Record<number, Deck & Position>>({});
-	const handsRef = useRef<Record<number, Hand>>({});
+	const cardsRef = useRef<Record<number, Card & Position & Id>>({});
+	const decksRef = useRef<Record<number, Deck & Position & Id>>({});
+	const handsRef = useRef<Record<number, Hand & Id>>({});
 	const nicknamesRef = useRef<Record<number, string>>({});
 
 	const handleDelta: HandleDelta = useCallback((delta) => {
@@ -39,6 +44,7 @@ const useGame = (onDelta: ReturnType<typeof useLobby>["onDelta"]) => {
 				cardsRef.current[entity] = {
 					...changed.cards[entity],
 					...changed.positions[entity],
+					id: entity,
 				};
 				return;
 			}
@@ -46,13 +52,15 @@ const useGame = (onDelta: ReturnType<typeof useLobby>["onDelta"]) => {
 				decksRef.current[entity] = {
 					...changed.decks[entity],
 					...changed.positions[entity],
+					id: entity,
 				};
 				return;
 			}
 			if (changed.hands[entity]) {
 				const hand = changed.hands[entity];
+				console.log("here");
 				nicknamesRef.current[hand.client_id] = hand.nickname;
-				handsRef.current[entity] = hand;
+				handsRef.current[entity] = { ...hand, id: entity };
 				return;
 			}
 			console.log("Unhandled entity type", changed, entity);
@@ -66,7 +74,7 @@ const useGame = (onDelta: ReturnType<typeof useLobby>["onDelta"]) => {
 		onDelta(handleDelta);
 	}, [onDelta, handleDelta]);
 
-	const [state, setState] = useState({
+	const [gameState, setGameState] = useState({
 		entities: entities.current,
 		cards: cardsRef.current,
 		decks: decksRef.current,
@@ -75,7 +83,7 @@ const useGame = (onDelta: ReturnType<typeof useLobby>["onDelta"]) => {
 	});
 
 	useEffect(() => {
-		setState({
+		setGameState({
 			entities: entities.current,
 			cards: cardsRef.current,
 			decks: decksRef.current,
@@ -84,7 +92,7 @@ const useGame = (onDelta: ReturnType<typeof useLobby>["onDelta"]) => {
 		});
 	}, [updates]);
 
-	return state;
+	return { ...gameState, sendGameAction };
 };
 
 export default useGame;

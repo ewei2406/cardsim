@@ -19,27 +19,17 @@ const GameSelector = (props: {
 				}}
 			>
 				<div style={{ fontWeight: 800 }}>Available Games</div>
-				<button
-					onClick={props.refreshGames}
-					style={{
-						display: "flex",
-						alignItems: "center",
-						gap: 5,
-					}}
-				>
-					<TbRefresh style={{ display: "block" }} />
+				<button onClick={props.refreshGames}>
+					<TbRefresh />
 					Refresh
 				</button>
 				<button
 					style={{
-						display: "flex",
-						alignItems: "center",
-						gap: 5,
 						marginLeft: "auto",
 					}}
 					onClick={props.createGame}
 				>
-					<TbPlus style={{ display: "block" }} />
+					<TbPlus />
 					Create Game
 				</button>
 			</div>
