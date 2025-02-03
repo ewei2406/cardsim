@@ -13,7 +13,6 @@ const Toggle = (props: {
 			onClick={() => props.onChange(!props.checked)}
 		>
 			{props.checked ? <TbCheck /> : <TbX />}
-			{props.checked ? "Yes" : "No"}
 		</button>
 	);
 };

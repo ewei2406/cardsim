@@ -2,9 +2,11 @@ import { ReactNode, useMemo } from "react";
 import { useSelect } from "../../../hooks/useSelection";
 import { BOARD_WIDTH, BOARD_HEIGHT, TILE_SIZE } from "../../../util/constants";
 import { COLORS } from "../../../util/colors";
+import { useDrag } from "../../../hooks/useDrag";
 
 const GameBoardTiles = () => {
 	const { select } = useSelect();
+	const { hoverDrag, finishDrag } = useDrag();
 
 	const gameBoardTiles: ReactNode[] = useMemo(() => {
 		const arr = [];
@@ -20,6 +22,26 @@ const GameBoardTiles = () => {
 								y: BOARD_HEIGHT / 2 - j,
 							});
 							e.stopPropagation();
+						}}
+						onMouseOver={(e) => {
+							if (e.button === 0) {
+								e.stopPropagation();
+								hoverDrag({
+									type: "gameBoard",
+									x: i - BOARD_WIDTH / 2,
+									y: BOARD_HEIGHT / 2 - j,
+								});
+							}
+						}}
+						onMouseUp={(e) => {
+							if (e.button === 0) {
+								e.stopPropagation();
+								finishDrag({
+									type: "gameBoard",
+									x: i - BOARD_WIDTH / 2,
+									y: BOARD_HEIGHT / 2 - j,
+								});
+							}
 						}}
 						style={{
 							position: "absolute",

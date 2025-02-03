@@ -1,7 +1,4 @@
 import { COLORS, hashColor } from "../../util/colors";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import "./index.css";
 
 // from https://projects.verou.me/css3patterns/#seigaiha
 const BG = (color1: string, color2: string) => `
@@ -55,10 +52,11 @@ const CardBack = (props: {
 			>
 				{props.selected && (
 					<div
-						className="pulse-size"
+						className="pulse-border"
 						style={{
 							width: "100%",
 							height: "100%",
+							border: `2px solid ${COLORS.SELECTION}`,
 						}}
 					></div>
 				)}

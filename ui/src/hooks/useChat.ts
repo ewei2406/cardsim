@@ -15,7 +15,6 @@ export const useChat = (
 	>([]);
 
 	const handleChatMessage: HandleChatMessage = useCallback((message) => {
-		console.log(message);
 		setMessageHistory((prev) => [
 			...prev,
 			{

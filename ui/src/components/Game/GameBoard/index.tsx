@@ -2,10 +2,16 @@ import { ReactNode, useRef } from "react";
 import { BOARD_HEIGHT, BOARD_WIDTH, TILE_SIZE } from "../../../util/constants";
 import { COLORS } from "../../../util/colors";
 import { useSelect } from "../../../hooks/useSelection";
+import { DragTarget, useDrag } from "../../../hooks/useDrag";
 
 const GameBoard = ({ children }: { children?: ReactNode }) => {
 	const gameBoardRef = useRef<HTMLDivElement>(null);
 	const { deselect } = useSelect();
+	const { hoverDrag, finishDrag } = useDrag();
+
+	const dragTarget: DragTarget = {
+		type: "void",
+	};
 
 	return (
 		<div
@@ -24,10 +30,22 @@ const GameBoard = ({ children }: { children?: ReactNode }) => {
 				deselect();
 				e.stopPropagation();
 			}}
+			onMouseOver={(e) => {
+				if (e.button === 0) {
+					hoverDrag(dragTarget);
+				}
+			}}
+			onMouseUp={(e) => {
+				if (e.button === 0) {
+					finishDrag(dragTarget);
+				}
+			}}
 		>
 			<div
 				style={{
 					position: "relative",
+					minWidth: BOARD_WIDTH * TILE_SIZE,
+					minHeight: BOARD_HEIGHT * TILE_SIZE,
 					width: BOARD_WIDTH * TILE_SIZE,
 					height: BOARD_HEIGHT * TILE_SIZE,
 					backgroundColor: COLORS.LIGHTEST,

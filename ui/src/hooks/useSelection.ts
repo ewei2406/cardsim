@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from "react";
+import { CardGroup, DeckGroup, HandGroup } from "./useGame";
 
 export type GameSelection =
 	| {
@@ -11,14 +12,15 @@ export type GameSelection =
 	  }
 	| {
 			type: "deck";
-			entityId: number;
+			deck: DeckGroup;
 	  }
 	| {
 			type: "cards";
-			entityIds: number[];
+			cards: CardGroup[];
 	  }
 	| {
 			type: "hand";
+			hand: HandGroup[];
 			handCardIds: number[];
 	  };
 
@@ -62,7 +64,6 @@ export const useSelection = () => {
 
 export const useSelect = () => {
 	const select = (selection: GameSelection) => {
-		console.log("select", selection);
 		selectionStore.setSelection(selection);
 	};
 

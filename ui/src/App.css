@@ -95,3 +95,23 @@ input[type="checkbox"] {
 	align-items: center;
 	justify-content: space-between;
 }
+
+.pulse-border {
+	animation: pulsate 1s infinite linear;
+	position: absolute;
+}
+
+@keyframes pulsate {
+	0% {
+		padding: 5px;
+		border-radius: 15px;
+	}
+	50% {
+		padding: 10px;
+		border-radius: 20px;
+	}
+	100% {
+		padding: 5px;
+		border-radius: 15px;
+	}
+}

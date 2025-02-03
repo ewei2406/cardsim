@@ -7,8 +7,12 @@ import {
 	Position,
 } from "../useClient/ServerResponse";
 import useLobby from "../useLobby";
+import { DragTarget, useDragFinishObserver } from "../useDrag";
 
 export type Id = { id: number };
+export type DeckGroup = Deck & Position & Id;
+export type CardGroup = Card & Position & Id;
+export type HandGroup = Hand & Id;
 
 const useGame = (
 	onDelta: ReturnType<typeof useLobby>["onDelta"],
@@ -16,9 +20,9 @@ const useGame = (
 ) => {
 	const [updates, setUpdates] = useState(0);
 	const entities = useRef<Set<number>>(new Set());
-	const cardsRef = useRef<Record<number, Card & Position & Id>>({});
-	const decksRef = useRef<Record<number, Deck & Position & Id>>({});
-	const handsRef = useRef<Record<number, Hand & Id>>({});
+	const cardsRef = useRef<Record<number, CardGroup>>({});
+	const decksRef = useRef<Record<number, DeckGroup>>({});
+	const handsRef = useRef<Record<number, HandGroup>>({});
 	const nicknamesRef = useRef<Record<number, string>>({});
 
 	const handleDelta: HandleDelta = useCallback((delta) => {
@@ -58,19 +62,18 @@ const useGame = (
 			}
 			if (changed.hands[entity]) {
 				const hand = changed.hands[entity];
-				console.log("here");
 				nicknamesRef.current[hand.client_id] = hand.nickname;
 				handsRef.current[entity] = { ...hand, id: entity };
 				return;
 			}
-			console.log("Unhandled entity type", changed, entity);
+			// TODO: handle other entity types
+			// console.log("Unhandled entity type", changed, entity);
 		});
 		setUpdates((prev) => prev + 1);
 		return { variant: "ok", value: undefined };
 	}, []);
 
 	useEffect(() => {
-		console.log("useGame", onDelta);
 		onDelta(handleDelta);
 	}, [onDelta, handleDelta]);
 
@@ -91,6 +94,43 @@ const useGame = (
 			nicknames: nicknamesRef.current,
 		});
 	}, [updates]);
+
+	const { onFinish } = useDragFinishObserver();
+
+	const handleDragFinish = useCallback((start: DragTarget, end: DragTarget) => {
+		switch (end.type) {
+			case "void":
+				if (
+					start.type !== "void" &&
+					start.type !== "none" &&
+					start.type !== "gameBoard"
+				) {
+					sendGameAction({
+						type: "Action",
+						action: "RemoveEntity",
+						entity: start.entityId,
+					});
+				}
+				return;
+			case "gameBoard":
+				if (start.type === "card" || start.type === "deck") {
+					sendGameAction({
+						type: "Action",
+						action: "MoveEntity",
+						entity: start.entityId,
+						x1: end.x,
+						y1: end.y,
+					});
+				}
+				return;
+			default:
+				console.log("Unhandled drag target", end);
+		}
+	}, []);
+
+	useEffect(() => {
+		onFinish(handleDragFinish);
+	}, [handleDragFinish, onFinish]);
 
 	return { ...gameState, sendGameAction };
 };

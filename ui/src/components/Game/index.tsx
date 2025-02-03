@@ -8,6 +8,7 @@ import GameBoardSelection from "./GameBoard/GameBoardSelection";
 import GameBoardTiles from "./GameBoard/GameBoardTiles";
 import LeaveGame from "./LeaveGame";
 import TableDecks from "./BoardPieces/TableDecks";
+import DragArrow from "./GameBoard/DragArrow";
 
 const Game = ({ lobby }: { lobby: ReturnType<typeof useLobby> }) => {
 	const game = useGame(lobby.onDelta, lobby.sendGameAction);
@@ -34,6 +35,7 @@ const Game = ({ lobby }: { lobby: ReturnType<typeof useLobby> }) => {
 			<ChatBox chat={chat} nicknames={game.nicknames} />
 			<GameBoard>
 				<GameBoardTiles />
+				<DragArrow />
 				<GameBoardSelection />
 				<TableDecks decks={Object.values(game.decks)} />
 			</GameBoard>

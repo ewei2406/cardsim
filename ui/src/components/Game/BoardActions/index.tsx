@@ -1,5 +1,6 @@
 import useGame from "../../../hooks/useGame";
 import { useSelection, GameSelection } from "../../../hooks/useSelection";
+import DeckActions from "./DeckActions";
 import GameBoardActions from "./GameBoardActions";
 
 const BoardActionsWrapper = (props: { children: React.ReactNode }) => {
@@ -30,6 +31,8 @@ const getActions = (
 	switch (selection.type) {
 		case "gameBoard":
 			return <GameBoardActions selection={selection} game={game} />;
+		case "deck":
+			return <DeckActions selection={selection} game={game} />;
 		default:
 			return;
 	}

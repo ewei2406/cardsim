@@ -29,9 +29,9 @@ const GameBoardActions = (props: {
 		<div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
 			<button onClick={() => setShowNewDeck(true)}>
 				<TbCards />
-				Add Deck
+				Add Deck...
 			</button>
-			<button style={{ backgroundColor: COLORS.DANGER }} onClick={deselect}>
+			<button style={{ backgroundColor: COLORS.DARK }} onClick={deselect}>
 				<TbX />
 				Deselect
 			</button>

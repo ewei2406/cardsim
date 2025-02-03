@@ -5,7 +5,11 @@ const BoardPiece = (props: {
 	x: number;
 	y: number;
 	children: ReactNode;
-	onClick?: () => void;
+	onClick?: React.MouseEventHandler<HTMLDivElement>;
+	onMouseDown?: React.MouseEventHandler<HTMLDivElement>;
+	onMouseOver?: React.MouseEventHandler<HTMLDivElement>;
+	onMouseUp?: React.MouseEventHandler<HTMLDivElement>;
+	disableInteraction?: boolean;
 }) => {
 	return (
 		<div
@@ -18,10 +22,32 @@ const BoardPiece = (props: {
 				display: "flex",
 				justifyContent: "center",
 				alignItems: "center",
+				userSelect: "none",
+				pointerEvents: props.disableInteraction ? "none" : undefined,
 			}}
 			onClick={(e) => {
-				e.stopPropagation();
-				props.onClick?.();
+				if (props.onClick) {
+					e.stopPropagation();
+					props.onClick(e);
+				}
+			}}
+			onMouseDown={(e) => {
+				if (props.onMouseDown) {
+					e.stopPropagation();
+					props.onMouseDown(e);
+				}
+			}}
+			onMouseUp={(e) => {
+				if (props.onMouseUp) {
+					e.stopPropagation();
+					props.onMouseUp(e);
+				}
+			}}
+			onMouseOver={(e) => {
+				if (props.onMouseOver) {
+					e.stopPropagation();
+					props.onMouseOver(e);
+				}
 			}}
 		>
 			<div style={{ position: "relative" }}>{props.children}</div>
