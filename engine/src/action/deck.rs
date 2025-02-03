@@ -45,6 +45,7 @@ pub fn create_deck(
     Outcome::Delta {
         changed: Some(dstate),
         deleted: None,
+        players: None,
     }
 }
 
@@ -73,6 +74,7 @@ pub fn cut_deck(gamestate: &mut GameState, deck: Entity, n: usize) -> Outcome {
     let new_deck = Deck {
         deck_id: orig_id,
         card_inits: flipped,
+        shuffle_ctr: 0,
     };
 
     let mut deleted = None;
@@ -89,6 +91,7 @@ pub fn cut_deck(gamestate: &mut GameState, deck: Entity, n: usize) -> Outcome {
     Outcome::Delta {
         changed: Some(dstate),
         deleted,
+        players: None,
     }
 }
 
@@ -101,8 +104,10 @@ pub fn flip_cards_from_deck(
     if n == 0 {
         return Outcome::None;
     }
+    let dy = if faceup { 0 } else { -2 };
+    let dx = if faceup { 2 } else { 0 };
     let position = match gamestate.positions.get(deck) {
-        Some(position) => gamestate.nearest_empty_position(position.x, position.y),
+        Some(position) => gamestate.nearest_empty_position(position.x + dx, position.y + dy),
         None => return Outcome::None,
     };
     let deck_component = match gamestate.decks.get_mut(deck) {
@@ -138,6 +143,7 @@ pub fn flip_cards_from_deck(
     Outcome::Delta {
         changed: Some(dstate),
         deleted: None,
+        players: None,
     }
 }
 
@@ -145,7 +151,13 @@ pub fn shuffle_deck(gamestate: &mut GameState, deck: Entity) -> Outcome {
     if let Some(deck_component) = gamestate.decks.get_mut(deck) {
         deck_component.shuffle();
     }
-    Outcome::None
+    let mut dstate = GameState::new();
+    dstate.clone_entity_from(gamestate, deck);
+    Outcome::Delta {
+        changed: Some(dstate),
+        deleted: None,
+        players: None,
+    }
 }
 
 pub fn collect_deck(gamestate: &mut GameState, deck_id: DeckId, x1: i64, y1: i64) -> Outcome {
@@ -197,6 +209,7 @@ pub fn collect_deck(gamestate: &mut GameState, deck_id: DeckId, x1: i64, y1: i64
     let new_deck = Deck {
         deck_id,
         card_inits,
+        shuffle_ctr: 0,
     };
     let new_deck = Deck::add(
         gamestate,
@@ -215,5 +228,6 @@ pub fn collect_deck(gamestate: &mut GameState, deck_id: DeckId, x1: i64, y1: i64
             true => None,
             false => Some(removed_entities),
         },
+        players: None,
     }
 }

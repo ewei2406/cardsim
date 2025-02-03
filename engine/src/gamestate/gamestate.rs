@@ -12,6 +12,7 @@ pub struct GameState {
     pub cards: ComponentStorage<Card>,
     pub decks: ComponentStorage<Deck>,
     pub hands: ComponentStorage<Hand>,
+    // Separate from entities
     pub players: Vec<PlayerDescription>,
 }
 

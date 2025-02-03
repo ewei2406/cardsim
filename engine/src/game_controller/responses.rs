@@ -1,7 +1,10 @@
 use serde::Serialize;
 
 use crate::{
-    action::Outcome, connection_manager::ConnectionId, entity::Entity, gamestate::AnonGameState,
+    action::Outcome,
+    connection_manager::ConnectionId,
+    entity::Entity,
+    gamestate::{AnonGameState, PlayerDescription},
 };
 
 use super::{GameDesc, GameId};
@@ -9,6 +12,9 @@ use super::{GameDesc, GameId};
 #[derive(Serialize, Debug)]
 #[serde(tag = "type")]
 pub enum ServerResponse {
+    ClientConnected {
+        client_id: ConnectionId,
+    },
     AvailableGames {
         games: Vec<GameDesc>,
     },
@@ -19,6 +25,7 @@ pub enum ServerResponse {
     Delta {
         changed: Option<AnonGameState>,
         deleted: Option<Vec<Entity>>,
+        players: Option<Vec<PlayerDescription>>,
     },
     ChatMessage {
         client_id: ConnectionId,
@@ -29,7 +36,8 @@ pub enum ServerResponse {
     },
     GameJoined {
         game_id: GameId,
-		game_state: AnonGameState,
+        game_state: AnonGameState,
+        players: Vec<PlayerDescription>,
     },
     GameLeft,
 }
@@ -37,9 +45,14 @@ pub enum ServerResponse {
 impl ServerResponse {
     pub fn from_outcome(outcome: &Outcome, perspective: ConnectionId) -> Self {
         match outcome {
-            Outcome::Delta { changed, deleted } => ServerResponse::Delta {
+            Outcome::Delta {
+                changed,
+                deleted,
+                players,
+            } => ServerResponse::Delta {
                 changed: changed.as_ref().map(|gs| gs.anonymize(perspective)),
                 deleted: deleted.clone(),
+                players: players.clone(),
             },
             Outcome::Invalid(err) => ServerResponse::Error {
                 message: format!("{:?}", err),

@@ -60,6 +60,7 @@ pub fn play_hand_cards(
     Outcome::Delta {
         changed: Some(dstate),
         deleted: None,
+        players: None,
     }
 }
 
@@ -106,6 +107,7 @@ pub fn play_hand_cards_to_deck(
     Outcome::Delta {
         changed: Some(dstate),
         deleted: None,
+        players: None,
     }
 }
 
@@ -137,6 +139,7 @@ pub fn show_hand_cards(
     Outcome::Delta {
         changed: Some(dstate),
         deleted: None,
+        players: None,
     }
 }
 
@@ -196,13 +199,14 @@ pub fn draw_card_from_deck(
     Outcome::Delta {
         changed: Some(dstate),
         deleted: removed,
+        players: None,
     }
 }
 
-pub fn draw_card_from_table(
+pub fn draw_cards_from_table(
     gamestate: &mut GameState,
     client_id: ConnectionId,
-    card: Entity,
+    cards: Vec<Entity>,
 ) -> Outcome {
     // Get the hand
     let hand = match gamestate.players.iter().find(|x| x.client_id == client_id) {
@@ -215,77 +219,50 @@ pub fn draw_card_from_table(
         None => return Outcome::Invalid(InvalidOutcomeError::EntityNotFound),
     };
 
-    // Get the card component
-    let card_component = match gamestate.cards.get_mut(card) {
-        Some(card) => card,
-        None => return Outcome::Invalid(InvalidOutcomeError::EntityNotFound),
-    };
-
-    hand_component.cards.push(HandCard {
-        id: get_id(),
-        suit: card_component.suit.clone(),
-        rank: card_component.rank,
-        shown: false,
-        deck_id: card_component.deck_id,
-    });
-    Card::remove(gamestate, card);
-
-    let mut dstate = GameState::new();
-    dstate.clone_entity_from(gamestate, hand);
-    Outcome::Delta {
-        changed: Some(dstate),
-        deleted: Some(vec![card]),
-    }
-}
-
-pub fn draw_cards_from_location(
-    gamestate: &mut GameState,
-    client_id: ConnectionId,
-    x: i64,
-    y: i64,
-) -> Outcome {
-    // Get the hand
-    let hand = match gamestate.players.iter().find(|x| x.client_id == client_id) {
-        Some(x) => x.hand,
-        None => return Outcome::Invalid(InvalidOutcomeError::EntityNotFound),
-    };
-
-    let hand_component = match gamestate.hands.get_mut(hand) {
-        Some(hand) => hand,
-        None => return Outcome::Invalid(InvalidOutcomeError::EntityNotFound),
-    };
-
-    // Get all cards at the location
-    let card_entities: Vec<(Entity, &Card)> =
-        gamestate.cards.filter_entities(|(card_entity, _)| {
-            match gamestate.positions.get(card_entity) {
-                Some(position) => position.x == x && position.y == y,
-                None => false,
-            }
-        });
-
-    // Remove the cards from the table and add them to the hand
-    let mut entities_to_remove = Vec::new();
-    for (card_entity, card_component) in &card_entities {
-        entities_to_remove.push(*card_entity);
+    // Add the cards to the hand
+    for card in &cards {
+        let card_component = match gamestate.cards.get(*card) {
+            Some(card) => card,
+            None => return Outcome::Invalid(InvalidOutcomeError::EntityNotFound),
+        };
         hand_component.cards.push(HandCard {
             id: get_id(),
             suit: card_component.suit.clone(),
             rank: card_component.rank,
             shown: false,
             deck_id: card_component.deck_id,
-        })
-    }
-    for entity in &entities_to_remove {
-        Card::remove(gamestate, *entity);
+        });
     }
 
-    // Create the delta state
+    for card in &cards {
+        Card::remove(gamestate, *card);
+    }
+
     let mut dstate = GameState::new();
     dstate.clone_entity_from(gamestate, hand);
-
     Outcome::Delta {
         changed: Some(dstate),
-        deleted: Some(entities_to_remove),
+        deleted: Some(cards),
+        players: None,
+    }
+}
+
+pub fn flip_cards(gamestate: &mut GameState, cards: Vec<Entity>, faceup: bool) -> Outcome {
+    for card in &cards {
+        let card_component = match gamestate.cards.get_mut(*card) {
+            Some(card) => card,
+            None => return Outcome::Invalid(InvalidOutcomeError::EntityNotFound),
+        };
+        card_component.faceup = faceup;
+    }
+
+    let mut dstate = GameState::new();
+    for entity in &cards {
+        dstate.clone_entity_from(gamestate, *entity);
+    }
+    Outcome::Delta {
+        changed: Some(dstate),
+        deleted: None,
+        players: None,
     }
 }

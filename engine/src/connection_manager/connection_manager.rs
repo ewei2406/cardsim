@@ -69,7 +69,14 @@ impl ConnectionManager {
             return Err(format!("ID {} already in use.", client_id));
         }
 
-        let _ = tx.send(client_id.to_string().into()).await;
+        let msg = ServerResponse::ClientConnected { client_id };
+        let _ = tx
+            .send(
+                serde_json::to_string(&msg)
+                    .map_err(|e| format!("Error serializing message: {:?}", e))?
+                    .into(),
+            )
+            .await;
         self.connections
             .write()
             .await

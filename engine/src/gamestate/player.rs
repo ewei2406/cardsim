@@ -30,6 +30,7 @@ impl GameState {
         Outcome::Delta {
             changed: Some(dstate),
             deleted: None,
+            players: Some(self.players.clone()),
         }
     }
 
@@ -77,6 +78,7 @@ impl GameState {
                     Outcome::Delta {
                         changed: Some(changed),
                         deleted: Some(vec![hand]),
+                        players: Some(self.players.clone()),
                     }
                 } else {
                     log::warn!("Failed to remove {} from the game.", client_id);

@@ -14,6 +14,7 @@ pub fn move_entity(gamestate: &mut GameState, entity: Entity, x1: i64, y1: i64) 
     Outcome::Delta {
         changed: Some(dstate),
         deleted: None,
+		players: None,
     }
 }
 
@@ -27,5 +28,6 @@ pub fn remove_entity(gamestate: &mut GameState, entity: Entity) -> Outcome {
     Outcome::Delta {
         changed: None,
         deleted: Some(vec![entity]),
+		players: None,
     }
 }

@@ -17,7 +17,7 @@ use super::{
 };
 
 impl GameController {
-    async fn apply_action(&self, client_id: ConnectionId, command: Command) {
+    async fn apply_command(&self, client_id: ConnectionId, command: Command) {
         match command {
             Command::CreateGame { nickname } => {
                 let _ = self.create_game(client_id, nickname).await;
@@ -60,7 +60,7 @@ impl GameController {
                 }
                 ClientRequest::Command(action) => {
                     log::info!("Client {} sent command: {:?}", client_id, action);
-                    self.apply_action(client_id, action).await;
+                    self.apply_command(client_id, action).await;
                 }
             }
         } else {
@@ -203,6 +203,7 @@ impl GameController {
         let message = ServerResponse::GameJoined {
             game_id,
             game_state: game.game_state.anonymize(client_id),
+            players: game.game_state.players.clone(),
         };
         self.send_to_client(client_id, &message).await;
 

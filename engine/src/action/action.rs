@@ -4,7 +4,7 @@ use crate::{
     component::{CardInit, DeckId, HandCardId},
     connection_manager::ConnectionId,
     entity::Entity,
-    gamestate::GameState,
+    gamestate::{GameState, PlayerDescription},
 };
 
 use super::{deck::*, entity::*, hand::*};
@@ -42,11 +42,11 @@ pub enum Action {
         y1: i64,
     },
     DrawCardFromTable {
-        card: Entity,
+        cards: Vec<Entity>,
     },
-    DrawCardsFromLocation {
-        x: i64,
-        y: i64,
+    FlipCards {
+        cards: Vec<Entity>,
+        faceup: bool,
     },
     DrawCardFromDeck {
         deck: Entity,
@@ -87,6 +87,7 @@ pub enum Outcome {
     Delta {
         changed: Option<GameState>,
         deleted: Option<Vec<Entity>>,
+        players: Option<Vec<PlayerDescription>>,
     },
     None,
     Invalid(InvalidOutcomeError),
@@ -107,7 +108,7 @@ impl Actionable for GameState {
             MoveEntity { entity, x1, y1 } => move_entity(self, entity, x1, y1),
             RemoveEntity { entity } => remove_entity(self, entity),
             CollectDeck { deck_id, x1, y1 } => collect_deck(self, deck_id, x1, y1),
-            DrawCardFromTable { card } => draw_card_from_table(self, client_id, card),
+            DrawCardFromTable { cards } => draw_cards_from_table(self, client_id, cards),
             DrawCardFromDeck { deck } => draw_card_from_deck(self, client_id, deck),
             PlayHandCards {
                 cards,
@@ -115,8 +116,7 @@ impl Actionable for GameState {
                 y,
                 faceup,
             } => play_hand_cards(self, client_id, cards, x, y, faceup),
-            // RemoveHand => remove_hand(self, client_id),
-            DrawCardsFromLocation { x, y } => draw_cards_from_location(self, client_id, x, y),
+            FlipCards { cards, faceup } => flip_cards(self, cards, faceup),
             ShowHandCards { cards, shown } => show_hand_cards(self, client_id, cards, shown),
             PlayHandCardsToDeck { cards, deck } => {
                 play_hand_cards_to_deck(self, client_id, cards, deck)
