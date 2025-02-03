@@ -14,8 +14,18 @@ const App = () => {
 		<div>
 			<DarkMode />
 			<Logger />
+
 			{lobby.lobbyStatus.status === "lobby" && <Lobby lobby={lobby} />}
-			{lobby.lobbyStatus.status !== "lobby" && <Game lobby={lobby} />}
+
+			{lobby.lobbyStatus.status === "ingame" && (
+				<Game
+					onDelta={lobby.onDelta}
+					sendGameAction={lobby.sendGameAction}
+					leaveGame={lobby.leaveGame}
+					gameId={lobby.lobbyStatus.gameId}
+					initialGameState={lobby.lobbyStatus.initialGameState}
+				/>
+			)}
 		</div>
 	);
 };

@@ -79,8 +79,6 @@ interface CutDeckRequest {
 	action: "CutDeck";
 	deck: number;
 	n: number;
-	x1: number;
-	y1: number;
 }
 
 interface FlipCardsFromDeckRequest {
@@ -88,8 +86,7 @@ interface FlipCardsFromDeckRequest {
 	action: "FlipCardsFromDeck";
 	deck: number;
 	n: number;
-	x1: number;
-	y1: number;
+	faceup: boolean;
 }
 
 interface ShuffleDeckRequest {

@@ -1,7 +1,5 @@
-import { useChat } from "../../hooks/useChat";
 import useGame from "../../hooks/useGame";
 import useLobby from "../../hooks/useLobby";
-import ChatBox from "./ChatBox";
 import GameBoard from "./GameBoard";
 import BoardActions from "./BoardActions";
 import GameBoardSelection from "./GameBoard/GameBoardSelection";
@@ -9,14 +7,28 @@ import GameBoardTiles from "./GameBoard/GameBoardTiles";
 import LeaveGame from "./LeaveGame";
 import TableDecks from "./BoardPieces/TableDecks";
 import DragArrow from "./GameBoard/DragArrow";
+import { GameState } from "../../hooks/useClient/ServerResponse";
 
-const Game = ({ lobby }: { lobby: ReturnType<typeof useLobby> }) => {
-	const game = useGame(lobby.onDelta, lobby.sendGameAction);
-	const chat = useChat(lobby.onChatMessage, lobby.sendChatMessage);
-
-	if (lobby.lobbyStatus.status !== "ingame") {
-		return <div>Loading...</div>;
-	}
+const Game = ({
+	initialGameState,
+	gameId,
+	onDelta,
+	sendGameAction,
+	leaveGame,
+}: {
+	initialGameState: GameState;
+	gameId: number;
+	onDelta: ReturnType<typeof useLobby>["onDelta"];
+	sendGameAction: ReturnType<typeof useLobby>["sendGameAction"];
+	leaveGame: ReturnType<typeof useLobby>["leaveGame"];
+}) => {
+	const game = useGame({
+		onDelta: onDelta,
+		sendGameAction: sendGameAction,
+		gameId: gameId,
+		initialGameState,
+	});
+	// const chat = useChat(onChatMessage, sendChatMessage);
 
 	return (
 		<div>
@@ -30,9 +42,9 @@ const Game = ({ lobby }: { lobby: ReturnType<typeof useLobby> }) => {
 					justifyContent: "center",
 				}}
 			>
-				Game: {lobby.lobbyStatus.gameId}
+				Game: {gameId}
 			</div>
-			<ChatBox chat={chat} nicknames={game.nicknames} />
+			{/* <ChatBox chat={chat} nicknames={game.nicknames} /> */}
 			<GameBoard>
 				<GameBoardTiles />
 				<DragArrow />
@@ -40,7 +52,7 @@ const Game = ({ lobby }: { lobby: ReturnType<typeof useLobby> }) => {
 				<TableDecks decks={Object.values(game.decks)} />
 			</GameBoard>
 			<BoardActions game={game} />
-			<LeaveGame leaveGame={lobby.leaveGame} />
+			<LeaveGame leaveGame={leaveGame} />
 		</div>
 	);
 };

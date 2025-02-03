@@ -1,6 +1,6 @@
 import { TbPlus, TbRefresh } from "react-icons/tb";
-import { GameDescription } from "../../hooks/useLobby";
 import GameCard from "./GameCard";
+import { GameDescription } from "../../hooks/useClient/ServerResponse";
 
 const GameSelector = (props: {
 	availableGames: GameDescription[];

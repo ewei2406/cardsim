@@ -1,5 +1,5 @@
 import { TbDoorEnter } from "react-icons/tb";
-import { GameDescription } from "../../hooks/useLobby";
+import { GameDescription } from "../../hooks/useClient/ServerResponse";
 
 const GameCard = (props: {
 	gameDescription: GameDescription;
@@ -20,9 +20,8 @@ const GameCard = (props: {
 			>
 				<div>
 					Game {props.gameDescription.game_id} (
-					{props.gameDescription.player_ids.length}{" "}
-					{props.gameDescription.player_ids.length === 1 ? "player" : "players"}
-					)
+					{props.gameDescription.player_ct}{" "}
+					{props.gameDescription.player_ct === 1 ? "player" : "players"})
 				</div>
 				<div>
 					<button onClick={handleClick}>

@@ -16,9 +16,11 @@ export type ServerResponse =
 	| GameJoined
 	| GameLeftResponse;
 
+export type GameDescription = { game_id: number; player_ct: number };
+
 interface AvailableGamesResponse {
 	type: "AvailableGames";
-	games: { game_id: number; player_ids: number[] }[];
+	games: GameDescription[];
 }
 
 interface GameCreatedResponse {
@@ -48,6 +50,7 @@ interface GameLeftResponse {
 interface GameJoined {
 	type: "GameJoined";
 	game_id: number;
+	game_state: GameState;
 }
 
 export type Position = {
@@ -91,22 +94,29 @@ export type Hand = {
 	)[];
 };
 
+export type GameState = {
+	entities: number[];
+	positions: {
+		[entity_id: number]: Position;
+	};
+	cards: {
+		[entity_id: number]: Card;
+	};
+	decks: {
+		[deck_id: number]: Deck;
+	};
+	hands: {
+		[client_id: number]: Hand;
+	};
+	players: {
+		nickname: string;
+		client_id: number;
+		hand: number;
+	}[];
+};
+
 export type DeltaResponse = {
 	type: "Delta";
-	changed: null | {
-		entities: number[];
-		positions: {
-			[entity_id: number]: Position;
-		};
-		cards: {
-			[entity_id: number]: Card;
-		};
-		decks: {
-			[deck_id: number]: Deck;
-		};
-		hands: {
-			[client_id: number]: Hand;
-		};
-	};
+	changed: null | GameState;
 	deleted: null | number[];
 };

@@ -1,5 +1,4 @@
-import { COLORS } from "../../util/colors";
-import { hashColor } from "../../util/hashColor";
+import { COLORS, hashColor } from "../../util/colors";
 
 const PlayerIcon = (props: { id: number }) => {
 	const color = hashColor(props.id);

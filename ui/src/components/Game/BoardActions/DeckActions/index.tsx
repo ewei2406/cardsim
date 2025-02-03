@@ -31,8 +31,6 @@ const DeckActions = ({
 			action: "CutDeck",
 			deck: selection.deck.id,
 			n,
-			x1: selection.deck.x + 2,
-			y1: selection.deck.y,
 		});
 		setShowCut(false);
 		deselect();
@@ -43,8 +41,7 @@ const DeckActions = ({
 			type: "Action",
 			action: "FlipCardsFromDeck",
 			n: 1,
-			x1: selection.deck.x + 2,
-			y1: selection.deck.y,
+			faceup: true,
 			deck: selection.deck.id,
 		});
 	};
@@ -54,8 +51,7 @@ const DeckActions = ({
 			type: "Action",
 			action: "FlipCardsFromDeck",
 			n: 1,
-			x1: selection.deck.x + 2,
-			y1: selection.deck.y,
+			faceup: false,
 			deck: selection.deck.id,
 		});
 	};

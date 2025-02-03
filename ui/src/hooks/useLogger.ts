@@ -43,21 +43,13 @@ setInterval(() => {
 	logsStore.clearStale();
 }, LOG_CLEAR_INTERVAL_MS);
 
-export const useLogger = () => {
-	const log = (message: string, severity: Log["severity"]) => {
-		logsStore.addLog({ message, time: new Date(), severity });
-	};
+const log = (message: string, severity: Log["severity"]) => {
+	logsStore.addLog({ message, time: new Date(), severity });
+};
 
-	const logger = useMemo(() => {
-		return {
-			success: (message: string) => log(message, "success"),
-			info: (message: string) => log(message, "info"),
-			warn: (message: string) => log(message, "warn"),
-			error: (message: string) => log(message, "error"),
-		};
-	}, []);
-
-	return {
-		logger,
-	};
+export const logger = {
+	success: (message: string) => log(message, "success"),
+	info: (message: string) => log(message, "info"),
+	warn: (message: string) => log(message, "warn"),
+	error: (message: string) => log(message, "error"),
 };
