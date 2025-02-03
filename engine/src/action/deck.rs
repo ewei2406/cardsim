@@ -1,7 +1,7 @@
 use super::action::Outcome;
 use crate::component::{CardInit, DeckId, GroupedComponent, Hand, HandCard, Suit};
 use crate::{
-    component::{Card, Deck, Position},
+    component::{Card, Deck},
     entity::Entity,
     gamestate::GameState,
     util::get_id,
@@ -37,12 +37,7 @@ pub fn create_deck(
     y: i64,
     card_inits: Vec<CardInit>,
 ) -> Outcome {
-    let position = Position {
-        x,
-        y,
-        z: 0,
-        rotation: 0,
-    };
+    let position = gamestate.nearest_empty_position(x, y);
     let deck = Deck::new(get_id(), card_inits);
     let entity = Deck::add(gamestate, (deck, position));
     let mut dstate = GameState::new();
@@ -54,16 +49,18 @@ pub fn create_deck(
 }
 
 // Move the top n cards of a deck onto another spot
-pub fn cut_deck(gamestate: &mut GameState, deck: Entity, n: usize, x1: i64, y1: i64) -> Outcome {
+pub fn cut_deck(gamestate: &mut GameState, deck: Entity, n: usize) -> Outcome {
     if n == 0 {
         return Outcome::None;
     }
-
+    let position = match gamestate.positions.get(deck) {
+        Some(position) => gamestate.nearest_empty_position(position.x, position.y),
+        None => return Outcome::None,
+    };
     let deck_component = match gamestate.decks.get_mut(deck) {
         Some(deck) => deck,
         None => return Outcome::None,
     };
-
     let mut flipped = Vec::new();
     for _ in 0..n {
         match deck_component.draw_card() {
@@ -76,13 +73,6 @@ pub fn cut_deck(gamestate: &mut GameState, deck: Entity, n: usize, x1: i64, y1: 
     let new_deck = Deck {
         deck_id: orig_id,
         card_inits: flipped,
-    };
-
-    let position = Position {
-        x: x1,
-        y: y1,
-        z: 0,
-        rotation: 0,
     };
 
     let mut deleted = None;
@@ -106,13 +96,15 @@ pub fn flip_cards_from_deck(
     gamestate: &mut GameState,
     deck: Entity,
     n: usize,
-    x1: i64,
-    y1: i64,
+    faceup: bool,
 ) -> Outcome {
     if n == 0 {
         return Outcome::None;
     }
-
+    let position = match gamestate.positions.get(deck) {
+        Some(position) => gamestate.nearest_empty_position(position.x, position.y),
+        None => return Outcome::None,
+    };
     let deck_component = match gamestate.decks.get_mut(deck) {
         Some(deck) => deck,
         None => return Outcome::None,
@@ -124,29 +116,20 @@ pub fn flip_cards_from_deck(
             None => break,
         }
     }
-
     let cards: Vec<Card> = flipped
         .iter()
         .map(|card_init| Card {
             rank: card_init.1,
             suit: card_init.0.clone(),
-            faceup: true,
+            faceup,
             deck_id: deck_component.deck_id,
         })
         .collect();
-
-    let position = Position {
-        x: x1,
-        y: y1,
-        z: 0,
-        rotation: 0,
-    };
 
     let card_entities: Vec<Entity> = cards
         .into_iter()
         .map(|card| Card::add(gamestate, (card, position.clone())))
         .collect();
-
     let mut dstate = GameState::new();
     for entity in card_entities {
         dstate.clone_entity_from(gamestate, entity);
@@ -202,7 +185,6 @@ pub fn collect_deck(gamestate: &mut GameState, deck_id: DeckId, x1: i64, y1: i64
                 Hand {
                     cards: hand_cards,
                     client_id: hand.client_id,
-                    nickname: hand.nickname.clone(),
                 },
             );
         }
@@ -218,15 +200,7 @@ pub fn collect_deck(gamestate: &mut GameState, deck_id: DeckId, x1: i64, y1: i64
     };
     let new_deck = Deck::add(
         gamestate,
-        (
-            new_deck,
-            Position {
-                x: x1,
-                y: y1,
-                z: 0,
-                rotation: 0,
-            },
-        ),
+        (new_deck, gamestate.nearest_empty_position(x1, y1)),
     );
 
     let mut dstate = GameState::new();

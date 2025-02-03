@@ -7,3 +7,4 @@ mod hand;
 pub use action::Action;
 pub use action::Actionable;
 pub use action::Outcome;
+pub use action::InvalidOutcomeError;

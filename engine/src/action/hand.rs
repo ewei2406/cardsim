@@ -7,25 +7,6 @@ use crate::{
 
 use super::{action::InvalidOutcomeError, Outcome};
 
-pub fn add_hand(gamestate: &mut GameState, nickname: String, client_id: ConnectionId) -> Outcome {
-    let hand = Hand::add(gamestate, (nickname, client_id));
-    let mut dstate = GameState::new();
-    dstate.clone_entity_from(gamestate, hand);
-    Outcome::Delta {
-        changed: Some(dstate),
-        deleted: None,
-    }
-}
-
-fn get_hand(
-    hand_storage: &mut ComponentStorage<Hand>,
-    client_id: ConnectionId,
-) -> Option<(Entity, &mut Hand)> {
-    let hand_id = hand_storage.get_entity_match(|hand| hand.client_id == client_id)?;
-    let hand = hand_storage.get_mut(hand_id)?;
-    Some((hand_id, hand))
-}
-
 pub fn play_hand_cards(
     gamestate: &mut GameState,
     client_id: ConnectionId,
@@ -34,10 +15,16 @@ pub fn play_hand_cards(
     y: i64,
     faceup: bool,
 ) -> Outcome {
-    let (hand, hand_component) = match get_hand(&mut gamestate.hands, client_id) {
+    let hand = match gamestate.players.iter().find(|x| x.client_id == client_id) {
+        Some(x) => x.hand,
+        None => return Outcome::Invalid(InvalidOutcomeError::EntityNotFound),
+    };
+
+    let hand_component = match gamestate.hands.get_mut(hand) {
         Some(hand) => hand,
         None => return Outcome::Invalid(InvalidOutcomeError::EntityNotFound),
     };
+
     let cards_set: std::collections::HashSet<HandCardId> = cards.iter().cloned().collect();
 
     let mut remaining = Vec::new();
@@ -60,12 +47,7 @@ pub fn play_hand_cards(
                 deck_id: played_card.deck_id,
                 faceup,
             };
-            let position = Position {
-                x,
-                y,
-                z: 0,
-                rotation: 0,
-            };
+            let position = gamestate.nearest_empty_position(x, y);
             Card::add(gamestate, (card, position))
         })
         .collect();
@@ -87,10 +69,16 @@ pub fn play_hand_cards_to_deck(
     cards: Vec<HandCardId>,
     deck: Entity,
 ) -> Outcome {
-    let (hand, hand_component) = match get_hand(&mut gamestate.hands, client_id) {
+    let hand = match gamestate.players.iter().find(|x| x.client_id == client_id) {
+        Some(x) => x.hand,
+        None => return Outcome::Invalid(InvalidOutcomeError::EntityNotFound),
+    };
+
+    let hand_component = match gamestate.hands.get_mut(hand) {
         Some(hand) => hand,
         None => return Outcome::Invalid(InvalidOutcomeError::EntityNotFound),
     };
+
     let deck_component = match gamestate.decks.get_mut(deck) {
         Some(deck) => deck,
         None => return Outcome::Invalid(InvalidOutcomeError::EntityNotFound),
@@ -127,7 +115,12 @@ pub fn show_hand_cards(
     cards: Vec<HandCardId>,
     shown: bool,
 ) -> Outcome {
-    let (hand, hand_component) = match get_hand(&mut gamestate.hands, client_id) {
+    let hand = match gamestate.players.iter().find(|x| x.client_id == client_id) {
+        Some(x) => x.hand,
+        None => return Outcome::Invalid(InvalidOutcomeError::EntityNotFound),
+    };
+
+    let hand_component = match gamestate.hands.get_mut(hand) {
         Some(hand) => hand,
         None => return Outcome::Invalid(InvalidOutcomeError::EntityNotFound),
     };
@@ -147,36 +140,18 @@ pub fn show_hand_cards(
     }
 }
 
-pub fn remove_hand(gamestate: &mut GameState, client_id: ConnectionId) -> Outcome {
-    // Get the hand entity
-    let (hand, hand_component) = match get_hand(&mut gamestate.hands, client_id) {
-        Some(hand) => hand,
-        None => return Outcome::Invalid(InvalidOutcomeError::EntityNotFound),
-    };
-
-    // Play all cards in the hand
-    let cards = hand_component.cards.iter().map(|hc| hc.id).collect();
-    let play_outcome = play_hand_cards(gamestate, client_id, cards, 0, 0, true);
-    let play_delta = match play_outcome {
-        Outcome::Delta { changed, .. } => changed,
-        _ => return play_outcome,
-    };
-
-    // Remove the hand
-    Hand::remove(gamestate, hand);
-    Outcome::Delta {
-        changed: play_delta,
-        deleted: Some(vec![hand]),
-    }
-}
-
 pub fn draw_card_from_deck(
     gamestate: &mut GameState,
     client_id: ConnectionId,
     deck: Entity,
 ) -> Outcome {
     // Get the hand
-    let (hand, hand_component) = match get_hand(&mut gamestate.hands, client_id) {
+    let hand = match gamestate.players.iter().find(|x| x.client_id == client_id) {
+        Some(x) => x.hand,
+        None => return Outcome::Invalid(InvalidOutcomeError::EntityNotFound),
+    };
+
+    let hand_component = match gamestate.hands.get_mut(hand) {
         Some(hand) => hand,
         None => return Outcome::Invalid(InvalidOutcomeError::EntityNotFound),
     };
@@ -230,7 +205,12 @@ pub fn draw_card_from_table(
     card: Entity,
 ) -> Outcome {
     // Get the hand
-    let (hand, hand_component) = match get_hand(&mut gamestate.hands, client_id) {
+    let hand = match gamestate.players.iter().find(|x| x.client_id == client_id) {
+        Some(x) => x.hand,
+        None => return Outcome::Invalid(InvalidOutcomeError::EntityNotFound),
+    };
+
+    let hand_component = match gamestate.hands.get_mut(hand) {
         Some(hand) => hand,
         None => return Outcome::Invalid(InvalidOutcomeError::EntityNotFound),
     };
@@ -265,7 +245,12 @@ pub fn draw_cards_from_location(
     y: i64,
 ) -> Outcome {
     // Get the hand
-    let (hand, hand_component) = match get_hand(&mut gamestate.hands, client_id) {
+    let hand = match gamestate.players.iter().find(|x| x.client_id == client_id) {
+        Some(x) => x.hand,
+        None => return Outcome::Invalid(InvalidOutcomeError::EntityNotFound),
+    };
+
+    let hand_component = match gamestate.hands.get_mut(hand) {
         Some(hand) => hand,
         None => return Outcome::Invalid(InvalidOutcomeError::EntityNotFound),
     };

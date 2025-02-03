@@ -29,6 +29,7 @@ pub enum ServerResponse {
     },
     GameJoined {
         game_id: GameId,
+		game_state: AnonGameState,
     },
     GameLeft,
 }

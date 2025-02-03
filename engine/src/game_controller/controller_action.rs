@@ -1,4 +1,4 @@
-use std::{collections::HashSet, sync::Arc};
+use std::sync::Arc;
 
 use tokio::sync::Mutex;
 use tokio_tungstenite::tungstenite::Message;
@@ -41,18 +41,6 @@ impl GameController {
         if let Ok(request) = serde_json::from_str::<ClientRequest>(&message.to_string()) {
             match request {
                 ClientRequest::Action(action) => {
-                    // Restrict specific actions
-                    match action {
-                        Action::AddHand { .. } => {
-                            self.error(client_id, "Invalid action.".to_string()).await;
-                            return;
-                        }
-                        Action::RemoveHand => {
-                            self.error(client_id, "Invalid action.".to_string()).await;
-                        }
-                        _ => {}
-                    }
-
                     if let Some(game_id) = self.get_client_game_id(client_id).await {
                         log::info!(
                             "Client {} sent (to game {}) the game action: {:?}",
@@ -104,9 +92,11 @@ impl GameController {
 
         match outcome {
             Outcome::Delta { .. } => {
-                for &game_client in game.player_ids.iter() {
-                    let anonymized = ServerResponse::from_outcome(&outcome, game_client);
-                    let _ = self.send_to_client(game_client, &anonymized).await;
+                for game_client in game.game_state.players.iter() {
+                    let anonymized = ServerResponse::from_outcome(&outcome, game_client.client_id);
+                    let _ = self
+                        .send_to_client(game_client.client_id, &anonymized)
+                        .await;
                 }
             }
             Outcome::Invalid(err) => {
@@ -134,7 +124,6 @@ impl GameController {
         let game_id = util::get_id();
         let game = Game {
             game_id,
-            player_ids: HashSet::new(),
             game_state: GameState::new(),
         };
         let message = ServerResponse::GameCreated { game_id };
@@ -180,37 +169,45 @@ impl GameController {
             }
         };
 
-        // Add the hand to the game
-        let add_action = Action::AddHand { nickname };
-        let action_result = self
-            .update_game_and_sync(game_id, add_action, client_id)
-            .await;
-        if let Err(e) = action_result {
-            log::error!(
-                "Client {} failed to join game {}: {}",
-                client_id,
-                game_id,
-                e
-            );
-            return self
-                .error(client_id, format!("Failed to join game {}.", game_id))
-                .await;
-        }
+        // Add the client
+        let mut game = game.lock().await;
+        let outcome = game.game_state.add_player(nickname, client_id);
+
+        // Let everyone else know
+        match outcome {
+            Outcome::Delta { .. } => {
+                for game_client in game.game_state.players.iter() {
+                    if game_client.client_id == client_id {
+                        continue;
+                    }
+                    let anonymized = ServerResponse::from_outcome(&outcome, game_client.client_id);
+                    let _ = self
+                        .send_to_client(game_client.client_id, &anonymized)
+                        .await;
+                }
+            }
+            _ => {
+                log::error!(
+                    "Client {} failed to join game {}: {:?}",
+                    client_id,
+                    game_id,
+                    outcome
+                );
+                return self
+                    .error(client_id, format!("Failed to join game {}.", game_id))
+                    .await;
+            }
+        };
 
         // Let client know they joined
-        let message = ServerResponse::GameJoined { game_id };
-        self.send_to_client(client_id, &message).await;
-
-        // Send the entire game state to catch them up
-        let message = ServerResponse::Delta {
-            changed: Some(game.lock().await.game_state.anonymize(client_id)),
-            deleted: None,
+        let message = ServerResponse::GameJoined {
+            game_id,
+            game_state: game.game_state.anonymize(client_id),
         };
         self.send_to_client(client_id, &message).await;
 
         // Update game record
         self.client_map.write().await.insert(client_id, game_id);
-        game.lock().await.player_ids.insert(client_id);
         log::info!("Client {} joined game {}.", client_id, game_id);
     }
 
@@ -227,26 +224,30 @@ impl GameController {
             }
         };
 
-        // Apply the action
-        let game_id = {
-            let game = game.lock().await;
-            game.game_id
+        let mut game = game.lock().await;
+        let outcome = game.game_state.remove_player(client_id);
+
+        match outcome {
+            Outcome::Delta { .. } => {
+                for game_client in game.game_state.players.iter() {
+                    let anonymized = ServerResponse::from_outcome(&outcome, game_client.client_id);
+                    let _ = self
+                        .send_to_client(game_client.client_id, &anonymized)
+                        .await;
+                }
+            }
+            _ => {
+                log::error!(
+                    "Client {} failed to leave game {}: {:?}",
+                    client_id,
+                    game.game_id,
+                    outcome
+                );
+                return self
+                    .error(client_id, format!("Failed to leave game {}.", game.game_id))
+                    .await;
+            }
         };
-
-        let remove_action = Action::RemoveHand;
-        let action_result = self
-            .update_game_and_sync(game_id, remove_action, client_id)
-            .await;
-
-        if let Err(err) = action_result {
-            log::error!(
-                "Client {} failed to leave game {}: {}",
-                client_id,
-                game_id,
-                err
-            );
-            return self.error(client_id, "Failed to leave game.".into()).await;
-        }
 
         // Let client know they left
         let message = ServerResponse::GameLeft;
@@ -254,8 +255,7 @@ impl GameController {
 
         // Update records
         self.client_map.write().await.remove(&client_id);
-        game.lock().await.player_ids.remove(&client_id);
-        log::info!("Client {} left game {}.", client_id, game_id);
+        log::info!("Client {} left game {}.", client_id, game.game_id);
     }
 
     async fn chat_message(&self, client_id: usize, message: String) {

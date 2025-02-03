@@ -3,6 +3,8 @@ use std::collections::HashSet;
 use crate::{component::*, entity::Entity, util::get_id};
 use serde::Serialize;
 
+use super::player::PlayerDescription;
+
 #[derive(Serialize, Clone, Debug)]
 pub struct GameState {
     pub entities: HashSet<Entity>,
@@ -10,6 +12,7 @@ pub struct GameState {
     pub cards: ComponentStorage<Card>,
     pub decks: ComponentStorage<Deck>,
     pub hands: ComponentStorage<Hand>,
+    pub players: Vec<PlayerDescription>,
 }
 
 #[derive(Serialize, Debug)]
@@ -29,6 +32,7 @@ impl GameState {
             cards: ComponentStorage::new(),
             decks: ComponentStorage::new(),
             hands: ComponentStorage::new(),
+            players: Vec::new(),
         }
     }
 
@@ -63,5 +67,17 @@ impl GameState {
             decks: self.decks.anonymize(perspective),
             hands: self.hands.anonymize(perspective),
         }
+    }
+
+    pub fn nearest_empty_position(&self, x: i64, y: i64) -> Position {
+        let mut x1 = x;
+        while self
+            .positions
+            .get_entity_match(|e| e.x == x1 && e.y == y)
+            .is_some()
+        {
+            x1 += 1;
+        }
+        Position { x: x1, y }
     }
 }

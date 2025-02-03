@@ -22,20 +22,18 @@ pub struct HandCard {
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Hand {
-    pub nickname: String,
     pub client_id: ConnectionId,
     pub cards: Vec<HandCard>,
 }
 
 impl GroupedComponent for Hand {
-    type Params = (String, ConnectionId);
+    type Params = ConnectionId;
     fn add(gamestate: &mut crate::gamestate::GameState, params: Self::Params) -> Entity {
         let entity = gamestate.get_entity();
         gamestate.hands.register(
             entity,
             Hand {
-                nickname: params.0,
-                client_id: params.1,
+                client_id: params,
                 cards: Vec::new(),
             },
         );
@@ -62,7 +60,6 @@ pub enum AnonHandCard {
 
 #[derive(Serialize, Debug)]
 pub struct AnonHand {
-    nickname: String,
     client_id: ConnectionId,
     cards: Vec<AnonHandCard>,
 }
@@ -77,7 +74,6 @@ impl Anonymize for Hand {
         if self.client_id == perspective {
             return AnonHand {
                 client_id: self.client_id,
-                nickname: self.nickname.clone(),
                 cards: self
                     .cards
                     .iter()
@@ -105,7 +101,6 @@ impl Anonymize for Hand {
             .collect();
         AnonHand {
             client_id: self.client_id,
-            nickname: self.nickname.clone(),
             cards: cards,
         }
     }

@@ -1,4 +1,4 @@
-use crate::{component::Position, entity::Entity, gamestate::GameState};
+use crate::{entity::Entity, gamestate::GameState};
 
 use super::{action::InvalidOutcomeError, Outcome};
 
@@ -6,15 +6,9 @@ pub fn move_entity(gamestate: &mut GameState, entity: Entity, x1: i64, y1: i64) 
     if let None = gamestate.positions.get(entity) {
         return Outcome::None;
     }
-    gamestate.positions.register(
-        entity,
-        Position {
-            x: x1,
-            y: y1,
-            z: 0,
-            rotation: 0,
-        },
-    );
+    gamestate
+        .positions
+        .register(entity, gamestate.nearest_empty_position(x1, y1));
     let mut dstate = GameState::new();
     dstate.clone_entity_from(gamestate, entity);
     Outcome::Delta {

@@ -1,5 +1,5 @@
 use serde::Serialize;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::{Mutex, RwLock};
 
@@ -13,7 +13,6 @@ pub type GameId = usize;
 #[derive(Debug)]
 pub struct Game {
     pub game_id: GameId,
-    pub player_ids: HashSet<usize>,
     pub game_state: GameState,
 }
 
@@ -26,7 +25,7 @@ pub struct GameController {
 #[derive(Debug, Serialize)]
 pub struct GameDesc {
     pub game_id: GameId,
-    pub player_ids: Vec<ConnectionId>,
+    pub player_ct: usize,
 }
 
 impl GameController {
@@ -68,10 +67,10 @@ impl GameController {
         let games = self.games.read().await;
         if let Some(game) = games.get(&game_id) {
             let game = game.lock().await;
-            for client_id in &game.player_ids {
+            for client in &game.game_state.players {
                 let _ = self
                     .connection_manager
-                    .send_message(*client_id, message)
+                    .send_message(client.client_id, message)
                     .await;
             }
         }
@@ -88,7 +87,7 @@ impl GameController {
         let mut games = self.games.write().await;
         let mut to_remove = Vec::new();
         for (game_id, game) in games.iter() {
-            if game.lock().await.player_ids.is_empty() {
+            if game.lock().await.game_state.players.is_empty() {
                 to_remove.push(*game_id);
             }
         }
@@ -101,10 +100,10 @@ impl GameController {
         let games = self.games.read().await;
         let mut game_descs = Vec::new();
         for (game_id, game) in games.iter() {
-            let player_ids = game.lock().await.player_ids.iter().copied().collect();
+            let player_ct = game.lock().await.game_state.players.len();
             game_descs.push(GameDesc {
                 game_id: *game_id,
-                player_ids,
+                player_ct,
             });
         }
         game_descs
@@ -123,9 +122,9 @@ impl GameController {
             };
 
             // Remove the game from the client map
-            for client_id in &game.lock().await.player_ids {
+            for client in &game.lock().await.game_state.players {
                 let mut client_map = self.client_map.write().await;
-                client_map.remove(client_id);
+                client_map.remove(&client.client_id);
             }
             games.remove(&game_id);
         }

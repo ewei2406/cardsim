@@ -27,14 +27,11 @@ pub enum Action {
     CutDeck {
         deck: Entity,
         n: usize,
-        x1: i64,
-        y1: i64,
     },
     FlipCardsFromDeck {
+        faceup: bool,
         deck: Entity,
         n: usize,
-        x1: i64,
-        y1: i64,
     },
     ShuffleDeck {
         deck: Entity,
@@ -76,10 +73,6 @@ pub enum Action {
         cards: Vec<HandCardId>,
         shown: bool,
     },
-    AddHand {
-        nickname: String,
-    },
-    RemoveHand,
 }
 
 #[derive(Serialize, Debug)]
@@ -108,22 +101,21 @@ impl Actionable for GameState {
         match action {
             CreateDeck { x, y, card_inits } => create_deck(self, x, y, card_inits),
             CreateStandardDecks { x, y, n, jokers } => create_standard_decks(self, x, y, n, jokers),
-            CutDeck { deck, n, x1, y1 } => cut_deck(self, deck, n, x1, y1),
-            FlipCardsFromDeck { deck, n, x1, y1 } => flip_cards_from_deck(self, deck, n, x1, y1),
+            CutDeck { deck, n } => cut_deck(self, deck, n),
+            FlipCardsFromDeck { deck, n, faceup } => flip_cards_from_deck(self, deck, n, faceup),
             ShuffleDeck { deck } => shuffle_deck(self, deck),
             MoveEntity { entity, x1, y1 } => move_entity(self, entity, x1, y1),
             RemoveEntity { entity } => remove_entity(self, entity),
             CollectDeck { deck_id, x1, y1 } => collect_deck(self, deck_id, x1, y1),
             DrawCardFromTable { card } => draw_card_from_table(self, client_id, card),
             DrawCardFromDeck { deck } => draw_card_from_deck(self, client_id, deck),
-            AddHand { nickname } => add_hand(self, nickname, client_id),
             PlayHandCards {
                 cards,
                 x,
                 y,
                 faceup,
             } => play_hand_cards(self, client_id, cards, x, y, faceup),
-            RemoveHand => remove_hand(self, client_id),
+            // RemoveHand => remove_hand(self, client_id),
             DrawCardsFromLocation { x, y } => draw_cards_from_location(self, client_id, x, y),
             ShowHandCards { cards, shown } => show_hand_cards(self, client_id, cards, shown),
             PlayHandCardsToDeck { cards, deck } => {

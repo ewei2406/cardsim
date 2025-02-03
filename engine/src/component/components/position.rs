@@ -6,8 +6,6 @@ use crate::{component::component::Anonymize, entity::Entity};
 pub struct Position {
     pub x: i64,
     pub y: i64,
-    pub z: i64,
-    pub rotation: i64,
 }
 
 impl Anonymize for Position {
