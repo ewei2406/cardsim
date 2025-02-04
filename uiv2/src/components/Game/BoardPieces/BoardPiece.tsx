@@ -10,7 +10,7 @@ const BoardPiece = (props: {
 	x: number;
 	y: number;
 	dz?: number;
-	children: ReactNode;
+	children?: ReactNode;
 	onClick?: React.MouseEventHandler<HTMLDivElement>;
 	onMouseDown?: React.MouseEventHandler<HTMLDivElement>;
 	onMouseUp?: React.MouseEventHandler<HTMLDivElement>;
@@ -18,10 +18,12 @@ const BoardPiece = (props: {
 	onMouseEnter?: React.MouseEventHandler<HTMLDivElement>;
 	onMouseLeave?: React.MouseEventHandler<HTMLDivElement>;
 	disableInteraction?: boolean;
+	style?: React.CSSProperties;
 }) => {
 	return (
 		<div
 			style={{
+				border: "1px solid red",
 				position: "absolute",
 				width: TILE_WIDTH,
 				height: TILE_HEIGHT,
@@ -38,6 +40,7 @@ const BoardPiece = (props: {
 				}px) translateZ(${1 + (props.dz ?? 0)}px)`,
 				transition: "transform 0.2s ease",
 				pointerEvents: props.disableInteraction ? "none" : undefined,
+				...props.style,
 			}}
 			onClick={props.onClick}
 			onMouseDown={props.onMouseDown}

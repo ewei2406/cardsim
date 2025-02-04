@@ -1,13 +1,9 @@
 import { Fragment, useState } from "react";
-import {
-	BOARD_WIDTH,
-	BOARD_HEIGHT,
-	TILE_WIDTH,
-	TILE_HEIGHT,
-} from "../../../util/constants";
+import { BOARD_WIDTH, BOARD_HEIGHT } from "../../../util/constants";
 import { COLORS } from "../../../util/colors";
 import { useSelect, useSelection } from "../../../hooks/useSelection";
 import { useDrag } from "../../../hooks/useDrag";
+import BoardPiece from "../BoardPieces/BoardPiece";
 
 const GBTile = ({
 	i,
@@ -23,7 +19,7 @@ const GBTile = ({
 	const [border, setBorder] = useState(`0.5px solid ${COLORS.LIGHTER}`);
 
 	return (
-		<div
+		<BoardPiece
 			onClick={(e) => {
 				setSelection({
 					type: "gameBoard",
@@ -62,16 +58,13 @@ const GBTile = ({
 					setBorder(`1px solid ${COLORS.LIGHT}`);
 				}
 			}}
+			x={i - BOARD_WIDTH / 2}
+			y={BOARD_HEIGHT / 2 - j}
 			style={{
-				position: "absolute",
-				width: TILE_WIDTH,
-				height: TILE_HEIGHT,
-				left: i * TILE_WIDTH,
-				top: j * TILE_HEIGHT,
 				boxSizing: "border-box",
 				border: selected ? `2px solid ${COLORS.SELECTION}` : border,
 			}}
-		></div>
+		></BoardPiece>
 	);
 };
 

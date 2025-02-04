@@ -1,15 +1,11 @@
 import { TbArrowBadgeDownFilled } from "react-icons/tb";
 import { COLORS } from "../../../util/colors";
-import {
-	BOARD_HEIGHT,
-	BOARD_WIDTH,
-	TILE_HEIGHT,
-	TILE_WIDTH,
-} from "../../../util/constants";
+import { TILE_WIDTH } from "../../../util/constants";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import "./GameBoardSelection.css";
 import { useSelection } from "../../../hooks/useSelection";
+import BoardPiece from "../BoardPieces/BoardPiece";
 
 const GameBoardSelection = () => {
 	const { selection } = useSelection();
@@ -17,17 +13,7 @@ const GameBoardSelection = () => {
 	if (selection.type !== "gameBoard") return <></>;
 
 	return (
-		<div
-			style={{
-				position: "absolute",
-				left: (selection.x + BOARD_WIDTH / 2) * TILE_WIDTH,
-				top: (BOARD_HEIGHT / 2 - selection.y) * TILE_HEIGHT,
-				width: TILE_WIDTH,
-				boxSizing: "border-box",
-				height: TILE_HEIGHT,
-				pointerEvents: "none",
-			}}
-		>
+		<BoardPiece x={selection.x} y={selection.y} disableInteraction>
 			<div
 				className="spinning center-content"
 				style={{
@@ -39,7 +25,7 @@ const GameBoardSelection = () => {
 			>
 				<TbArrowBadgeDownFilled />
 			</div>
-		</div>
+		</BoardPiece>
 	);
 };
 

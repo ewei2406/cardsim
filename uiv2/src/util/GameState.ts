@@ -28,23 +28,23 @@ export type DeckGroup = {
 };
 
 const playerPosMap = {
-	0: [2, 0],
-	1: [1, 3],
-	2: [0, 1],
-	3: [3, 2],
-	4: [1, 0],
-	5: [2, 3],
-	6: [0, 2],
-	7: [3, 1],
+	0: [2, 0, 0],
+	1: [1, 3, 180],
+	2: [0, 1, 90],
+	3: [3, 2, 260],
+	4: [1, 0, 0],
+	5: [2, 3, 180],
+	6: [0, 2, 90],
+	7: [3, 1, 270],
 };
 
 const getPlayerPos = (playerIdx: number) => {
-	const W = BOARD_WIDTH + 8;
-	const H = BOARD_HEIGHT + 3;
-	const [sx, sy] = playerPosMap[playerIdx as keyof typeof playerPosMap];
+	const W = BOARD_WIDTH + 4;
+	const H = BOARD_HEIGHT + 4;
+	const [sx, sy, rot] = playerPosMap[playerIdx as keyof typeof playerPosMap];
 	const x = sx * (W / 3) - W / 2 - 0.5;
 	const y = sy * (H / 3) - H / 2 + 0.5;
-	return [x, y];
+	return [x, y, rot];
 };
 
 export type PlayerGroup = {
@@ -54,6 +54,7 @@ export type PlayerGroup = {
 	order: number;
 	x: number;
 	y: number;
+	rot: number;
 };
 
 export class GameState {
@@ -80,7 +81,7 @@ export class GameState {
 		this.players = players;
 		this.playerMap = {};
 		players.forEach((player, idx) => {
-			const [x, y] = getPlayerPos(idx);
+			const [x, y, rot] = getPlayerPos(idx);
 			this.playerMap[player.client_id] = {
 				client_id: player.client_id,
 				hand: player.hand,
@@ -88,6 +89,7 @@ export class GameState {
 				order: idx,
 				x,
 				y,
+				rot,
 			};
 		});
 	};

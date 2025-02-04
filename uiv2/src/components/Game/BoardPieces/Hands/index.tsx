@@ -4,8 +4,6 @@ import {
 	OTHER_HAND_CARDS_MAX_ARC,
 	OTHER_HAND_CARDS_SPACING_DEG,
 	OTHER_HAND_CARDS_SPACING_DIST,
-	TILE_HEIGHT,
-	TILE_WIDTH,
 } from "../../../../util/constants";
 import { EntityId, HandGroup, PlayerGroup } from "../../../../util/GameState";
 import {
@@ -36,34 +34,41 @@ const TableHand = ({
 		<BoardPiece x={x} y={y}>
 			<div
 				style={{
-					position: "absolute",
-					top: 0,
-					left: 0,
-					transform: `translateY(${TILE_HEIGHT}px)`,
+					transform: `rotateZ(${player.rot}deg)`,
 				}}
 			>
-				{hand.hand.cards.map((card, index) => (
-					<div
-						style={{
-							position: "absolute",
-							bottom: 0,
-							left: "50%",
-							transformOrigin: `${
-								OTHER_HAND_CARD_SIZE / 2
-							}px ${OTHER_HAND_CARDS_SPACING_DIST}px`,
-							transform: `translate(-50%, -50%) rotateZ(${
-								((index + 0.5) / n - 0.5) * max
-							}deg)`,
-						}}
-					>
-						<CardBack
-							deck_id={card.deck_id}
-							width={OTHER_HAND_CARD_SIZE}
-							key={card.id}
-						/>
-					</div>
-				))}
+				<div
+					style={{
+						position: "absolute",
+						top: 0,
+						left: 0,
+						transform: `translateY(${OTHER_HAND_CARD_SIZE * 1.4}px)`,
+					}}
+				>
+					{hand.hand.cards.map((card, index) => (
+						<div
+							style={{
+								position: "absolute",
+								bottom: 0,
+								left: "50%",
+								transformOrigin: `${
+									OTHER_HAND_CARD_SIZE / 2
+								}px ${OTHER_HAND_CARDS_SPACING_DIST}px`,
+								transform: `translate(-50%, -50%) rotateZ(${
+									((index + 0.5) / n - 0.5) * max
+								}deg)`,
+							}}
+						>
+							<CardBack
+								deck_id={card.deck_id}
+								width={OTHER_HAND_CARD_SIZE}
+								key={card.id}
+							/>
+						</div>
+					))}
+				</div>
 			</div>
+
 			<div
 				style={{
 					position: "absolute",

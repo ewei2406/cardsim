@@ -32,7 +32,7 @@ const ChatHistory = ({ sendMessage }: { sendMessage: SendMessage }) => {
 				position: "fixed",
 				bottom: 0,
 				right: 0,
-				zIndex: 1000,
+				zIndex: 10000,
 			}}
 			onMouseEnter={() => setIsFocused(true)}
 			onMouseLeave={() => setIsFocused(false)}
