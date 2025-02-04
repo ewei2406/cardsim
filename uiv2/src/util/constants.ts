@@ -11,3 +11,13 @@ export const BOARD_HEIGHT = 10;
 
 export const CARD_WIDTH = TILE_WIDTH * 1.1;
 export const CARD_FACE_PADDING = 3;
+
+export const MY_HAND_CARDS_MAX_ARC = 20;
+export const MY_HAND_CARDS_SPACING_DEG = 0.75;
+export const MY_HAND_CARDS_SPACING_DIST = 3000;
+export const MY_HAND_CARD_SIZE = 120;
+
+export const OTHER_HAND_CARDS_MAX_ARC = 110;
+export const OTHER_HAND_CARDS_SPACING_DEG = 5;
+export const OTHER_HAND_CARDS_SPACING_DIST = 100;
+export const OTHER_HAND_CARD_SIZE = TILE_WIDTH * 1.25;

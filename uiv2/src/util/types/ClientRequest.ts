@@ -50,7 +50,7 @@ type ActionRequest =
 	| FlipCardsFromDeckRequest
 	| ShuffleDeckRequest
 	| CollectDeckRequest
-	| DrawCardFromTableRequest
+	| DrawCardsFromTableRequest
 	| FlipCardsRequest
 	| DrawCardFromDeckRequest
 	| MoveEntityRequest
@@ -114,9 +114,9 @@ interface CollectDeckRequest {
 	y1: number;
 }
 
-interface DrawCardFromTableRequest {
+interface DrawCardsFromTableRequest {
 	type: "Action";
-	action: "DrawCardFromTable";
+	action: "DrawCardsFromTable";
 	cards: number[];
 }
 

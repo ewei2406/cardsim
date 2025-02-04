@@ -5,6 +5,7 @@ use crate::{
     component::{component::Anonymize, GroupedComponent},
     connection_manager::ConnectionId,
     entity::Entity,
+    util,
 };
 
 use super::{card::Suit, deck::DeckId};
@@ -23,17 +24,22 @@ pub struct HandCard {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Hand {
     pub client_id: ConnectionId,
+    pub nickname: String,
+    pub order: usize,
     pub cards: Vec<HandCard>,
 }
 
 impl GroupedComponent for Hand {
-    type Params = ConnectionId;
+    type Params = (ConnectionId, String);
     fn add(gamestate: &mut crate::gamestate::GameState, params: Self::Params) -> Entity {
         let entity = gamestate.get_entity();
         gamestate.hands.register(
             entity,
             Hand {
-                client_id: params,
+                client_id: params.0,
+                nickname: params.1,
+                // TODO: replace - this assumes this is always ascending.
+                order: util::get_id(),
                 cards: Vec::new(),
             },
         );
@@ -49,11 +55,14 @@ impl GroupedComponent for Hand {
 #[serde(tag = "type")]
 pub enum AnonHandCard {
     HandCard {
+        id: HandCardId,
         rank: u8,
         suit: Suit,
         deck_id: DeckId,
+        shown: bool,
     },
     AnonHandCard {
+        id: HandCardId,
         deck_id: DeckId,
     },
 }
@@ -61,6 +70,8 @@ pub enum AnonHandCard {
 #[derive(Serialize, Debug)]
 pub struct AnonHand {
     client_id: ConnectionId,
+    nickname: String,
+    order: usize,
     cards: Vec<AnonHandCard>,
 }
 
@@ -73,11 +84,15 @@ impl Anonymize for Hand {
         );
         if self.client_id == perspective {
             return AnonHand {
+                nickname: self.nickname.clone(),
+                order: self.order,
                 client_id: self.client_id,
                 cards: self
                     .cards
                     .iter()
                     .map(|c| AnonHandCard::HandCard {
+                        id: c.id,
+                        shown: c.shown,
                         rank: c.rank,
                         suit: c.suit.clone(),
                         deck_id: c.deck_id,
@@ -90,16 +105,21 @@ impl Anonymize for Hand {
             .iter()
             .map(|card| match card.shown {
                 true => AnonHandCard::HandCard {
+                    id: card.id,
+                    shown: card.shown,
                     rank: card.rank,
                     suit: card.suit.clone(),
                     deck_id: card.deck_id,
                 },
                 false => AnonHandCard::AnonHandCard {
+                    id: card.id,
                     deck_id: card.deck_id,
                 },
             })
             .collect();
         AnonHand {
+            nickname: self.nickname.clone(),
+            order: self.order,
             client_id: self.client_id,
             cards: cards,
         }

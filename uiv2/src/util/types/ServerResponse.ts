@@ -83,21 +83,24 @@ export type Deck = {
 	shuffle_ctr: number;
 };
 
+export type HandCard =
+	| {
+			type: "HandCard";
+			id: number;
+			deck_id: number;
+			shown: boolean;
+			rank: number;
+			suit: "S" | "H" | "D" | "C" | "J";
+	  }
+	| {
+			type: "AnonHandCard";
+			id: number;
+			deck_id: number;
+	  };
+
 export type Hand = {
-	nickname: string;
 	client_id: number;
-	cards: (
-		| {
-				type: "HandCard";
-				rank: number;
-				suit: "S" | "H" | "D" | "C" | "J";
-				deck_id: number;
-		  }
-		| {
-				type: "AnonHandCard";
-				deck_id: number;
-		  }
-	)[];
+	cards: HandCard[];
 };
 
 export type GameECS = {

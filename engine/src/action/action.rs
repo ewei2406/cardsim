@@ -41,7 +41,7 @@ pub enum Action {
         x1: i64,
         y1: i64,
     },
-    DrawCardFromTable {
+    DrawCardsFromTable {
         cards: Vec<Entity>,
     },
     FlipCards {
@@ -108,7 +108,7 @@ impl Actionable for GameState {
             MoveEntity { entity, x1, y1 } => move_entity(self, entity, x1, y1),
             RemoveEntity { entity } => remove_entity(self, entity),
             CollectDeck { deck_id, x1, y1 } => collect_deck(self, deck_id, x1, y1),
-            DrawCardFromTable { cards } => draw_cards_from_table(self, client_id, cards),
+            DrawCardsFromTable { cards } => draw_cards_from_table(self, client_id, cards),
             DrawCardFromDeck { deck } => draw_card_from_deck(self, client_id, deck),
             PlayHandCards {
                 cards,

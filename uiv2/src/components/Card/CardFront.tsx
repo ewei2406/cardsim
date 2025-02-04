@@ -1,4 +1,4 @@
-import { TbClubsFilled, TbJoker, TbSpadeFilled } from "react-icons/tb";
+import { TbJoker } from "react-icons/tb";
 import { COLORS } from "../../util/colors";
 import {
 	BsFillSuitClubFill,
@@ -10,7 +10,7 @@ import {
 	BsSuitHeart,
 	BsSuitSpade,
 } from "react-icons/bs";
-import { CARD_FACE_PADDING, CARD_WIDTH } from "../../util/constants";
+import { CARD_FACE_PADDING } from "../../util/constants";
 
 const getRank = (rank: number) => {
 	switch (rank) {
@@ -88,6 +88,7 @@ const getColor = (suit: "H" | "D" | "C" | "S" | "J", rank: number) => {
 const CardFront = (props: {
 	width: number;
 	deck_id: number;
+	fontSize?: number;
 	rank: number;
 	suit: "H" | "D" | "C" | "S" | "J";
 	selected?: boolean;
@@ -115,7 +116,7 @@ const CardFront = (props: {
 			<div
 				className="column-center"
 				style={{
-					fontSize: "0.8em",
+					fontSize: props.fontSize ?? props.width / 4,
 					position: "absolute",
 					top: CARD_FACE_PADDING,
 					left: CARD_FACE_PADDING,
@@ -127,7 +128,7 @@ const CardFront = (props: {
 			<div
 				style={{
 					position: "absolute",
-					fontSize: CARD_WIDTH / 2.5,
+					fontSize: props.width / 2.5,
 					fontWeight: 800,
 					whiteSpace: "nowrap",
 					top: "50%",
@@ -141,7 +142,7 @@ const CardFront = (props: {
 			<div
 				style={{
 					position: "absolute",
-					fontSize: CARD_WIDTH / 1.1,
+					fontSize: props.width / 1.1,
 					whiteSpace: "nowrap",
 					top: "50%",
 					right: "50%",
@@ -155,7 +156,7 @@ const CardFront = (props: {
 			<div
 				className="column-center"
 				style={{
-					fontSize: "0.8em",
+					fontSize: props.fontSize ?? props.width / 4,
 					position: "absolute",
 					bottom: CARD_FACE_PADDING,
 					right: CARD_FACE_PADDING,

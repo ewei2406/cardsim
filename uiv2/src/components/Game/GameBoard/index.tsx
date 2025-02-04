@@ -64,7 +64,7 @@ const GameBoard = ({
 					height: BOARD_HEIGHT * TILE_HEIGHT,
 					backgroundColor: "transparent",
 					border: `5px solid ${COLORS.LIGHTER}`,
-					transform: `perspective(750px) rotateX(45deg) translateZ(-100px) ${
+					transform: `perspective(1400px) rotateX(35deg) translateZ(-50px) translateY(-100px) ${
 						rotated ? "rotateZ(180deg)" : ""
 					}`,
 				}}

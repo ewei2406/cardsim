@@ -1,7 +1,8 @@
-import { TbEye, TbEyeOff, TbX } from "react-icons/tb";
+import { TbEye, TbEyeOff, TbHandStop, TbX } from "react-icons/tb";
 import { SendMessage } from "../../../../util/types/ClientRequest";
 import { GameSelection, useSelect } from "../../../../hooks/useSelection";
 import { COLORS } from "../../../../util/colors";
+import { IoLayersOutline } from "react-icons/io5";
 
 const CardActions = ({
 	selection,
@@ -35,8 +36,43 @@ const CardActions = ({
 		});
 	};
 
+	const handlePickup = () => {
+		sendMessage({
+			type: "Action",
+			action: "DrawCardsFromTable",
+			cards: selection.cards.map((card) => card.id),
+		});
+		deselect();
+	};
+
+	let regroupId =
+		selection.cards.length === 0 ? null : selection.cards[0].card.deck_id;
+	selection.cards.forEach((card) => {
+		if (card.card.deck_id !== regroupId) {
+			regroupId = null;
+		}
+	});
+
+	const handleRegroup = () => {
+		if (!regroupId) {
+			return;
+		}
+		sendMessage({
+			type: "Action",
+			action: "CollectDeck",
+			deck_id: regroupId,
+			x1: selection.cards[selection.cards.length - 1].position.x,
+			y1: selection.cards[selection.cards.length - 1].position.y,
+		});
+		deselect();
+	};
+
 	return (
 		<div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+			<button onClick={handlePickup}>
+				<TbHandStop />
+				Pick Up
+			</button>
 			<button onClick={() => handleFlip(false)}>
 				<TbEyeOff />
 				Flip Facedown
@@ -44,6 +80,10 @@ const CardActions = ({
 			<button onClick={() => handleFlip(true)}>
 				<TbEye />
 				Flip Faceup
+			</button>
+			<button onClick={handleRegroup} disabled={!regroupId}>
+				<IoLayersOutline />
+				Regroup All
 			</button>
 			<button style={{ backgroundColor: COLORS.DARK }} onClick={deselect}>
 				<TbX />

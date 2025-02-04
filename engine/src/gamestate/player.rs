@@ -18,7 +18,7 @@ pub struct PlayerDescription {
 
 impl GameState {
     pub fn add_player(&mut self, nickname: String, client_id: ConnectionId) -> Outcome {
-        let hand = Hand::add(self, client_id);
+        let hand = Hand::add(self, (client_id, nickname.clone()));
         self.players.push(PlayerDescription {
             nickname,
             client_id,
