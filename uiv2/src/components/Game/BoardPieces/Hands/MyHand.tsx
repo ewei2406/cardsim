@@ -89,33 +89,11 @@ const MyHandCard = ({
 	}
 };
 
-const MyHandContent = ({}) => {
-	
-}
-
-const MyHand = ({
-	hands,
-	players,
-	clientId,
-}: {
-	clientId: number;
-	players: PlayerDescription[];
-	hands: { [id: EntityId]: HandGroup };
-}) => {
+const MyHandContent = ({ hand }: { hand: HandGroup }) => {
 	const { selection } = useSelection();
 	const [showHand, setShowHand] = useState(false);
 
 	const [calcPriority, setCalcPriority] = useState<CardOrdering>(() => byRank);
-
-	const myHand = players.find((p) => p.client_id === clientId)?.hand;
-	if (!myHand) {
-		return <></>;
-	}
-
-	const hand = hands[myHand];
-	if (!hand) {
-		return <></>;
-	}
 
 	const ids = selection.type === "handCards" ? selection.handCardIds : [];
 	const n = hand.hand.cards.length;
@@ -195,6 +173,28 @@ const MyHand = ({
 			/>
 		</div>
 	);
+};
+
+const MyHand = ({
+	hands,
+	players,
+	clientId,
+}: {
+	clientId: number;
+	players: PlayerDescription[];
+	hands: { [id: EntityId]: HandGroup };
+}) => {
+	const myHand = players.find((p) => p.client_id === clientId)?.hand;
+	if (!myHand) {
+		return <></>;
+	}
+
+	const hand = hands[myHand];
+	if (!hand) {
+		return <></>;
+	}
+
+	return <MyHandContent hand={hand} />;
 };
 
 export default MyHand;
