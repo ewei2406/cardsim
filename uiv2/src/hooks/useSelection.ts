@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-import { DeckGroup, CardGroup, HandGroup } from "../util/GameState";
+import { DeckGroup, CardGroup } from "../util/GameState";
 
 export type GameSelection =
 	| {
@@ -20,7 +20,6 @@ export type GameSelection =
 	  }
 	| {
 			type: "handCards";
-			hand: HandGroup;
 			handCardIds: number[];
 	  };
 
@@ -43,7 +42,6 @@ export type AddSelection =
 	  }
 	| {
 			type: "handCard";
-			hand: HandGroup;
 			handCardId: number;
 	  };
 
@@ -123,9 +121,17 @@ class SelectionStore {
 				break;
 			case "handCard":
 				if (this.selection.type === "handCards") {
+					if (this.selection.handCardIds.includes(addSelection.handCardId)) {
+						this.setSelection({
+							type: "handCards",
+							handCardIds: this.selection.handCardIds.filter(
+								(cardId) => cardId !== addSelection.handCardId
+							),
+						});
+						break;
+					}
 					this.setSelection({
 						type: "handCards",
-						hand: addSelection.hand,
 						handCardIds: [
 							...this.selection.handCardIds,
 							addSelection.handCardId,
@@ -134,7 +140,6 @@ class SelectionStore {
 				} else {
 					this.setSelection({
 						type: "handCards",
-						hand: addSelection.hand,
 						handCardIds: [addSelection.handCardId],
 					});
 				}

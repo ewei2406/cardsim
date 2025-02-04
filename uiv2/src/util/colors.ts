@@ -9,6 +9,7 @@ export const COLORS = {
 	PRIMARY_DARKER: "var(--primary-color-darker)",
 	DANGER: "var(--danger-color)",
 	SELECTION: "var(--selection-color)",
+	SELECTION_LIGHTER: "var(--selection-lighter-color)",
 	GAMEBOARD: "var(--lighter-color)",
 };
 

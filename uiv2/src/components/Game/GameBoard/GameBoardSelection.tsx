@@ -13,7 +13,12 @@ const GameBoardSelection = () => {
 	if (selection.type !== "gameBoard") return <></>;
 
 	return (
-		<BoardPiece x={selection.x} y={selection.y} disableInteraction>
+		<BoardPiece
+			x={selection.x}
+			y={selection.y}
+			disableInteraction
+			style={{ zIndex: -10000 }}
+		>
 			<div
 				className="spinning center-content"
 				style={{

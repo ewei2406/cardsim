@@ -46,9 +46,9 @@ const Game = ({ gameState, gameId, sendMessage, clientId }: GameProps) => {
 				/>
 			</GameBoard>
 			<MyHand
+				clientId={clientId}
 				hands={gameState.hands}
 				players={gameState.players}
-				clientId={clientId}
 			/>
 			<BoardActions sendMessage={sendMessage} />
 			<ChatHistory sendMessage={sendMessage} />

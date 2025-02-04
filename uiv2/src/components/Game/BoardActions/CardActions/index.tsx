@@ -13,8 +13,6 @@ const CardActions = ({
 }) => {
 	const { deselect } = useSelect();
 
-	const plural = selection.cards.length > 1 ? "Cards" : "Card";
-
 	// TODO: Make this a group action
 	const handleDelete = () => {
 		selection.cards.forEach((card) => {
@@ -75,11 +73,11 @@ const CardActions = ({
 			</button>
 			<button onClick={() => handleFlip(false)}>
 				<TbEyeOff />
-				Flip Facedown
+				Facedown
 			</button>
 			<button onClick={() => handleFlip(true)}>
 				<TbEye />
-				Flip Faceup
+				Faceup
 			</button>
 			<button onClick={handleRegroup} disabled={!regroupId}>
 				<IoLayersOutline />
@@ -91,7 +89,7 @@ const CardActions = ({
 			</button>
 			<button style={{ backgroundColor: COLORS.DANGER }} onClick={handleDelete}>
 				<TbX />
-				Delete {plural}
+				Delete
 			</button>
 		</div>
 	);

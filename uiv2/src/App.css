@@ -9,6 +9,7 @@
 	--primary-color-darker: #0056b3;
 	--danger-color: #dc3545;
 	--selection-color: #00b3ff;
+	--selection-lighter-color: #e1f4ff;
 }
 
 .theme-dark {
@@ -22,6 +23,7 @@
 	--primary-color-darker: #0056b3;
 	--danger-color: #dc3545;
 	--selection-color: #00b3ff;
+	--selection-lighter-color: #1a374a;
 }
 
 body {

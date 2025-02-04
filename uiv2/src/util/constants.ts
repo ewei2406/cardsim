@@ -22,8 +22,11 @@ export const OTHER_HAND_CARDS_SPACING_DEG = 5;
 export const OTHER_HAND_CARDS_SPACING_DIST = 100;
 export const OTHER_HAND_CARD_SIZE = TILE_WIDTH * 1.25;
 
-export const BOARD_LR_PLAYER_OFFSET = 200;
+export const BOARD_LR_PLAYER_OFFSET = 60;
+export const BOARD_LR_PLAYER_ROT = 15;
 export const BOARD_PERSPECTIVE = 1400;
 export const BOARD_TILT = 35;
 export const BOARD_LIFT = -50;
-export const BOARD_DISTANCE = -100;
+export const BOARD_DISTANCE = -120;
+
+export const MAX_PLAYER_COUNT = 8;

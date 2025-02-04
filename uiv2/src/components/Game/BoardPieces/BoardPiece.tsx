@@ -23,7 +23,7 @@ const BoardPiece = (props: {
 	return (
 		<div
 			style={{
-				border: "1px solid red",
+				zIndex: x + y,
 				position: "absolute",
 				width: TILE_WIDTH,
 				height: TILE_HEIGHT,
@@ -34,7 +34,7 @@ const BoardPiece = (props: {
 				alignItems: "center",
 				userSelect: "none",
 				transform: `translateX(${x}px) translateY(${y}px) translateZ(${
-					1 + (props.dz ?? 0)
+					props.dz ?? 0
 				}px)`,
 				transition: "transform 0.2s ease",
 				pointerEvents: props.disableInteraction ? "none" : undefined,

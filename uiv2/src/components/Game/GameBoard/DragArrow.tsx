@@ -30,7 +30,12 @@ const DragArrow = () => {
 	if (end.type === "void") {
 		return (
 			<>
-				<BoardPiece x={startX} y={startY} disableInteraction>
+				<BoardPiece
+					x={startX}
+					y={startY}
+					disableInteraction
+					style={{ zIndex: -10000 }}
+				>
 					<div
 						style={{
 							display: "flex",

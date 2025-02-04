@@ -63,6 +63,7 @@ const GBTile = ({
 			style={{
 				boxSizing: "border-box",
 				border: selected ? `2px solid ${COLORS.SELECTION}` : border,
+				zIndex: -10001,
 			}}
 		></BoardPiece>
 	);

@@ -92,6 +92,7 @@ const CardFront = (props: {
 	rank: number;
 	suit: "H" | "D" | "C" | "S" | "J";
 	selected?: boolean;
+	style?: React.CSSProperties;
 }) => {
 	const displayRank = getRank(props.rank);
 	const displaySuit = getSuit(props.suit);
@@ -101,6 +102,8 @@ const CardFront = (props: {
 	return (
 		<div
 			style={{
+				userSelect: "none",
+				WebkitUserSelect: "none",
 				position: "relative",
 				boxSizing: "border-box",
 				display: "flex",
@@ -111,6 +114,7 @@ const CardFront = (props: {
 				color: color,
 				border: `1px solid ${props.selected ? COLORS.SELECTION : COLORS.LIGHT}`,
 				backgroundColor: props.selected ? COLORS.SELECTION : COLORS.LIGHTEST,
+				...props.style,
 			}}
 		>
 			<div

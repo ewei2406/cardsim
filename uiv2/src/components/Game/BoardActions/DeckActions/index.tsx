@@ -96,17 +96,17 @@ const DeckActions = ({
 
 	return (
 		<div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-			<button onClick={() => setShowCut(true)} disabled={isSingleCard}>
-				<TbScissors />
-				Cut Deck...
+			<button onClick={handleDrawCard}>
+				<TbArrowUp />
+				Draw
 			</button>
 			<button onClick={handleFlip}>
 				<TbArrowForwardUp />
-				Flip Card
+				Flip
 			</button>
 			<button onClick={handleBurn}>
 				<RiFireLine />
-				Burn Card
+				Burn
 			</button>
 			<button onClick={handleShuffle} disabled={isSingleCard}>
 				<TbArrowsShuffle />
@@ -114,7 +114,7 @@ const DeckActions = ({
 			</button>
 			<button onClick={() => setShowCut(true)}>
 				<TbArrowFork />
-				Deal Card
+				Deal One
 			</button>
 			<button onClick={() => setShowCut(true)}>
 				<TbArrowFork />
@@ -124,9 +124,9 @@ const DeckActions = ({
 				<IoLayersOutline />
 				Regroup All
 			</button>
-			<button onClick={handleDrawCard}>
-				<TbArrowUp />
-				Draw Card
+			<button onClick={() => setShowCut(true)} disabled={isSingleCard}>
+				<TbScissors />
+				Cut...
 			</button>
 			<button style={{ backgroundColor: COLORS.DARK }} onClick={deselect}>
 				<TbX />
@@ -134,7 +134,7 @@ const DeckActions = ({
 			</button>
 			<button style={{ backgroundColor: COLORS.DANGER }} onClick={handleDelete}>
 				<TbX />
-				Delete Deck
+				Delete
 			</button>
 			<Modal shown={showCut} close={() => setShowCut(false)} title="Cut Deck">
 				{<CutDeck deck={selection.deck} handleCut={handleCut} />}

@@ -4,6 +4,7 @@ import {
 	BOARD_HEIGHT,
 	BOARD_LIFT,
 	BOARD_LR_PLAYER_OFFSET,
+	BOARD_LR_PLAYER_ROT,
 	BOARD_PERSPECTIVE,
 	BOARD_TILT,
 	BOARD_WIDTH,
@@ -72,6 +73,7 @@ const GameBoard = ({
 					transform: `
 						perspective(${BOARD_PERSPECTIVE}px) 
 						rotateX(${BOARD_TILT}deg) 
+						rotateZ(${isOnRight ? -BOARD_LR_PLAYER_ROT : BOARD_LR_PLAYER_ROT}deg)
 						translateZ(${BOARD_LIFT}px) 
 						translateY(${BOARD_DISTANCE}px) 
 						translateX(${isOnRight ? BOARD_LR_PLAYER_OFFSET : -BOARD_LR_PLAYER_OFFSET}px)`,

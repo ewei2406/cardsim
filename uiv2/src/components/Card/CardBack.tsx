@@ -18,6 +18,8 @@ const CardBack = (props: {
 	return (
 		<div
 			style={{
+				userSelect: "none",
+				WebkitUserSelect: "none",
 				position: "relative",
 				boxSizing: "border-box",
 				display: "flex",

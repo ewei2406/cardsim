@@ -14,7 +14,9 @@ const TableHand = ({
 	x,
 	y,
 	player,
+	isMe,
 }: {
+	isMe: boolean;
 	hand: HandGroup;
 	x: number;
 	y: number;
@@ -70,7 +72,7 @@ const TableHand = ({
 					WebkitTextStroke: `5px ${COLORS.LIGHTEST}`,
 				}}
 			>
-				{player.nickname}
+				{player.nickname} {isMe && "(me)"}
 			</div>
 			<div
 				style={{
@@ -81,7 +83,7 @@ const TableHand = ({
 					color: hashColor(player.client_id),
 				}}
 			>
-				{player.nickname}
+				{player.nickname} {isMe && "(me)"}
 			</div>
 		</BoardPiece>
 	);
@@ -100,12 +102,12 @@ const TableHands = ({
 		<>
 			{Object.values(playerMap).map(
 				(player) =>
-					player.client_id !== clientId &&
 					hands[player.hand] && (
 						<TableHand
 							key={player.client_id}
 							hand={hands[player.hand]}
 							player={player}
+							isMe={player.client_id === clientId}
 							x={player.x}
 							y={player.y}
 						/>
