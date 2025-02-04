@@ -3,9 +3,11 @@ import { COLORS } from "../../../util/colors";
 import { TILE_HEIGHT, TILE_WIDTH } from "../../../util/constants";
 import BoardPiece from "../BoardPieces/BoardPiece";
 import { getXY, useDragObserver } from "../../../hooks/useDrag";
+import { useRot } from "../../../hooks/useTransformCoords";
 
 const DragArrow = () => {
 	const { start, end } = useDragObserver();
+	const rot = useRot();
 
 	if (start.type === "none" || start.type === "void" || end.type === "none") {
 		return <></>;
@@ -23,7 +25,7 @@ const DragArrow = () => {
 	const [startX, startY] = getXY(start);
 	const [endX, endY] = getXY(end);
 
-	console.log(start, end);
+	console.log(rot);
 
 	if (end.type === "void") {
 		return (
@@ -37,7 +39,7 @@ const DragArrow = () => {
 							justifyContent: "center",
 							alignItems: "center",
 							backfaceVisibility: "visible",
-							transform: "translateZ(50px) rotateX(-90deg)",
+							transform: `translateZ(50px) rotateX(-90deg)`,
 						}}
 					>
 						<div
@@ -69,6 +71,7 @@ const DragArrow = () => {
 				style={{
 					overflow: "visible",
 					display: "block",
+					transform: `rotateZ(${rot}deg)`,
 				}}
 				xmlns="http://www.w3.org/2000/svg"
 			>

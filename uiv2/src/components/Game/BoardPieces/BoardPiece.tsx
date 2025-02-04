@@ -1,10 +1,6 @@
 import { ReactNode } from "react";
-import {
-	BOARD_HEIGHT,
-	BOARD_WIDTH,
-	TILE_HEIGHT,
-	TILE_WIDTH,
-} from "../../../util/constants";
+import { TILE_HEIGHT, TILE_WIDTH } from "../../../util/constants";
+import { useTransform } from "../../../hooks/useTransformCoords";
 
 const BoardPiece = (props: {
 	x: number;
@@ -20,6 +16,10 @@ const BoardPiece = (props: {
 	disableInteraction?: boolean;
 	style?: React.CSSProperties;
 }) => {
+	const transform = useTransform();
+
+	const [x, y] = transform(props.x, props.y);
+
 	return (
 		<div
 			style={{
@@ -33,11 +33,9 @@ const BoardPiece = (props: {
 				justifyContent: "center",
 				alignItems: "center",
 				userSelect: "none",
-				transform: `translateX(${
-					(props.x + BOARD_WIDTH / 2) * TILE_WIDTH
-				}px) translateY(${
-					(BOARD_HEIGHT / 2 - props.y) * TILE_HEIGHT
-				}px) translateZ(${1 + (props.dz ?? 0)}px)`,
+				transform: `translateX(${x}px) translateY(${y}px) translateZ(${
+					1 + (props.dz ?? 0)
+				}px)`,
 				transition: "transform 0.2s ease",
 				pointerEvents: props.disableInteraction ? "none" : undefined,
 				...props.style,

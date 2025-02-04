@@ -73,7 +73,7 @@ const Y = Array.from({ length: BOARD_HEIGHT }, (_, i) => i);
 
 const GameBoardTiles = () => {
 	const { selection } = useSelection();
-	console.log(selection);
+
 	return (
 		<>
 			{X.map((x) => (

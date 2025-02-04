@@ -6,10 +6,6 @@ import {
 	OTHER_HAND_CARDS_SPACING_DIST,
 } from "../../../../util/constants";
 import { EntityId, HandGroup, PlayerGroup } from "../../../../util/GameState";
-import {
-	HandCard,
-	PlayerDescription,
-} from "../../../../util/types/ServerResponse";
 import CardBack from "../../../Card/CardBack";
 import BoardPiece from "../BoardPiece";
 
@@ -34,39 +30,34 @@ const TableHand = ({
 		<BoardPiece x={x} y={y}>
 			<div
 				style={{
-					transform: `rotateZ(${player.rot}deg)`,
+					position: "absolute",
+					top: 0,
+					left: 0,
+					transform: `translateY(${OTHER_HAND_CARD_SIZE * 1.4}px)`,
 				}}
 			>
-				<div
-					style={{
-						position: "absolute",
-						top: 0,
-						left: 0,
-						transform: `translateY(${OTHER_HAND_CARD_SIZE * 1.4}px)`,
-					}}
-				>
-					{hand.hand.cards.map((card, index) => (
-						<div
-							style={{
-								position: "absolute",
-								bottom: 0,
-								left: "50%",
-								transformOrigin: `${
-									OTHER_HAND_CARD_SIZE / 2
-								}px ${OTHER_HAND_CARDS_SPACING_DIST}px`,
-								transform: `translate(-50%, -50%) rotateZ(${
-									((index + 0.5) / n - 0.5) * max
-								}deg)`,
-							}}
-						>
-							<CardBack
-								deck_id={card.deck_id}
-								width={OTHER_HAND_CARD_SIZE}
-								key={card.id}
-							/>
-						</div>
-					))}
-				</div>
+				{hand.hand.cards.map((card, index) => (
+					<div
+						key={card.id}
+						style={{
+							position: "absolute",
+							bottom: 0,
+							left: "50%",
+							transformOrigin: `${
+								OTHER_HAND_CARD_SIZE / 2
+							}px ${OTHER_HAND_CARDS_SPACING_DIST}px`,
+							transform: `translate(-50%, -50%) rotateZ(${
+								((index + 0.5) / n - 0.5) * max
+							}deg)`,
+						}}
+					>
+						<CardBack
+							deck_id={card.deck_id}
+							width={OTHER_HAND_CARD_SIZE}
+							key={card.id}
+						/>
+					</div>
+				))}
 			</div>
 
 			<div
@@ -96,30 +87,6 @@ const TableHand = ({
 	);
 };
 
-const testHands: { [id: number]: HandGroup } = {};
-const testPlayers: PlayerDescription[] = [];
-
-for (let i = 0; i < 8; i++) {
-	testHands[i] = {
-		id: i + 100,
-		hand: {
-			cards: Array.from({ length: 30 }).map(
-				(_, j): HandCard => ({
-					type: "AnonHandCard",
-					deck_id: i + 200,
-					id: i + j + 200,
-				})
-			),
-			client_id: i,
-		},
-	};
-	testPlayers.push({
-		client_id: i,
-		hand: i + 100,
-		nickname: "Player " + i,
-	});
-}
-
 const TableHands = ({
 	hands,
 	playerMap,
@@ -133,7 +100,7 @@ const TableHands = ({
 		<>
 			{Object.values(playerMap).map(
 				(player) =>
-					// player.client_id !== clientId &&
+					player.client_id !== clientId &&
 					hands[player.hand] && (
 						<TableHand
 							key={player.client_id}

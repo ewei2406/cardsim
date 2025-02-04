@@ -9,9 +9,10 @@ import GameBoardSelection from "./GameBoard/GameBoardSelection";
 import BoardActions from "./BoardActions";
 import TableDecks from "./BoardPieces/TableDecks";
 import TableCards from "./BoardPieces/TableCards";
-import { useMemo } from "react";
+import { useEffect, useState } from "react";
 import TableHands from "./BoardPieces/Hands";
 import MyHand from "./BoardPieces/Hands/MyHand";
+import { updateTransform } from "../../hooks/useTransformCoords";
 
 interface GameProps {
 	gameState: GameState;
@@ -21,20 +22,18 @@ interface GameProps {
 }
 
 const Game = ({ gameState, gameId, sendMessage, clientId }: GameProps) => {
-	const myHand = useMemo(() => {
-		const myDesc = gameState.players.find((p) => p.client_id === clientId);
-		console.log(myDesc);
-		if (!myDesc || !gameState.hands[myDesc.hand]) {
-			return null;
-		}
-		return gameState.hands[myDesc.hand];
-	}, [clientId, gameState]);
+	const [isOnRight, setPlayerIsOnRight] = useState(false);
 
-	console.log(myHand);
+	useEffect(() => {
+		console.log("here", gameState.playerMap, clientId);
+		if (!gameState.playerMap[clientId]) return;
+		updateTransform(gameState.playerMap[clientId].rot);
+		setPlayerIsOnRight(gameState.playerMap[clientId].order > 3);
+	}, [clientId, gameState.playerMap, gameState.players]);
 
 	return (
 		<div>
-			<GameBoard gameId={gameId}>
+			<GameBoard gameId={gameId} isOnRight={isOnRight}>
 				<GameBoardTiles />
 				<DragArrow />
 				<GameBoardSelection />

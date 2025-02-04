@@ -1,6 +1,11 @@
 import { ReactNode, useRef } from "react";
 import {
+	BOARD_DISTANCE,
 	BOARD_HEIGHT,
+	BOARD_LIFT,
+	BOARD_LR_PLAYER_OFFSET,
+	BOARD_PERSPECTIVE,
+	BOARD_TILT,
 	BOARD_WIDTH,
 	TILE_HEIGHT,
 	TILE_WIDTH,
@@ -12,11 +17,11 @@ import { useDrag } from "../../../hooks/useDrag";
 const GameBoard = ({
 	children,
 	gameId,
-	rotated,
+	isOnRight,
 }: {
 	children?: ReactNode;
 	gameId: number;
-	rotated?: boolean;
+	isOnRight: boolean;
 }) => {
 	const gameBoardRef = useRef<HTMLDivElement>(null);
 	const { deselect } = useSelect();
@@ -64,9 +69,12 @@ const GameBoard = ({
 					height: BOARD_HEIGHT * TILE_HEIGHT,
 					backgroundColor: "transparent",
 					border: `5px solid ${COLORS.LIGHTER}`,
-					transform: `perspective(1400px) rotateX(35deg) translateZ(-50px) translateY(-100px) ${
-						rotated ? "rotateZ(180deg)" : ""
-					}`,
+					transform: `
+						perspective(${BOARD_PERSPECTIVE}px) 
+						rotateX(${BOARD_TILT}deg) 
+						translateZ(${BOARD_LIFT}px) 
+						translateY(${BOARD_DISTANCE}px) 
+						translateX(${isOnRight ? BOARD_LR_PLAYER_OFFSET : -BOARD_LR_PLAYER_OFFSET}px)`,
 				}}
 				ref={gameBoardRef}
 			>

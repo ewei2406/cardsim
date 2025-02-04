@@ -97,8 +97,6 @@ const TableCard = ({
 const TableCards = ({ cards }: { cards: { [id: EntityId]: CardGroup } }) => {
 	const { selection } = useSelection();
 
-	console.log("HERE", selection);
-
 	const ids =
 		selection.type === "cards" ? selection.cards.map((c) => c.id) : [];
 
