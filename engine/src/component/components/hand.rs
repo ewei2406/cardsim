@@ -30,6 +30,7 @@ pub struct Hand {
 impl GroupedComponent for Hand {
     type Params = Hand;
     fn add_id(gamestate: &mut crate::gamestate::GameState, params: Self::Params, id: Entity) {
+        gamestate.entities.insert(id);
         gamestate.hands.register(id, params);
     }
     fn add(gamestate: &mut crate::gamestate::GameState, params: Self::Params) -> Entity {
@@ -39,6 +40,7 @@ impl GroupedComponent for Hand {
     }
     fn remove(gamestate: &mut crate::gamestate::GameState, entity: Entity) {
         gamestate.hands.unregister(entity);
+        gamestate.entities.remove(&entity);
     }
 }
 

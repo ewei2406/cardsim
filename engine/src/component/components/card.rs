@@ -28,17 +28,20 @@ pub struct Card {
 impl GroupedComponent for Card {
     type Params = (Card, Position);
     fn add_id(gamestate: &mut GameState, params: Self::Params, id: Entity) {
+        gamestate.entities.insert(id);
         gamestate.cards.register(id, params.0);
         gamestate.positions.register(id, params.1);
     }
     fn add(gamestate: &mut GameState, params: Self::Params) -> Entity {
         let entity = gamestate.get_entity();
         Self::add_id(gamestate, params, entity);
+        log::error!("Added card with id {}", entity);
         entity
     }
     fn remove(gamestate: &mut GameState, entity: Entity) {
         gamestate.cards.unregister(entity);
         gamestate.positions.unregister(entity);
+        gamestate.entities.remove(&entity);
     }
 }
 

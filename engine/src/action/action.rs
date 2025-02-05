@@ -55,8 +55,16 @@ pub enum Action {
         x1: i64,
         y1: i64,
     },
+    MoveEntities {
+        entities: Vec<Entity>,
+        x1: i64,
+        y1: i64,
+    },
     RemoveEntity {
         entity: Entity,
+    },
+    RemoveEntities {
+        entities: Vec<Entity>,
     },
     PlayHandCards {
         cards: Vec<HandCardId>,
@@ -68,9 +76,19 @@ pub enum Action {
         cards: Vec<HandCardId>,
         deck: Entity,
     },
+    ReturnCardsToDeck {
+        cards: Vec<Entity>,
+        deck: Entity,
+    },
     ShowHandCards {
         cards: Vec<HandCardId>,
         shown: bool,
+    },
+    DealDeckSingle {
+        deck: Entity,
+    },
+    DealDeckAll {
+        deck: Entity,
     },
 }
 
@@ -105,7 +123,9 @@ impl Actionable for GameState {
             FlipCardFromDeck { deck, faceup } => flip_card_from_deck(self, deck, faceup),
             ShuffleDeck { deck } => shuffle_deck(self, deck),
             MoveEntity { entity, x1, y1 } => move_entity(self, entity, x1, y1),
+            MoveEntities { entities, x1, y1 } => move_entities(self, entities, x1, y1),
             RemoveEntity { entity } => remove_entity(self, entity),
+            RemoveEntities { entities } => remove_entities(self, entities),
             CollectDeck { deck_id, x1, y1 } => collect_deck(self, deck_id, x1, y1),
             DrawCardsFromTable { cards } => draw_cards_from_table(self, client_id, cards),
             DrawCardFromDeck { deck } => draw_card_from_deck(self, client_id, deck),
@@ -120,6 +140,9 @@ impl Actionable for GameState {
             PlayHandCardsToDeck { cards, deck } => {
                 play_hand_cards_to_deck(self, client_id, cards, deck)
             }
+            ReturnCardsToDeck { cards, deck } => return_cards_to_deck(self, cards, deck),
+            DealDeckSingle { deck } => deal_deck_single(self, deck),
+            DealDeckAll { deck } => deal_deck_all(self, deck),
         }
     }
 }

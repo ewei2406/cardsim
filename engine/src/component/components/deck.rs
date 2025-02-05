@@ -47,17 +47,20 @@ impl Deck {
 impl GroupedComponent for Deck {
     type Params = (Deck, Position);
     fn add_id(gamestate: &mut GameState, params: Self::Params, id: Entity) {
+        gamestate.entities.insert(id);
         gamestate.decks.register(id, params.0);
         gamestate.positions.register(id, params.1);
     }
     fn add(gamestate: &mut GameState, params: Self::Params) -> Entity {
         let entity = gamestate.get_entity();
-        Self::add_id(gamestate, params, entity);
+        gamestate.decks.register(entity, params.0);
+		gamestate.positions.register(entity, params.1);
         entity
     }
     fn remove(gamestate: &mut GameState, entity: Entity) {
         gamestate.decks.unregister(entity);
         gamestate.positions.unregister(entity);
+        gamestate.entities.remove(&entity);
     }
 }
 

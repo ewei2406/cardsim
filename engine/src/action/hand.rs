@@ -109,6 +109,41 @@ pub fn play_hand_cards_to_deck(
     }
 }
 
+pub fn return_cards_to_deck(
+    gamestate: &mut GameState,
+    cards: Vec<Entity>,
+    deck: Entity,
+) -> Outcome {
+    let deck_component = match gamestate.decks.get_mut(deck) {
+        Some(deck) => deck,
+        None => return Outcome::Invalid(InvalidOutcomeError::EntityNotFound),
+    };
+
+    for card in &cards {
+        let card_component = match gamestate.cards.get(*card) {
+            Some(card) => card,
+            None => continue,
+        };
+        deck_component.return_card(CardInit(
+            card_component.suit.clone(),
+            card_component.rank,
+            *card,
+        ));
+    }
+
+    for card in &cards {
+        Card::remove(gamestate, *card);
+    }
+
+    let mut dstate = GameState::new();
+    dstate.clone_entity_from(gamestate, deck);
+    Outcome::Delta {
+        changed: Some(dstate),
+        deleted: Some(cards),
+        players: None,
+    }
+}
+
 pub fn show_hand_cards(
     gamestate: &mut GameState,
     client_id: ConnectionId,
