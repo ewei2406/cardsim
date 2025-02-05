@@ -1,4 +1,4 @@
-use crate::{entity::Entity, gamestate::GameState};
+use crate::{entity::Entity, gamestate::GameState, util::NearestEmptyPosition};
 
 use super::{action::InvalidOutcomeError, Outcome};
 
@@ -8,7 +8,7 @@ pub fn move_entity(gamestate: &mut GameState, entity: Entity, x1: i64, y1: i64) 
     }
     gamestate
         .positions
-        .register(entity, gamestate.nearest_empty_position(x1, y1));
+        .register(entity, NearestEmptyPosition::bfs(&gamestate, x1, y1));
     let mut dstate = GameState::new();
     dstate.clone_entity_from(gamestate, entity);
     Outcome::Delta {
@@ -31,7 +31,7 @@ pub fn move_entities(
         }
         gamestate
             .positions
-            .register(entity, gamestate.nearest_empty_position(x1, y1));
+            .register(entity, NearestEmptyPosition::bfs(&gamestate, x1, y1));
         dstate.clone_entity_from(gamestate, entity);
     }
     Outcome::Delta {

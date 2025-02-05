@@ -1,6 +1,9 @@
-use std::vec;
+use std::{collections::HashSet, vec};
 
-use crate::{component::*, connection_manager::ConnectionId, entity::Entity, gamestate::GameState};
+use crate::{
+    component::*, connection_manager::ConnectionId, entity::Entity, gamestate::GameState,
+    util::NearestEmptyPosition,
+};
 
 use super::{action::InvalidOutcomeError, Outcome};
 
@@ -34,6 +37,7 @@ pub fn play_hand_cards(
             false => remaining.push(hand_card.clone()),
         });
 
+    let w = (cards_set.len() / 2) as i64;
     hand_component.cards = remaining;
     let new_cards: Vec<Entity> = played
         .iter()
@@ -44,7 +48,7 @@ pub fn play_hand_cards(
                 deck_id: played_card.deck_id,
                 faceup,
             };
-            let position = gamestate.nearest_empty_position(x, y);
+            let position = NearestEmptyPosition::pos_x_wrap(gamestate, x - w, y, 8);
             Card::add_id(gamestate, (card, position), played_card.id);
             played_card.id
         })
@@ -119,7 +123,14 @@ pub fn return_cards_to_deck(
         None => return Outcome::Invalid(InvalidOutcomeError::EntityNotFound),
     };
 
+    let mut seen: HashSet<Entity> = HashSet::new();
     for card in &cards {
+        match seen.contains(card) {
+            true => continue,
+            false => {
+                seen.insert(*card);
+            }
+        }
         let card_component = match gamestate.cards.get(*card) {
             Some(card) => card,
             None => continue,

@@ -69,16 +69,4 @@ impl GameState {
             hands: self.hands.anonymize(perspective),
         }
     }
-
-    pub fn nearest_empty_position(&self, x: i64, y: i64) -> Position {
-        let mut x1 = x;
-        while self
-            .positions
-            .get_entity_match(|e| e.x == x1 && e.y == y)
-            .is_some()
-        {
-            x1 += 1;
-        }
-        Position { x: x1, y }
-    }
 }

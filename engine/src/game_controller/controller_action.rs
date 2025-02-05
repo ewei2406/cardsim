@@ -6,6 +6,7 @@ use tokio_tungstenite::tungstenite::Message;
 use crate::{
     action::*,
     connection_manager::ConnectionId,
+    constants::MAX_PLAYERS,
     game_controller::{responses::ServerResponse, Game},
     gamestate::*,
     util,
@@ -168,9 +169,17 @@ impl GameController {
                     .await;
             }
         };
+        let mut game = game.lock().await;
+
+        // Game can't be full
+        if game.game_state.players.len() >= MAX_PLAYERS {
+            log::info!("Client {} tried to join full game {}.", client_id, game_id);
+            return self
+                .error(client_id, format!("Game {} is full.", game_id))
+                .await;
+        }
 
         // Add the client
-        let mut game = game.lock().await;
         let outcome = game.game_state.add_player(nickname, client_id);
 
         // Let everyone else know

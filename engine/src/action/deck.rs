@@ -1,7 +1,7 @@
 use super::action::Outcome;
 use super::InvalidOutcomeError;
 use crate::component::{CardInit, DeckId, GroupedComponent, Hand, HandCard, Suit};
-use crate::util;
+use crate::util::{self, NearestEmptyPosition};
 use crate::{
     component::{Card, Deck},
     entity::Entity,
@@ -38,7 +38,7 @@ pub fn create_deck(
     y: i64,
     card_inits: Vec<CardInit>,
 ) -> Outcome {
-    let position = gamestate.nearest_empty_position(x, y);
+    let position = NearestEmptyPosition::bfs(gamestate, x, y);
     let deck = Deck::new(gamestate.get_entity(), card_inits);
     let entity = Deck::add(gamestate, (deck, position));
     let mut dstate = GameState::new();
@@ -53,7 +53,7 @@ pub fn create_deck(
 // Move the top n cards of a deck onto another spot
 pub fn cut_deck(gamestate: &mut GameState, deck: Entity, n: usize) -> Outcome {
     let position = match gamestate.positions.get(deck) {
-        Some(position) => gamestate.nearest_empty_position(position.x, position.y),
+        Some(position) => NearestEmptyPosition::bfs(gamestate, position.x, position.y),
         None => return Outcome::Invalid(InvalidOutcomeError::EntityNotFound),
     };
     if n == 0 {
@@ -93,10 +93,11 @@ pub fn cut_deck(gamestate: &mut GameState, deck: Entity, n: usize) -> Outcome {
 }
 
 pub fn flip_card_from_deck(gamestate: &mut GameState, deck: Entity, faceup: bool) -> Outcome {
-    let dy = if faceup { 0 } else { -2 };
-    let dx = if faceup { 2 } else { 0 };
     let position = match gamestate.positions.get(deck) {
-        Some(position) => gamestate.nearest_empty_position(position.x + dx, position.y + dy),
+        Some(position) => match faceup {
+            true => NearestEmptyPosition::pos_x_wrap(gamestate, position.x + 2, position.y, 8),
+            false => NearestEmptyPosition::neg_x_wrap(gamestate, position.x - 2, position.y, 8),
+        },
         None => return Outcome::None,
     };
     let deck_component = match gamestate.decks.get_mut(deck) {
@@ -207,7 +208,7 @@ pub fn collect_deck(gamestate: &mut GameState, deck_id: DeckId, x1: i64, y1: i64
     let new_deck = Deck::new(deck_id, card_inits);
     let new_deck = Deck::add(
         gamestate,
-        (new_deck, gamestate.nearest_empty_position(x1, y1)),
+        (new_deck, NearestEmptyPosition::bfs(gamestate, x1, y1)),
     );
 
     let mut dstate = GameState::new();
