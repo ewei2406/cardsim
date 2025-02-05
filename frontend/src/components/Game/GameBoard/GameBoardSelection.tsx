@@ -4,7 +4,7 @@ import { TILE_WIDTH } from "../../../util/constants";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import "./GameBoardSelection.css";
-import { useSelection } from "../../../hooks/useSelection";
+import { selectionObject, useSelection } from "../../../hooks/useSelection";
 import BoardPiece from "../BoardPieces/BoardPiece";
 
 const GameBoardSelection = () => {
@@ -16,7 +16,10 @@ const GameBoardSelection = () => {
 		<BoardPiece
 			x={selection.x}
 			y={selection.y}
-			disableInteraction
+			onClick={(e) => {
+				selectionObject.deselect();
+				e.stopPropagation();
+			}}
 			style={{ zIndex: -10000 }}
 		>
 			<div

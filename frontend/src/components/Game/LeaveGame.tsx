@@ -1,6 +1,7 @@
 import { TbDoorExit } from "react-icons/tb";
 import { COLORS } from "../../util/colors";
 import { SendMessage } from "../../util/types/ClientRequest";
+import { selectionObject } from "../../hooks/useSelection";
 
 const LeaveGame = ({ sendMessage }: { sendMessage: SendMessage }) => {
 	const leaveGame = () => {
@@ -8,6 +9,7 @@ const LeaveGame = ({ sendMessage }: { sendMessage: SendMessage }) => {
 			type: "Command",
 			command: "LeaveGame",
 		});
+		selectionObject.deselect();
 	};
 
 	return (

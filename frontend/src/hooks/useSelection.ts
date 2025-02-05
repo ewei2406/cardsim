@@ -71,6 +71,38 @@ class SelectionStore {
 		this.notify();
 	}
 
+	removeEntities(entityIds: number[]) {
+		const entityIdSet = new Set(entityIds);
+		switch (this.selection.type) {
+			case "cards":
+				if (this.selection.cards.every((card) => !entityIdSet.has(card.id)))
+					return;
+				this.setSelection({
+					type: "cards",
+					cards: this.selection.cards.filter(
+						(card) => !entityIdSet.has(card.id)
+					),
+				});
+				break;
+			case "deck":
+				if (!entityIdSet.has(this.selection.deck.id)) return;
+				this.setSelection({ type: "none" });
+				break;
+			case "handCards":
+				if (this.selection.handCardIds.every((id) => !entityIdSet.has(id)))
+					return;
+				this.setSelection({
+					type: "handCards",
+					handCardIds: this.selection.handCardIds.filter(
+						(id) => !entityIdSet.has(id)
+					),
+				});
+				break;
+			default:
+				break;
+		}
+	}
+
 	addSelection(addSelection: AddSelection) {
 		let cards: CardGroup[] = [];
 		switch (addSelection.type) {
@@ -172,6 +204,7 @@ export const selectionStore = new SelectionStore();
 export const selectionObject = {
 	getCurSelection: selectionStore.getSelection.bind(selectionStore),
 	addSelection: selectionStore.addSelection.bind(selectionStore),
+	removeEntities: selectionStore.removeEntities.bind(selectionStore),
 	deselect: () => {
 		selectionStore.setSelection({ type: "none" });
 	},

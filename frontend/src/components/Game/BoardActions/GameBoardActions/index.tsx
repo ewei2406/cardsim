@@ -3,7 +3,7 @@ import { COLORS } from "../../../../util/colors";
 import { useState } from "react";
 import DeckSelector, { DeckProps } from "./DeckSelector";
 import { SendMessage } from "../../../../util/types/ClientRequest";
-import { GameSelection, useSelect } from "../../../../hooks/useSelection";
+import { GameSelection, selectionObject, useSelect } from "../../../../hooks/useSelection";
 import Modal from "../../../Modal";
 
 const GameBoardActions = ({
@@ -25,6 +25,7 @@ const GameBoardActions = ({
 			y: selection.y,
 		});
 		setShowNewDeck(false);
+		selectionObject.deselect();
 	};
 
 	return (

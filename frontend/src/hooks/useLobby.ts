@@ -5,11 +5,7 @@ import { logger } from "./useLogger";
 import { ClientRequest } from "../util/types/ClientRequest";
 import { chat } from "./useChat";
 import { DragTarget, useDragFinishObserver } from "./useDrag";
-import {
-	GameSelection,
-	getCardIds,
-	useSelectionChangeObserver,
-} from "./useSelection";
+import { GameSelection, getCardIds, selectionObject } from "./useSelection";
 
 type LobbyStatus =
 	| {
@@ -172,6 +168,7 @@ export const useLobby = () => {
 							action: "RemoveEntity",
 							entity: start.id,
 						});
+						selectionObject.deselect();
 					}
 					if (start.type === "card") {
 						sendMessage({
@@ -179,6 +176,7 @@ export const useLobby = () => {
 							action: "RemoveEntities",
 							entities: getCardIds(curSelection, start.id),
 						});
+						selectionObject.deselect();
 					}
 					break;
 				case "myHand":
@@ -188,6 +186,7 @@ export const useLobby = () => {
 							action: "DrawCardsFromTable",
 							cards: getCardIds(curSelection, start.id),
 						});
+						selectionObject.deselect();
 						break;
 					}
 					if (start.type === "deck") {
@@ -196,6 +195,7 @@ export const useLobby = () => {
 							action: "DrawCardFromDeck",
 							deck: start.id,
 						});
+						selectionObject.deselect();
 						break;
 					}
 					break;
@@ -207,6 +207,7 @@ export const useLobby = () => {
 							cards: getCardIds(curSelection, start.id),
 							deck: end.id,
 						});
+						selectionObject.deselect();
 					}
 					if (start.type === "myHandCard") {
 						sendMessage({
@@ -215,6 +216,7 @@ export const useLobby = () => {
 							cards: getCardIds(curSelection, start.cardId),
 							deck: end.id,
 						});
+						selectionObject.deselect();
 					}
 					break;
 				default:

@@ -1,6 +1,6 @@
 import { TbEye, TbEyeOff, TbHandStop, TbX } from "react-icons/tb";
 import { SendMessage } from "../../../../util/types/ClientRequest";
-import { GameSelection, useSelect } from "../../../../hooks/useSelection";
+import { GameSelection, selectionObject, useSelect } from "../../../../hooks/useSelection";
 import { COLORS } from "../../../../util/colors";
 import { IoLayersOutline } from "react-icons/io5";
 
@@ -19,6 +19,7 @@ const CardActions = ({
 			action: "RemoveEntities",
 			entities: selection.cards.map((card) => card.id),
 		});
+		selectionObject.deselect();
 	};
 
 	const handleFlip = (faceup: boolean) => {
@@ -36,6 +37,7 @@ const CardActions = ({
 			action: "DrawCardsFromTable",
 			cards: selection.cards.map((card) => card.id),
 		});
+		selectionObject.deselect();
 	};
 
 	let regroupId =
@@ -57,6 +59,7 @@ const CardActions = ({
 			x1: selection.cards[selection.cards.length - 1].position.x,
 			y1: selection.cards[selection.cards.length - 1].position.y,
 		});
+		selectionObject.deselect();
 	};
 
 	return (

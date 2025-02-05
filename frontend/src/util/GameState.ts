@@ -1,3 +1,4 @@
+import { selectionObject } from "../hooks/useSelection";
 import { BOARD_WIDTH, BOARD_HEIGHT } from "./constants";
 import {
 	Card,
@@ -95,7 +96,6 @@ export class GameState {
 	};
 
 	applyChanged = (changed: GameECS) => {
-		console.log("changed entities", changed.entities);
 		changed.entities.forEach((entityId) => {
 			this.entities.add(entityId);
 			if (changed.cards[entityId] && changed.positions[entityId]) {
@@ -132,6 +132,7 @@ export class GameState {
 			delete this.decks[entityId];
 			delete this.hands[entityId];
 		});
+		selectionObject.removeEntities(deleted);
 	};
 
 	applyDelta = (delta: DeltaResponse) => {

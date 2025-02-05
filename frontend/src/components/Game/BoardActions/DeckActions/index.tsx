@@ -12,7 +12,7 @@ import { IoLayersOutline } from "react-icons/io5";
 import CutDeck from "./CutDeck";
 import { COLORS } from "../../../../util/colors";
 import { SendMessage } from "../../../../util/types/ClientRequest";
-import { GameSelection, useSelect } from "../../../../hooks/useSelection";
+import { GameSelection, selectionObject, useSelect } from "../../../../hooks/useSelection";
 import Modal from "../../../Modal";
 
 const DeckActions = ({
@@ -32,6 +32,7 @@ const DeckActions = ({
 			deck: selection.deck.id,
 			n,
 		});
+		selectionObject.deselect();
 		setShowCut(false);
 	};
 
@@ -77,6 +78,7 @@ const DeckActions = ({
 			action: "RemoveEntity",
 			entity: selection.deck.id,
 		});
+		selectionObject.deselect();
 	};
 
 	const handleDrawCard = () => {
@@ -101,6 +103,7 @@ const DeckActions = ({
 			action: "DealDeckAll",
 			deck: selection.deck.id,
 		});
+		selectionObject.deselect();
 	};
 
 	const isSingleCard = selection.deck.deck.card_count <= 1;
