@@ -39,8 +39,7 @@ const DeckActions = ({
 	const handleFlip = () => {
 		sendMessage({
 			type: "Action",
-			action: "FlipCardsFromDeck",
-			n: 1,
+			action: "FlipCardFromDeck",
 			faceup: true,
 			deck: selection.deck.id,
 		});
@@ -49,8 +48,7 @@ const DeckActions = ({
 	const handleBurn = () => {
 		sendMessage({
 			type: "Action",
-			action: "FlipCardsFromDeck",
-			n: 1,
+			action: "FlipCardFromDeck",
 			faceup: false,
 			deck: selection.deck.id,
 		});

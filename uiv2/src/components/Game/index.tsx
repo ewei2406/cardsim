@@ -32,9 +32,15 @@ const Game = ({ gameState, gameId, sendMessage, clientId }: GameProps) => {
 
 	return (
 		<div>
+			<MyHand
+				sendMessage={sendMessage}
+				clientId={clientId}
+				hands={gameState.hands}
+				players={gameState.players}
+			/>
 			<GameBoard gameId={gameId} isOnRight={isOnRight}>
 				<GameBoardTiles />
-				<DragArrow />
+				<DragArrow playerGroup={gameState.playerMap[clientId]} />
 				<GameBoardSelection />
 				<TableDecks decks={gameState.decks} />
 				<TableCards cards={gameState.cards} />
@@ -44,11 +50,6 @@ const Game = ({ gameState, gameId, sendMessage, clientId }: GameProps) => {
 					clientId={clientId}
 				/>
 			</GameBoard>
-			<MyHand
-				clientId={clientId}
-				hands={gameState.hands}
-				players={gameState.players}
-			/>
 			<BoardActions sendMessage={sendMessage} />
 			<ChatHistory sendMessage={sendMessage} />
 			<LeaveGame sendMessage={sendMessage} />

@@ -1,5 +1,7 @@
 import { useCallback, useSyncExternalStore } from "react";
-import { Card, Deck, Hand, Position } from "../util/types/ServerResponse";
+import { Card, Deck, Position } from "../util/types/ServerResponse";
+import { PlayerGroup } from "../util/GameState";
+import { GameSelection, useSelection } from "./useSelection";
 
 export type DragTarget =
 	| {
@@ -25,20 +27,25 @@ export type DragTarget =
 			id: number;
 	  }
 	| {
-			type: "hand";
-			hand: Hand;
-			id: number;
+			type: "myHandCard";
+			cardId: number;
+	  }
+	| {
+			type: "myHand";
 	  };
 
-export const getXY = (target: DragTarget): [number, number] => {
+export const getXY = (
+	target: DragTarget,
+	playerGroup: PlayerGroup
+): [number, number] => {
 	switch (target.type) {
 		case "card":
 		case "deck":
 		case "gameBoard":
 			return [target.position.x, target.position.y];
-		case "hand":
-			// TODO: Position the hand
-			return [0, 0];
+		case "myHand":
+		case "myHandCard":
+			return [playerGroup.x, playerGroup.y];
 		default:
 			return [0, 0];
 	}
@@ -69,8 +76,8 @@ class DragStore {
 
 	setStart = (start: DragTarget) => {
 		this.drag = {
-			...this.drag,
 			start,
+			end: { type: "none" },
 		};
 		this.notify();
 	};
@@ -95,13 +102,24 @@ class DragStore {
 }
 
 export const dragStore = new DragStore();
+document.addEventListener("mouseup", () => {
+	dragStore.setStart({ type: "none" });
+});
 
 export const useDragFinishObserver = () => {
+	const { selection } = useSelection();
+
 	const onFinish = useCallback(
-		(cb: (start: DragTarget, end: DragTarget) => void) => {
-			dragStore.onFinish = cb;
+		(
+			cb: (
+				start: DragTarget,
+				end: DragTarget,
+				curSelection: GameSelection
+			) => void
+		) => {
+			dragStore.onFinish = (start, end) => cb(start, end, selection);
 		},
-		[]
+		[selection]
 	);
 
 	return onFinish;

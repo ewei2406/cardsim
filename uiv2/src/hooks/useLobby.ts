@@ -5,6 +5,7 @@ import { logger } from "./useLogger";
 import { ClientRequest } from "../util/types/ClientRequest";
 import { chat } from "./useChat";
 import { DragTarget, useDragFinishObserver } from "./useDrag";
+import { GameSelection } from "./useSelection";
 
 type LobbyStatus =
 	| {
@@ -127,7 +128,7 @@ export const useLobby = () => {
 	}, [sendMessage, gameUpdates]);
 
 	const handleDragFinish = useCallback(
-		(start: DragTarget, end: DragTarget) => {
+		(start: DragTarget, end: DragTarget, curSelection: GameSelection) => {
 			switch (end.type) {
 				case "gameBoard":
 					if (start.type === "card" || start.type === "deck") {
@@ -139,6 +140,18 @@ export const useLobby = () => {
 							y1: end.position.y,
 						});
 					}
+					if (start.type === "myHandCard") {
+						const cards =
+							curSelection.type === "handCards" ? curSelection.handCardIds : [];
+						sendMessage({
+							type: "Action",
+							action: "PlayHandCards",
+							cards: [...cards, start.cardId],
+							faceup: true,
+							x: end.position.x,
+							y: end.position.y,
+						});
+					}
 					break;
 				case "void":
 					if (start.type === "card" || start.type === "deck") {
@@ -147,6 +160,28 @@ export const useLobby = () => {
 							action: "RemoveEntity",
 							entity: start.id,
 						});
+					}
+					break;
+				case "myHand":
+					if (start.type === "card") {
+						const cards =
+							curSelection.type === "cards"
+								? curSelection.cards.map((c) => c.id)
+								: [];
+						sendMessage({
+							type: "Action",
+							action: "DrawCardsFromTable",
+							cards: [...cards, start.id],
+						});
+						break;
+					}
+					if (start.type === "deck") {
+						sendMessage({
+							type: "Action",
+							action: "DrawCardFromDeck",
+							deck: start.id,
+						});
+						break;
 					}
 					break;
 				default:

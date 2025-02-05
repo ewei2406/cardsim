@@ -1,17 +1,37 @@
 import { TbNumber123, TbSpade, TbX, TbArrowUp } from "react-icons/tb";
 import { useSelection } from "../../../../../hooks/useSelection";
 import { byRank, bySuit, CardOrdering } from "../../../../../util/cardOrdering";
+import { SendMessage } from "../../../../../util/types/ClientRequest";
+import { useDragObserver } from "../../../../../hooks/useDrag";
 
 const MyHandActions = ({
+	sendMessage,
 	setShowHand,
 	handleSort,
 	ids,
 }: {
+	sendMessage: SendMessage;
 	setShowHand: (v: boolean) => void;
 	handleSort: (sortFn: CardOrdering) => void;
 	ids: number[];
 }) => {
-	const { deselect } = useSelection();
+	const { selection, deselect } = useSelection();
+	const { start } = useDragObserver();
+
+	if (start.type !== "none") return <></>;
+
+	const handlePlayCards = () => {
+		if (selection.type === "handCards") {
+			sendMessage({
+				type: "Action",
+				action: "PlayHandCards",
+				cards: selection.handCardIds,
+				faceup: true,
+				x: 0,
+				y: 0,
+			});
+		}
+	};
 
 	return (
 		<div
@@ -35,7 +55,7 @@ const MyHandActions = ({
 				</button>
 			</div>
 			<div style={{ display: "flex", gap: 5 }}>
-				<button>
+				<button disabled={ids.length === 0} onClick={handlePlayCards}>
 					<TbArrowUp />
 					Play
 				</button>

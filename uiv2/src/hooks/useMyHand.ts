@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
-import { CardOrdering } from "../../../../../util/cardOrdering";
-import { HandCard } from "../../../../../util/types/ServerResponse";
+import { CardOrdering } from "../util/cardOrdering";
+import { HandCard } from "../util/types/ServerResponse";
 
 export const useMyHand = () => {
 	const [handCards, setHandCards] = useState<HandCard[]>([]);
@@ -9,7 +9,6 @@ export const useMyHand = () => {
 
 	const handleDragOver = useCallback(
 		(card: HandCard) => {
-			console.log("drag over", card.id);
 			if (
 				!draggingCard ||
 				card.id === draggingCard.id ||
@@ -21,7 +20,6 @@ export const useMyHand = () => {
 			const origIdx = cardsOrder.get(draggingCard.id)!;
 			const targetIdx = cardsOrder.get(card.id)!;
 			newCardsOrder.set(draggingCard.id, targetIdx);
-			console.log("drag", origIdx, "=>", targetIdx);
 			cardsOrder.forEach((idx, id) => {
 				if (origIdx < idx && idx <= targetIdx) {
 					newCardsOrder.set(id, idx - 1);
@@ -29,7 +27,6 @@ export const useMyHand = () => {
 				if (targetIdx <= idx && idx < origIdx) {
 					newCardsOrder.set(id, idx + 1);
 				}
-				console.log("here 2");
 			});
 			setCardsOrder(newCardsOrder);
 		},
@@ -82,7 +79,6 @@ export const useMyHand = () => {
 			if (newCardsOrder.has(card.id)) return;
 			newCardsOrder.set(card.id, newCardsOrder.size);
 		});
-		console.log(newCardsOrder);
 		setCardsOrder(newCardsOrder);
 	}, [cardsOrder, handCards]);
 

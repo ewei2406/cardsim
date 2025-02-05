@@ -20,6 +20,7 @@ const TableCard = ({
 
 	return (
 		<BoardPiece
+			key={card.id}
 			x={card.position.x}
 			y={card.position.y}
 			dz={hover ? 5 : 0}

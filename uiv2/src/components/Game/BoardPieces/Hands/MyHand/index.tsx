@@ -9,9 +9,16 @@ import { EntityId, HandGroup } from "../../../../../util/GameState";
 import { PlayerDescription } from "../../../../../util/types/ServerResponse";
 import MyHandActions from "./MyHandActions";
 import MyHandCard from "./MyHandCard";
-import useMyHand from "./useMyHand";
+import useMyHand from "../../../../../hooks/useMyHand";
+import { SendMessage } from "../../../../../util/types/ClientRequest";
 
-const MyHandContent = ({ hand }: { hand: HandGroup }) => {
+const MyHandContent = ({
+	hand,
+	sendMessage,
+}: {
+	hand: HandGroup;
+	sendMessage: SendMessage;
+}) => {
 	const { selection } = useSelection();
 	const ids = selection.type === "handCards" ? selection.handCardIds : [];
 	const [showHand, setShowHand] = useState(false);
@@ -61,6 +68,7 @@ const MyHandContent = ({ hand }: { hand: HandGroup }) => {
 				onMouseLeave={() => {
 					setDraggingCard(null);
 				}}
+				onMouseOver={(e) => e.stopPropagation()}
 			>
 				{hand.hand.cards.map((card) => (
 					<MyHandCard
@@ -78,6 +86,7 @@ const MyHandContent = ({ hand }: { hand: HandGroup }) => {
 				))}
 			</div>
 			<MyHandActions
+				sendMessage={sendMessage}
 				setShowHand={setShowHand}
 				ids={ids}
 				handleSort={handleSort}
@@ -87,10 +96,12 @@ const MyHandContent = ({ hand }: { hand: HandGroup }) => {
 };
 
 const MyHand = ({
+	sendMessage,
 	hands,
 	players,
 	clientId,
 }: {
+	sendMessage: SendMessage;
 	clientId: number;
 	players: PlayerDescription[];
 	hands: { [id: EntityId]: HandGroup };
@@ -105,7 +116,7 @@ const MyHand = ({
 		return <></>;
 	}
 
-	return <MyHandContent hand={hand} />;
+	return <MyHandContent hand={hand} sendMessage={sendMessage} />;
 };
 
 export default MyHand;

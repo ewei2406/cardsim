@@ -1,3 +1,4 @@
+import { useDrag } from "../../../../hooks/useDrag";
 import { COLORS, hashColor } from "../../../../util/colors";
 import {
 	OTHER_HAND_CARD_SIZE,
@@ -22,6 +23,7 @@ const TableHand = ({
 	y: number;
 	player: PlayerGroup;
 }) => {
+	const { finishDrag, hoverDrag } = useDrag();
 	const n = hand.hand.cards.length;
 	const max = Math.min(
 		OTHER_HAND_CARDS_MAX_ARC,
@@ -29,7 +31,26 @@ const TableHand = ({
 	);
 
 	return (
-		<BoardPiece x={x} y={y}>
+		<BoardPiece
+			x={x}
+			y={y}
+			onMouseEnter={(e) => {
+				if (e.buttons === 1) {
+					hoverDrag({ type: "myHand" });
+				}
+				e.stopPropagation();
+			}}
+			onMouseOver={(e) => {
+				if (e.buttons === 1) {
+					hoverDrag({ type: "myHand" });
+				}
+				e.stopPropagation();
+			}}
+			onMouseUp={(e) => {
+				finishDrag({ type: "myHand" });
+				e.stopPropagation();
+			}}
+		>
 			<div
 				style={{
 					position: "absolute",

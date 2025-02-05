@@ -47,7 +47,7 @@ type ActionRequest =
 	| CreateDeckRequest
 	| CreateStandardDecksRequest
 	| CutDeckRequest
-	| FlipCardsFromDeckRequest
+	| FlipCardFromDeckRequest
 	| ShuffleDeckRequest
 	| CollectDeckRequest
 	| DrawCardsFromTableRequest
@@ -92,11 +92,10 @@ interface CutDeckRequest {
 	n: number;
 }
 
-interface FlipCardsFromDeckRequest {
+interface FlipCardFromDeckRequest {
 	type: "Action";
-	action: "FlipCardsFromDeck";
+	action: "FlipCardFromDeck";
 	deck: number;
-	n: number;
 	faceup: boolean;
 }
 

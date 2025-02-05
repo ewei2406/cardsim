@@ -4,26 +4,32 @@ import { TILE_HEIGHT, TILE_WIDTH } from "../../../util/constants";
 import BoardPiece from "../BoardPieces/BoardPiece";
 import { getXY, useDragObserver } from "../../../hooks/useDrag";
 import { useRot } from "../../../hooks/useTransformCoords";
+import { PlayerGroup } from "../../../util/GameState";
 
-const DragArrow = () => {
+const DragArrow = ({
+	playerGroup,
+}: {
+	playerGroup: PlayerGroup | undefined;
+}) => {
 	const { start, end } = useDragObserver();
 	const rot = useRot();
+
+	if (!playerGroup) return <></>;
 
 	if (start.type === "none" || start.type === "void" || end.type === "none") {
 		return <></>;
 	}
 
 	if (
-		start.type !== "gameBoard" &&
-		end.type !== "gameBoard" &&
-		end.type !== "void" &&
+		(start.type === "card" || start.type === "deck") &&
+		(end.type === "card" || end.type === "deck") &&
 		start.id === end.id
 	) {
 		return <></>;
 	}
 
-	const [startX, startY] = getXY(start);
-	const [endX, endY] = getXY(end);
+	const [startX, startY] = getXY(start, playerGroup);
+	const [endX, endY] = getXY(end, playerGroup);
 
 	if (end.type === "void") {
 		return (

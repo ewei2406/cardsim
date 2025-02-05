@@ -8,6 +8,7 @@ import { HandCard } from "../../../../../util/types/ServerResponse";
 import CardBack from "../../../../Card/CardBack";
 import CardFront from "../../../../Card/CardFront";
 import { COLORS } from "../../../../../util/colors";
+import { useDrag } from "../../../../../hooks/useDrag";
 
 const MyHandCard = ({
 	card,
@@ -31,6 +32,8 @@ const MyHandCard = ({
 	selected?: boolean;
 }) => {
 	const { addSelection } = useSelect();
+	const { hoverDrag, startDrag, finishDrag } = useDrag();
+
 	const [hover, setHover] = useState(false);
 
 	if (card.type === "AnonHandCard") {
@@ -62,33 +65,46 @@ const MyHandCard = ({
 	if (card.type === "HandCard") {
 		return (
 			<div
-				onMouseEnter={() => {
+				onMouseEnter={(e) => {
 					setHover(true);
 					setShowHand(true);
+					if (e.buttons === 1) {
+						hoverDrag({ type: "myHand" });
+					}
+					e.stopPropagation();
 				}}
-				onMouseLeave={() => {
+				onMouseLeave={(e) => {
 					setHover(false);
 					setShowHand(false);
+					e.stopPropagation();
 				}}
 				onMouseDown={(e) => {
+					if (e.buttons === 1) {
+						startDrag({ type: "myHandCard", cardId: card.id });
+					}
 					setDraggingCard(card);
 					e.stopPropagation();
 				}}
 				onMouseUp={(e) => {
 					setDraggingCard(null);
+					finishDrag({ type: "myHand" });
 					e.stopPropagation();
 				}}
 				onMouseOver={(e) => {
-					if (e.buttons === 1 && !beingDragged) {
-						e.preventDefault();
+					if (!beingDragged) {
 						handleDragOver(card);
 					}
+					if (e.buttons !== 1) {
+						setDraggingCard(null);
+					}
+					e.stopPropagation();
 				}}
-				onClick={() => {
+				onClick={(e) => {
 					addSelection({
 						type: "handCard",
 						handCardId: card.id,
 					});
+					e.stopPropagation();
 				}}
 				style={{
 					position: "absolute",
