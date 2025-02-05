@@ -1,47 +1,37 @@
-import { Fragment, useState } from "react";
+import { Fragment } from "react";
 import { BOARD_WIDTH, BOARD_HEIGHT } from "../../../util/constants";
-import { COLORS } from "../../../util/colors";
-import { useSelect, useSelection } from "../../../hooks/useSelection";
+import { useSelect } from "../../../hooks/useSelection";
 import { useDrag } from "../../../hooks/useDrag";
 import BoardPiece from "../BoardPieces/BoardPiece";
+import { SendMessage } from "../../../util/types/ClientRequest";
+import { COLORS } from "../../../util/colors";
 
 const GBTile = ({
 	i,
 	j,
-	selected,
 }: {
 	i: number;
 	j: number;
-	selected?: boolean;
+	sendMessage: SendMessage;
 }) => {
-	const { setSelection } = useSelect();
+	const { addSelection } = useSelect();
 	const { hoverDrag, finishDrag } = useDrag();
-	const [border, setBorder] = useState(`0.5px solid ${COLORS.LIGHTER}`);
-
+	const x = i - BOARD_WIDTH / 2;
+	const y = BOARD_HEIGHT / 2 - j;
 	return (
 		<BoardPiece
 			onClick={(e) => {
-				setSelection({
-					type: "gameBoard",
-					x: i - BOARD_WIDTH / 2,
-					y: BOARD_HEIGHT / 2 - j,
-				});
 				e.stopPropagation();
-			}}
-			onMouseEnter={(e) => {
-				if (e.buttons === 1) {
-					setBorder(`3px dotted ${COLORS.LIGHT}`);
-				} else {
-					setBorder(`1px solid ${COLORS.LIGHT}`);
-				}
-			}}
-			onMouseLeave={() => {
-				setBorder(`0.5px solid ${COLORS.LIGHTER}`);
+				addSelection({
+					type: "gameBoard",
+					x,
+					y,
+				});
 			}}
 			onMouseOver={(e) => {
 				hoverDrag({
 					type: "gameBoard",
-					position: { x: i - BOARD_WIDTH / 2, y: BOARD_HEIGHT / 2 - j },
+					position: { x, y },
 				});
 				e.stopPropagation();
 			}}
@@ -51,18 +41,18 @@ const GBTile = ({
 					finishDrag({
 						type: "gameBoard",
 						position: {
-							x: i - BOARD_WIDTH / 2,
-							y: BOARD_HEIGHT / 2 - j,
+							x,
+							y,
 						},
 					});
-					setBorder(`1px solid ${COLORS.LIGHT}`);
 				}
 			}}
-			x={i - BOARD_WIDTH / 2}
-			y={BOARD_HEIGHT / 2 - j}
+			x={x}
+			y={y}
 			style={{
+				borderRight: `0.5px solid ${COLORS.LIGHTER}`,
+				borderBottom: `0.5px solid ${COLORS.LIGHTER}`,
 				boxSizing: "border-box",
-				border: selected ? `2px solid ${COLORS.SELECTION}` : border,
 				zIndex: -10001,
 			}}
 		></BoardPiece>
@@ -72,24 +62,13 @@ const GBTile = ({
 const X = Array.from({ length: BOARD_WIDTH }, (_, i) => i);
 const Y = Array.from({ length: BOARD_HEIGHT }, (_, i) => i);
 
-const GameBoardTiles = () => {
-	const { selection } = useSelection();
-
+const GameBoardTiles = ({ sendMessage }: { sendMessage: SendMessage }) => {
 	return (
 		<>
 			{X.map((x) => (
 				<Fragment key={x}>
 					{Y.map((y) => (
-						<GBTile
-							key={`${x}-${y}`}
-							i={x}
-							j={y}
-							selected={
-								selection.type === "gameBoard" &&
-								selection.x === x - BOARD_WIDTH / 2 &&
-								selection.y === BOARD_HEIGHT / 2 - y
-							}
-						/>
+						<GBTile key={`${x}-${y}`} i={x} j={y} sendMessage={sendMessage} />
 					))}
 				</Fragment>
 			))}

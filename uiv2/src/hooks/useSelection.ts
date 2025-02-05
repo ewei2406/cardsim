@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from "react";
+import { useCallback, useSyncExternalStore } from "react";
 import { DeckGroup, CardGroup } from "../util/GameState";
 
 export type GameSelection =
@@ -48,6 +48,7 @@ export type AddSelection =
 class SelectionStore {
 	selection: GameSelection = { type: "none" };
 	listeners = new Set<() => void>();
+	onChange: (start: GameSelection, end: GameSelection) => void = () => {};
 
 	constructor() {}
 
@@ -64,8 +65,9 @@ class SelectionStore {
 		return this.selection;
 	};
 
-	setSelection(selection: GameSelection) {
-		this.selection = selection;
+	setSelection(newSelection: GameSelection) {
+		this.onChange(this.selection, newSelection);
+		this.selection = newSelection;
 		this.notify();
 	}
 
@@ -76,6 +78,14 @@ class SelectionStore {
 				this.setSelection({ type: "none" });
 				break;
 			case "gameBoard":
+				if (
+					this.selection.type === "gameBoard" &&
+					this.selection.x === addSelection.x &&
+					this.selection.y === addSelection.y
+				) {
+					this.setSelection({ type: "none" });
+					break;
+				}
 				this.setSelection({
 					type: "gameBoard",
 					x: addSelection.x,
@@ -83,6 +93,13 @@ class SelectionStore {
 				});
 				break;
 			case "deck":
+				if (
+					this.selection.type === "deck" &&
+					this.selection.deck.id === addSelection.deck.id
+				) {
+					this.setSelection({ type: "none" });
+					break;
+				}
 				this.setSelection({
 					type: "deck",
 					deck: addSelection.deck,
@@ -153,7 +170,7 @@ class SelectionStore {
 export const selectionStore = new SelectionStore();
 
 export const selectionObject = {
-	setSelection: selectionStore.setSelection.bind(selectionStore),
+	getCurSelection: selectionStore.getSelection.bind(selectionStore),
 	addSelection: selectionStore.addSelection.bind(selectionStore),
 	deselect: () => {
 		selectionStore.setSelection({ type: "none" });
@@ -166,16 +183,23 @@ export const useSelection = () => {
 		selectionStore.getSelection
 	);
 
-	const { setSelection, deselect } = useSelect();
+	const { addSelection, deselect } = useSelect();
 
-	return { selection, setSelection, deselect };
+	return { selection, addSelection, deselect };
+};
+
+export const useSelectionChangeObserver = () => {
+	const onFinish = useCallback(
+		(cb: (start: GameSelection, end: GameSelection) => void) => {
+			selectionStore.onChange = (start, end) => cb(start, end);
+		},
+		[]
+	);
+
+	return onFinish;
 };
 
 export const useSelect = () => {
-	const setSelection = (selection: GameSelection) => {
-		selectionStore.setSelection(selection);
-	};
-
 	const addSelection = (addSelection: AddSelection) => {
 		selectionStore.addSelection(addSelection);
 	};
@@ -184,5 +208,22 @@ export const useSelect = () => {
 		selectionStore.setSelection({ type: "none" });
 	};
 
-	return { addSelection, setSelection, deselect };
+	return { addSelection, deselect };
+};
+
+export const getCardIds = (
+	selection: GameSelection,
+	additionalId: number | null
+): number[] => {
+	const ids = new Set<number>();
+	if (selection.type === "cards") {
+		selection.cards.forEach((card) => ids.add(card.id));
+	}
+	if (selection.type === "handCards") {
+		selection.handCardIds.forEach((id) => ids.add(id));
+	}
+	if (additionalId) {
+		ids.add(additionalId);
+	}
+	return Array.from(ids);
 };

@@ -9,12 +9,14 @@ import GameBoardSelection from "./GameBoard/GameBoardSelection";
 import BoardActions from "./BoardActions";
 import TableDecks from "./BoardPieces/TableDecks";
 import { useEffect, useState } from "react";
-import TableHands from "./BoardPieces/Hands";
-import MyHand from "./BoardPieces/Hands/MyHand";
+import MyHand from "./BoardPieces/MyHand";
 import { updateTransform } from "../../hooks/useTransformCoords";
 import getTableCards from "./BoardPieces/TableCard/getTableCards";
 import { useSelection } from "../../hooks/useSelection";
 import TableCard from "./BoardPieces/TableCard";
+import getTableHandCards from "./BoardPieces/TableCard/getTableHandCards";
+import getTableDeckCards from "./BoardPieces/TableCard/getTableDeckCards";
+import Void from "./GameBoard/Void";
 
 interface GameProps {
 	gameState: GameState;
@@ -35,9 +37,18 @@ const Game = ({ gameState, gameId, sendMessage, clientId }: GameProps) => {
 
 	// TODO: memoize this. this is pretty bad!
 	const tableCards = getTableCards(gameState.cards, selection);
+	const tableHandCards = getTableHandCards(
+		gameState.playerMap,
+		gameState.hands
+	);
+	const tableDeckCards = getTableDeckCards(gameState.decks, selection);
+	const cards = [...tableHandCards, ...tableCards, ...tableDeckCards].sort(
+		(a, b) => a.id - b.id
+	);
 
 	return (
 		<div>
+			<Void />
 			<MyHand
 				sendMessage={sendMessage}
 				clientId={clientId}
@@ -45,18 +56,13 @@ const Game = ({ gameState, gameId, sendMessage, clientId }: GameProps) => {
 				players={gameState.players}
 			/>
 			<GameBoard gameId={gameId} isOnRight={isOnRight}>
-				<GameBoardTiles />
+				<GameBoardTiles sendMessage={sendMessage} />
 				<DragArrow playerGroup={gameState.playerMap[clientId]} />
 				<GameBoardSelection />
 				<TableDecks decks={gameState.decks} />
-				{tableCards.map((cardProps) => (
+				{cards.map((cardProps) => (
 					<TableCard key={cardProps.id} {...cardProps} />
 				))}
-				<TableHands
-					hands={gameState.hands}
-					playerMap={gameState.playerMap}
-					clientId={clientId}
-				/>
 			</GameBoard>
 			<BoardActions sendMessage={sendMessage} />
 			<ChatHistory sendMessage={sendMessage} />

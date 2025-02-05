@@ -14,6 +14,8 @@ import { CARD_FACE_PADDING } from "../../util/constants";
 
 const getRank = (rank: number) => {
 	switch (rank) {
+		case 0:
+			return "?";
 		case 1:
 			return "A";
 		case 11:

@@ -1,8 +1,8 @@
 import { TbNumber123, TbSpade, TbX, TbArrowUp } from "react-icons/tb";
-import { useSelection } from "../../../../../hooks/useSelection";
-import { byRank, bySuit, CardOrdering } from "../../../../../util/cardOrdering";
-import { SendMessage } from "../../../../../util/types/ClientRequest";
-import { useDragObserver } from "../../../../../hooks/useDrag";
+import { useSelection } from "../../../../hooks/useSelection";
+import { byRank, bySuit, CardOrdering } from "../../../../util/cardOrdering";
+import { SendMessage } from "../../../../util/types/ClientRequest";
+import { useDragObserver } from "../../../../hooks/useDrag";
 
 const MyHandActions = ({
 	sendMessage,

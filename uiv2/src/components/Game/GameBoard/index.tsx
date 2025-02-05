@@ -12,8 +12,6 @@ import {
 	TILE_WIDTH,
 } from "../../../util/constants";
 import { COLORS } from "../../../util/colors";
-import { useSelect } from "../../../hooks/useSelection";
-import { useDrag } from "../../../hooks/useDrag";
 
 const GameBoard = ({
 	children,
@@ -25,8 +23,6 @@ const GameBoard = ({
 	isOnRight: boolean;
 }) => {
 	const gameBoardRef = useRef<HTMLDivElement>(null);
-	const { deselect } = useSelect();
-	const { hoverDrag, finishDrag } = useDrag();
 
 	return (
 		<div
@@ -38,26 +34,7 @@ const GameBoard = ({
 				left: 0,
 				right: 0,
 				bottom: 0,
-			}}
-			onClick={(e) => {
-				deselect();
-				e.stopPropagation();
-			}}
-			onMouseOver={(e) => {
-				if (e.button === 0) {
-					hoverDrag({
-						type: "void",
-					});
-					e.stopPropagation();
-				}
-			}}
-			onMouseUp={(e) => {
-				if (e.button === 0) {
-					finishDrag({
-						type: "void",
-					});
-					e.stopPropagation();
-				}
+				pointerEvents: "none",
 			}}
 		>
 			<div
@@ -80,6 +57,7 @@ const GameBoard = ({
 				}}
 				ref={gameBoardRef}
 			>
+				{children}
 				<div
 					style={{
 						fontWeight: 800,
@@ -105,7 +83,6 @@ const GameBoard = ({
 				>
 					GAME {gameId}
 				</div>
-				{children}
 			</div>
 		</div>
 	);

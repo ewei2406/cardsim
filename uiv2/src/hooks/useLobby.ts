@@ -5,7 +5,11 @@ import { logger } from "./useLogger";
 import { ClientRequest } from "../util/types/ClientRequest";
 import { chat } from "./useChat";
 import { DragTarget, useDragFinishObserver } from "./useDrag";
-import { GameSelection } from "./useSelection";
+import {
+	GameSelection,
+	getCardIds,
+	useSelectionChangeObserver,
+} from "./useSelection";
 
 type LobbyStatus =
 	| {
@@ -132,7 +136,7 @@ export const useLobby = () => {
 		(start: DragTarget, end: DragTarget, curSelection: GameSelection) => {
 			switch (end.type) {
 				case "gameBoard":
-					if (start.type === "card" || start.type === "deck") {
+					if (start.type === "deck") {
 						sendMessage({
 							type: "Action",
 							action: "MoveEntity",
@@ -142,37 +146,47 @@ export const useLobby = () => {
 						});
 					}
 					if (start.type === "myHandCard") {
-						const cards =
-							curSelection.type === "handCards" ? curSelection.handCardIds : [];
 						sendMessage({
 							type: "Action",
 							action: "PlayHandCards",
-							cards: [...cards, start.cardId],
+							cards: getCardIds(curSelection, start.cardId),
 							faceup: true,
 							x: end.position.x,
 							y: end.position.y,
 						});
 					}
+					if (start.type === "card") {
+						sendMessage({
+							type: "Action",
+							action: "MoveEntities",
+							entities: getCardIds(curSelection, start.id),
+							x1: end.position.x,
+							y1: end.position.y,
+						});
+					}
 					break;
 				case "void":
-					if (start.type === "card" || start.type === "deck") {
+					if (start.type === "deck") {
 						sendMessage({
 							type: "Action",
 							action: "RemoveEntity",
 							entity: start.id,
 						});
 					}
+					if (start.type === "card") {
+						sendMessage({
+							type: "Action",
+							action: "RemoveEntities",
+							entities: getCardIds(curSelection, start.id),
+						});
+					}
 					break;
 				case "myHand":
 					if (start.type === "card") {
-						const cards =
-							curSelection.type === "cards"
-								? curSelection.cards.map((c) => c.id)
-								: [];
 						sendMessage({
 							type: "Action",
 							action: "DrawCardsFromTable",
-							cards: [...cards, start.id],
+							cards: getCardIds(curSelection, start.id),
 						});
 						break;
 					}
@@ -183,6 +197,24 @@ export const useLobby = () => {
 							deck: start.id,
 						});
 						break;
+					}
+					break;
+				case "deck":
+					if (start.type === "card") {
+						sendMessage({
+							type: "Action",
+							action: "ReturnCardsToDeck",
+							cards: getCardIds(curSelection, start.id),
+							deck: end.id,
+						});
+					}
+					if (start.type === "myHandCard") {
+						sendMessage({
+							type: "Action",
+							action: "PlayHandCardsToDeck",
+							cards: getCardIds(curSelection, start.cardId),
+							deck: end.id,
+						});
 					}
 					break;
 				default:

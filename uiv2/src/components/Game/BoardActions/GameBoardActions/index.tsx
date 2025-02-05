@@ -25,7 +25,6 @@ const GameBoardActions = ({
 			y: selection.y,
 		});
 		setShowNewDeck(false);
-		deselect();
 	};
 
 	return (

@@ -7,6 +7,7 @@ import BoardPiece from "../BoardPiece";
 export type TableCardProps = {
 	tableCard: Card;
 	id: number;
+	transform?: string;
 	className?: string;
 	selected?: boolean;
 	hovered?: boolean;
@@ -27,16 +28,16 @@ const TableCard = (props: TableCardProps) => {
 	return (
 		<BoardPiece {...props} dz={props.hovered ? 5 : 0} key={props.id}>
 			<div
+				key={props.id}
 				style={{
 					position: "absolute",
 					transform: `translate(-50%, -50%) rotateY(${
 						props.tableCard.type === "Hidden" ? 360 : 180
 					}deg)`,
-					transition: "transform 0.2s ease",
+					transition: "transform 0.75s ease",
 					backfaceVisibility: "hidden",
 				}}
 			>
-				{props.id}
 				<CardBack
 					width={CARD_WIDTH}
 					deck_id={props.tableCard.deck_id}
@@ -49,15 +50,14 @@ const TableCard = (props: TableCardProps) => {
 					transform: `translate(-50%, -50%) rotateY(${
 						props.tableCard.type === "Hidden" ? 180 : 0
 					}deg)`,
-					transition: "transform 2s ease",
+					transition: "transform 0.75s ease",
 					backfaceVisibility: "hidden",
 				}}
 			>
 				<CardFront
 					width={CARD_WIDTH}
 					deck_id={props.tableCard.deck_id}
-					// rank={props.tableCard.type === "Hidden" ? 0 : props.tableCard.rank}
-					rank={props.id}
+					rank={props.tableCard.type === "Hidden" ? 0 : props.tableCard.rank}
 					suit={props.tableCard.type === "Hidden" ? "S" : props.tableCard.suit}
 					selected={props.selected}
 				/>

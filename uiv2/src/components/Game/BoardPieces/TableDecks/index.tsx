@@ -15,7 +15,7 @@ const TableDeck = ({
 	selected?: boolean;
 }) => {
 	const { startDrag, hoverDrag, finishDrag } = useDrag();
-	const { setSelection } = useSelect();
+	const { addSelection } = useSelect();
 	const [showCount, setShowCount] = useState(false);
 
 	const stackHeight =
@@ -56,7 +56,7 @@ const TableDeck = ({
 				}
 			}}
 			onClick={(e) => {
-				setSelection({
+				addSelection({
 					type: "deck",
 					deck,
 				});
@@ -84,7 +84,7 @@ const TableDeck = ({
 			))}
 
 			{(showCount || selected) && (
-				<CardCount count={deck.deck.card_count} height={3 * stackHeight - 3} />
+				<CardCount count={deck.deck.card_count} height={3 * stackHeight} />
 			)}
 		</BoardPiece>
 	);

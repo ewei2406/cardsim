@@ -43,6 +43,7 @@ body {
 }
 
 #game-board * {
+	pointer-events: auto;
 	transform-style: preserve-3d;
 	backface-visibility: inherit;
 }
@@ -103,7 +104,6 @@ input[type="checkbox"] {
 }
 
 .board-piece {
-	border: 1px solid red;
 	position: absolute;
 	left: 0;
 	top: 0;

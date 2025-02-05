@@ -13,16 +13,12 @@ const CardActions = ({
 }) => {
 	const { deselect } = useSelect();
 
-	// TODO: Make this a group action
 	const handleDelete = () => {
-		selection.cards.forEach((card) => {
-			sendMessage({
-				type: "Action",
-				action: "RemoveEntity",
-				entity: card.id,
-			});
+		sendMessage({
+			type: "Action",
+			action: "RemoveEntities",
+			entities: selection.cards.map((card) => card.id),
 		});
-		deselect();
 	};
 
 	const handleFlip = (faceup: boolean) => {
@@ -40,7 +36,6 @@ const CardActions = ({
 			action: "DrawCardsFromTable",
 			cards: selection.cards.map((card) => card.id),
 		});
-		deselect();
 	};
 
 	let regroupId =
@@ -62,7 +57,6 @@ const CardActions = ({
 			x1: selection.cards[selection.cards.length - 1].position.x,
 			y1: selection.cards[selection.cards.length - 1].position.y,
 		});
-		deselect();
 	};
 
 	return (

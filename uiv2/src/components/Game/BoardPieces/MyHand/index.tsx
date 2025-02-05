@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react";
-import { useSelection } from "../../../../../hooks/useSelection";
+import { useSelection } from "../../../../hooks/useSelection";
 import {
 	MY_HAND_CARD_SIZE,
 	MY_HAND_CARDS_MAX_ARC,
 	MY_HAND_CARDS_SPACING_DEG,
-} from "../../../../../util/constants";
-import { EntityId, HandGroup } from "../../../../../util/GameState";
-import { PlayerDescription } from "../../../../../util/types/ServerResponse";
+} from "../../../../util/constants";
+import { EntityId, HandGroup } from "../../../../util/GameState";
+import { PlayerDescription } from "../../../../util/types/ServerResponse";
 import MyHandActions from "./MyHandActions";
 import MyHandCard from "./MyHandCard";
-import useMyHand from "../../../../../hooks/useMyHand";
-import { SendMessage } from "../../../../../util/types/ClientRequest";
+import useMyHand from "../../../../hooks/useMyHand";
+import { SendMessage } from "../../../../util/types/ClientRequest";
 
 const MyHandContent = ({
 	hand,

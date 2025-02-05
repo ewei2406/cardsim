@@ -33,7 +33,6 @@ const DeckActions = ({
 			n,
 		});
 		setShowCut(false);
-		deselect();
 	};
 
 	const handleFlip = () => {
@@ -70,7 +69,6 @@ const DeckActions = ({
 			x1: selection.deck.position.x,
 			y1: selection.deck.position.y,
 		});
-		deselect();
 	};
 
 	const handleDelete = () => {
@@ -79,13 +77,28 @@ const DeckActions = ({
 			action: "RemoveEntity",
 			entity: selection.deck.id,
 		});
-		deselect();
 	};
 
 	const handleDrawCard = () => {
 		sendMessage({
 			type: "Action",
 			action: "DrawCardFromDeck",
+			deck: selection.deck.id,
+		});
+	};
+
+	const handleDealSingle = () => {
+		sendMessage({
+			type: "Action",
+			action: "DealDeckSingle",
+			deck: selection.deck.id,
+		});
+	};
+
+	const handleDealAll = () => {
+		sendMessage({
+			type: "Action",
+			action: "DealDeckAll",
 			deck: selection.deck.id,
 		});
 	};
@@ -110,11 +123,11 @@ const DeckActions = ({
 				<TbArrowsShuffle />
 				Shuffle
 			</button>
-			<button onClick={() => setShowCut(true)}>
+			<button onClick={handleDealSingle}>
 				<TbArrowFork />
 				Deal One
 			</button>
-			<button onClick={() => setShowCut(true)}>
+			<button onClick={handleDealAll}>
 				<TbArrowFork />
 				Deal All
 			</button>

@@ -1,14 +1,14 @@
 import { useState } from "react";
-import { useSelect } from "../../../../../hooks/useSelection";
+import { useSelect } from "../../../../hooks/useSelection";
 import {
 	MY_HAND_CARD_SIZE,
 	MY_HAND_CARDS_SPACING_DIST,
-} from "../../../../../util/constants";
-import { HandCard } from "../../../../../util/types/ServerResponse";
-import CardBack from "../../../../Card/CardBack";
-import CardFront from "../../../../Card/CardFront";
-import { COLORS } from "../../../../../util/colors";
-import { useDrag } from "../../../../../hooks/useDrag";
+} from "../../../../util/constants";
+import { HandCard } from "../../../../util/types/ServerResponse";
+import CardBack from "../../../Card/CardBack";
+import CardFront from "../../../Card/CardFront";
+import { COLORS } from "../../../../util/colors";
+import { useDrag } from "../../../../hooks/useDrag";
 
 const MyHandCard = ({
 	card,

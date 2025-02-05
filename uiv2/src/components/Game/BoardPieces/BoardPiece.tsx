@@ -5,6 +5,7 @@ import { useTransform } from "../../../hooks/useTransformCoords";
 const BoardPiece = (props: {
 	x: number;
 	y: number;
+	transform?: string;
 	className?: string;
 	rot?: number;
 	dz?: number;
@@ -27,13 +28,16 @@ const BoardPiece = (props: {
 			className={"board-piece" + (props.className ? ` ${props.className}` : "")}
 			style={{
 				zIndex: x + y,
-				border: "5px solid red",
 				width: TILE_WIDTH,
 				height: TILE_HEIGHT,
 				transform: `translateX(${x}px) translateY(${y}px) translateZ(${
 					props.dz ?? 0
-				}px) rotateZ(${props.rot ?? 0}deg) var(--extra-transform)`,
-				pointerEvents: props.disableInteraction ? "none" : undefined,
+				}px) rotateZ(${props.rot ?? 0}deg) var(--extra-transform) ${
+					props.transform ?? ""
+				}`,
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				//@ts-ignore
+				pointerEvents: props.disableInteraction ? "none !important" : undefined,
 				...props.style,
 			}}
 			onClick={props.onClick}

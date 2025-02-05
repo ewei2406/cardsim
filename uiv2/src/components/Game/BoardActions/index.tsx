@@ -15,6 +15,7 @@ const BoardActionsWrapper = (props: { children: React.ReactNode }) => {
 				display: "flex",
 				justifyContent: "center",
 				alignItems: "center",
+				userSelect: "none",
 			}}
 		>
 			<div style={{ display: "flex", flexDirection: "column", gap: 5 }}>

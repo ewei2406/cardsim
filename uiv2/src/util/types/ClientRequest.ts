@@ -54,12 +54,48 @@ type ActionRequest =
 	| FlipCardsRequest
 	| DrawCardFromDeckRequest
 	| MoveEntityRequest
+	| MoveEntitiesRequest
 	| RemoveEntityRequest
+	| RemoveEntitiesRequest
 	| PlayHandCardsRequest
 	| PlayHandCardsToDeckRequest
+	| ReturnCardsToDeckRequest
 	| ShowHandCardsRequest
-	| AddHandRequest
-	| RemoveHandRequest;
+	| DealDeckSingleRequest
+	| DealDeckAllRequest;
+
+interface MoveEntitiesRequest {
+	type: "Action";
+	action: "MoveEntities";
+	entities: number[];
+	x1: number;
+	y1: number;
+}
+
+interface RemoveEntitiesRequest {
+	type: "Action";
+	action: "RemoveEntities";
+	entities: number[];
+}
+
+interface ReturnCardsToDeckRequest {
+	type: "Action";
+	action: "ReturnCardsToDeck";
+	cards: number[];
+	deck: number;
+}
+
+interface DealDeckAllRequest {
+	type: "Action";
+	action: "DealDeckAll";
+	deck: number;
+}
+
+interface DealDeckSingleRequest {
+	type: "Action";
+	action: "DealDeckSingle";
+	deck: number;
+}
 
 interface FlipCardsRequest {
 	type: "Action";
@@ -160,15 +196,4 @@ interface ShowHandCardsRequest {
 	action: "ShowHandCards";
 	cards: number[];
 	shown: boolean;
-}
-
-interface AddHandRequest {
-	type: "Action";
-	action: "AddHand";
-	nickname: string;
-}
-
-interface RemoveHandRequest {
-	type: "Action";
-	action: "RemoveHand";
 }

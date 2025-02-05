@@ -81,6 +81,7 @@ export type Deck = {
 	deck_id: number;
 	card_count: number;
 	shuffle_ctr: number;
+	next_card: number;
 };
 
 export type HandCard =
