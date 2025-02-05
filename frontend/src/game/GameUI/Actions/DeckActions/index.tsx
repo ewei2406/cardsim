@@ -11,9 +11,14 @@ import { RiFireLine } from "react-icons/ri";
 import { IoLayersOutline } from "react-icons/io5";
 import CutDeck from "./CutDeck";
 import Modal from "@/components/Modal";
-import { GameSelection, useSelect, selectionObject } from "@/hooks/useSelection";
+import {
+	GameSelection,
+	useSelect,
+	selectionObject,
+} from "@/hooks/useSelection";
 import { COLORS } from "@/util/colors";
 import { SendMessage } from "@/util/types/ClientRequest";
+import IconButton from "@/components/IconButton";
 
 const DeckActions = ({
 	selection,
@@ -110,10 +115,9 @@ const DeckActions = ({
 
 	return (
 		<div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-			<button onClick={handleDrawCard}>
-				<TbArrowUp />
-				Draw
-			</button>
+			<IconButton icon={TbArrowUp} onClick={handleDrawCard}>
+				<span className="underline">D</span>raw
+			</IconButton>
 			<button onClick={handleFlip}>
 				<TbArrowForwardUp />
 				Flip

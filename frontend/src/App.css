@@ -179,3 +179,7 @@ input[type="checkbox"] {
 		transform: rotateZ(360deg) rotateX(-90deg) translateY(-20px);
 	}
 }
+
+.underline {
+	text-decoration: underline;
+}

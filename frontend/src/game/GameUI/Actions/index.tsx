@@ -4,6 +4,16 @@ import { SendMessage } from "@/util/types/ClientRequest";
 import CardActions from "./CardActions";
 import DeckActions from "./DeckActions";
 import GameBoardActions from "./GameBoardActions";
+import { IconType } from "react-icons";
+
+type ActionProps = {
+	icon: IconType;
+	label: string;
+	onClick: React.MouseEventHandler<HTMLButtonElement>;
+	underlineIndex?: number;
+	hotKey?: string;
+	disabled?: boolean;
+};
 
 const BoardActionsWrapper = (props: { children: React.ReactNode }) => {
 	return (
