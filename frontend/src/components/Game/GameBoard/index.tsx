@@ -12,6 +12,8 @@ import {
 	TILE_WIDTH,
 } from "../../../util/constants";
 import { COLORS } from "../../../util/colors";
+import GameBoardSelection from "./GameBoardSelection";
+import GameBoardTiles from "./GameBoardTiles";
 
 const GameBoard = ({
 	children,
@@ -57,6 +59,8 @@ const GameBoard = ({
 				}}
 				ref={gameBoardRef}
 			>
+				<GameBoardTiles />
+				<GameBoardSelection />
 				{children}
 				<div
 					style={{

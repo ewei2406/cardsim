@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Toggle from "../../../Toggle";
+import Toggle from "../../../../Toggle";
 import { TbCards } from "react-icons/tb";
 
 export type DeckProps =

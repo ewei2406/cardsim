@@ -1,9 +1,10 @@
 import { TbDoorExit } from "react-icons/tb";
-import { COLORS } from "../../util/colors";
-import { SendMessage } from "../../util/types/ClientRequest";
-import { selectionObject } from "../../hooks/useSelection";
+import { COLORS } from "../../../util/colors";
+import { selectionObject } from "../../../hooks/useSelection";
+import { useSendMessage } from "../../../context/useSendMessage";
 
-const LeaveGame = ({ sendMessage }: { sendMessage: SendMessage }) => {
+const LeaveGame = () => {
+	const sendMessage = useSendMessage();
 	const leaveGame = () => {
 		sendMessage({
 			type: "Command",

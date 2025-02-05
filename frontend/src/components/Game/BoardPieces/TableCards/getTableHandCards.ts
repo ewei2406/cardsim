@@ -6,7 +6,7 @@ import {
 	OTHER_HAND_CARDS_SPACING_DIST,
 } from "../../../../util/constants";
 import { EntityId, HandGroup, PlayerGroup } from "../../../../util/GameState";
-import { TableCardProps } from ".";
+import { TableCardProps } from "./TableCard";
 
 const getTableHand = (
 	hand: HandGroup,

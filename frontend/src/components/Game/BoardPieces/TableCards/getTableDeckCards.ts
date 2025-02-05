@@ -1,6 +1,6 @@
 import { DeckGroup, EntityId } from "../../../../util/GameState";
 import { GameSelection } from "../../../../hooks/useSelection";
-import { TableCardProps } from ".";
+import { TableCardProps } from "./TableCard";
 
 const getTableDeckCard = (
 	deck: DeckGroup,

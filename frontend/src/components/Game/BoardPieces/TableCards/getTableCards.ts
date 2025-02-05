@@ -1,7 +1,7 @@
 import { dragObject } from "../../../../hooks/useDrag";
 import { GameSelection, selectionObject } from "../../../../hooks/useSelection";
 import { CardGroup, EntityId } from "../../../../util/GameState";
-import { TableCardProps } from ".";
+import { TableCardProps } from "./TableCard";
 
 const getTableCardWrapper = (
 	card: CardGroup,

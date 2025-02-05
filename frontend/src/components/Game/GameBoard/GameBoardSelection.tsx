@@ -1,9 +1,6 @@
 import { TbArrowBadgeDownFilled } from "react-icons/tb";
 import { COLORS } from "../../../util/colors";
 import { TILE_WIDTH } from "../../../util/constants";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import "./GameBoardSelection.css";
 import { selectionObject, useSelection } from "../../../hooks/useSelection";
 import BoardPiece from "../BoardPieces/BoardPiece";
 

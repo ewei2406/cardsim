@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { TbScissors } from "react-icons/tb";
-import { DeckGroup } from "../../../../util/GameState";
+import { DeckGroup } from "../../../../../util/GameState";
 
 const CutDeck = ({
 	deck,

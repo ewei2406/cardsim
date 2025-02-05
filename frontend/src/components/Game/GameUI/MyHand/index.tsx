@@ -11,6 +11,7 @@ import MyHandActions from "./MyHandActions";
 import MyHandCard from "./MyHandCard";
 import useMyHand from "../../../../hooks/useMyHand";
 import { SendMessage } from "../../../../util/types/ClientRequest";
+import { useSendMessage } from "../../../../context/useSendMessage";
 
 const MyHandContent = ({
 	hand,
@@ -96,16 +97,16 @@ const MyHandContent = ({
 };
 
 const MyHand = ({
-	sendMessage,
 	hands,
 	players,
 	clientId,
 }: {
-	sendMessage: SendMessage;
 	clientId: number;
 	players: PlayerDescription[];
 	hands: { [id: EntityId]: HandGroup };
 }) => {
+	const sendMessage = useSendMessage();
+
 	const myHand = players.find((p) => p.client_id === clientId)?.hand;
 	if (!myHand) {
 		return <></>;

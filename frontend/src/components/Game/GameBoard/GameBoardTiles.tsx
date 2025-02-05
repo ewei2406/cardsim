@@ -5,6 +5,7 @@ import { useDrag } from "../../../hooks/useDrag";
 import BoardPiece from "../BoardPieces/BoardPiece";
 import { SendMessage } from "../../../util/types/ClientRequest";
 import { COLORS } from "../../../util/colors";
+import { useSendMessage } from "../../../context/useSendMessage";
 
 const GBTile = ({
 	i,
@@ -62,7 +63,8 @@ const GBTile = ({
 const X = Array.from({ length: BOARD_WIDTH }, (_, i) => i);
 const Y = Array.from({ length: BOARD_HEIGHT }, (_, i) => i);
 
-const GameBoardTiles = ({ sendMessage }: { sendMessage: SendMessage }) => {
+const GameBoardTiles = () => {
+	const sendMessage = useSendMessage();
 	return (
 		<>
 			{X.map((x) => (

@@ -2,10 +2,11 @@ import { useCallback, useRef, useState } from "react";
 import { useChatHistory } from "../../hooks/useChat";
 import { COLORS, hashColor } from "../../util/colors";
 import { getHHMM } from "../../util/date";
-import { SendMessage } from "../../util/types/ClientRequest";
 import { TbSend } from "react-icons/tb";
+import { useSendMessage } from "../../context/useSendMessage";
 
-const ChatHistory = ({ sendMessage }: { sendMessage: SendMessage }) => {
+const ChatHistory = () => {
+	const sendMessage = useSendMessage();
 	const messages = useChatHistory();
 	const historyRef = useRef<HTMLDivElement | null>(null);
 	const [isFocused, setIsFocused] = useState(false);

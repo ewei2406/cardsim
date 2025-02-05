@@ -10,10 +10,14 @@ import { useState } from "react";
 import { RiFireLine } from "react-icons/ri";
 import { IoLayersOutline } from "react-icons/io5";
 import CutDeck from "./CutDeck";
-import { COLORS } from "../../../../util/colors";
-import { SendMessage } from "../../../../util/types/ClientRequest";
-import { GameSelection, selectionObject, useSelect } from "../../../../hooks/useSelection";
-import Modal from "../../../Modal";
+import { COLORS } from "../../../../../util/colors";
+import { SendMessage } from "../../../../../util/types/ClientRequest";
+import {
+	GameSelection,
+	selectionObject,
+	useSelect,
+} from "../../../../../hooks/useSelection";
+import Modal from "../../../../Modal";
 
 const DeckActions = ({
 	selection,

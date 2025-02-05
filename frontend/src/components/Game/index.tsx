@@ -1,18 +1,17 @@
 import { GameState } from "../../util/GameState";
 import { SendMessage } from "../../util/types/ClientRequest";
-import ChatHistory from "../Chat/ChatHistory";
-import LeaveGame from "./LeaveGame";
+import ChatHistory from "../ChatHistory/ChatHistory";
+import LeaveGame from "./GameUI/LeaveGame";
 import GameBoard from "./GameBoard";
-import GameBoardTiles from "./GameBoard/GameBoardTiles";
 import DragArrow from "./BoardPieces/DragArrow";
-import GameBoardSelection from "./GameBoard/GameBoardSelection";
-import BoardActions from "./BoardActions";
+import BoardActions from "./GameUI/Actions";
 import TableDecks from "./BoardPieces/TableDecks";
 import { useEffect, useState } from "react";
-import MyHand from "./BoardPieces/MyHand";
+import MyHand from "./GameUI/MyHand";
 import { updateTransform } from "../../hooks/useTransformCoords";
-import Void from "./GameBoard/Void";
+import Void from "./GameUI/Void";
 import TableCards from "./BoardPieces/TableCards";
+import { SendMessageContext } from "../../context/useSendMessage";
 
 interface GameProps {
 	gameState: GameState;
@@ -31,25 +30,22 @@ const Game = ({ gameState, gameId, sendMessage, clientId }: GameProps) => {
 	}, [clientId, gameState.playerMap, gameState.players]);
 
 	return (
-		<div>
+		<SendMessageContext.Provider value={{ sendMessage }}>
 			<Void />
 			<GameBoard gameId={gameId} isOnRight={isOnRight}>
-				<GameBoardTiles sendMessage={sendMessage} />
-				<GameBoardSelection />
 				<DragArrow playerGroup={gameState.playerMap[clientId]} />
 				<TableCards gameState={gameState} />
 				<TableDecks decks={gameState.decks} />
 			</GameBoard>
 			<MyHand
-				sendMessage={sendMessage}
 				clientId={clientId}
 				hands={gameState.hands}
 				players={gameState.players}
 			/>
-			<BoardActions sendMessage={sendMessage} />
-			<ChatHistory sendMessage={sendMessage} />
-			<LeaveGame sendMessage={sendMessage} />
-		</div>
+			<BoardActions />
+			<ChatHistory />
+			<LeaveGame />
+		</SendMessageContext.Provider>
 	);
 };
 

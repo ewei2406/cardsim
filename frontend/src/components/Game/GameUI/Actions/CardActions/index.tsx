@@ -1,8 +1,12 @@
 import { TbEye, TbEyeOff, TbHandStop, TbX } from "react-icons/tb";
-import { SendMessage } from "../../../../util/types/ClientRequest";
-import { GameSelection, selectionObject, useSelect } from "../../../../hooks/useSelection";
-import { COLORS } from "../../../../util/colors";
 import { IoLayersOutline } from "react-icons/io5";
+import {
+	GameSelection,
+	useSelect,
+	selectionObject,
+} from "../../../../../hooks/useSelection";
+import { COLORS } from "../../../../../util/colors";
+import { SendMessage } from "../../../../../util/types/ClientRequest";
 
 const CardActions = ({
 	selection,

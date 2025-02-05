@@ -1,5 +1,6 @@
-import { GameSelection, useSelection } from "../../../hooks/useSelection";
-import { SendMessage } from "../../../util/types/ClientRequest";
+import { useSendMessage } from "../../../../context/useSendMessage";
+import { GameSelection, useSelection } from "../../../../hooks/useSelection";
+import { SendMessage } from "../../../../util/types/ClientRequest";
 import CardActions from "./CardActions";
 import DeckActions from "./DeckActions";
 import GameBoardActions from "./GameBoardActions";
@@ -41,9 +42,9 @@ const getActions = (selection: GameSelection, sendMessage: SendMessage) => {
 	}
 };
 
-const BoardActions = ({ sendMessage }: { sendMessage: SendMessage }) => {
+const BoardActions = () => {
+	const sendMessage = useSendMessage();
 	const { selection } = useSelection();
-
 	const actions = getActions(selection, sendMessage);
 
 	return <BoardActionsWrapper>{actions}</BoardActionsWrapper>;

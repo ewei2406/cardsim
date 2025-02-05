@@ -1,10 +1,14 @@
 import { TbCards, TbX } from "react-icons/tb";
-import { COLORS } from "../../../../util/colors";
 import { useState } from "react";
 import DeckSelector, { DeckProps } from "./DeckSelector";
-import { SendMessage } from "../../../../util/types/ClientRequest";
-import { GameSelection, selectionObject, useSelect } from "../../../../hooks/useSelection";
-import Modal from "../../../Modal";
+import {
+	GameSelection,
+	useSelect,
+	selectionObject,
+} from "../../../../../hooks/useSelection";
+import { COLORS } from "../../../../../util/colors";
+import { SendMessage } from "../../../../../util/types/ClientRequest";
+import Modal from "../../../../Modal";
 
 const GameBoardActions = ({
 	selection,
