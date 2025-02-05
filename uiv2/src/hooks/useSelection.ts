@@ -152,6 +152,14 @@ class SelectionStore {
 
 export const selectionStore = new SelectionStore();
 
+export const selectionObject = {
+	setSelection: selectionStore.setSelection.bind(selectionStore),
+	addSelection: selectionStore.addSelection.bind(selectionStore),
+	deselect: () => {
+		selectionStore.setSelection({ type: "none" });
+	},
+};
+
 export const useSelection = () => {
 	const selection = useSyncExternalStore(
 		selectionStore.subscribe,

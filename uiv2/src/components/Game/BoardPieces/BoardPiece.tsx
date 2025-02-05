@@ -5,6 +5,7 @@ import { useTransform } from "../../../hooks/useTransformCoords";
 const BoardPiece = (props: {
 	x: number;
 	y: number;
+	className?: string;
 	rot?: number;
 	dz?: number;
 	children?: ReactNode;
@@ -23,22 +24,15 @@ const BoardPiece = (props: {
 
 	return (
 		<div
+			className={"board-piece" + (props.className ? ` ${props.className}` : "")}
 			style={{
 				zIndex: x + y,
 				border: "5px solid red",
-				position: "absolute",
 				width: TILE_WIDTH,
 				height: TILE_HEIGHT,
-				left: 0,
-				top: 0,
-				display: "flex",
-				justifyContent: "center",
-				alignItems: "center",
-				userSelect: "none",
 				transform: `translateX(${x}px) translateY(${y}px) translateZ(${
 					props.dz ?? 0
-				}px) rotateZ(${props.rot ?? 0}deg)`,
-				transition: "transform 0.2s ease",
+				}px) rotateZ(${props.rot ?? 0}deg) var(--extra-transform)`,
 				pointerEvents: props.disableInteraction ? "none" : undefined,
 				...props.style,
 			}}

@@ -4,9 +4,10 @@ import CardBack from "../../../Card/CardBack";
 import CardFront from "../../../Card/CardFront";
 import BoardPiece from "../BoardPiece";
 
-const TableCard = (props: {
+export type TableCardProps = {
 	tableCard: Card;
 	id: number;
+	className?: string;
 	selected?: boolean;
 	hovered?: boolean;
 	x: number;
@@ -20,7 +21,9 @@ const TableCard = (props: {
 	onMouseLeave?: React.MouseEventHandler<HTMLDivElement>;
 	disableInteraction?: boolean;
 	style?: React.CSSProperties;
-}) => {
+};
+
+const TableCard = (props: TableCardProps) => {
 	return (
 		<BoardPiece {...props} dz={props.hovered ? 5 : 0} key={props.id}>
 			<div

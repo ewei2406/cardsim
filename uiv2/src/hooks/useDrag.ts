@@ -156,3 +156,9 @@ export const useDrag = () => {
 		finishDrag,
 	};
 };
+
+export const dragObject = {
+	startDrag: dragStore.setStart,
+	hoverDrag: dragStore.hoverDrag,
+	finishDrag: dragStore.finish,
+};

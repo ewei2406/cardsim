@@ -8,11 +8,13 @@ import DragArrow from "./GameBoard/DragArrow";
 import GameBoardSelection from "./GameBoard/GameBoardSelection";
 import BoardActions from "./BoardActions";
 import TableDecks from "./BoardPieces/TableDecks";
-import TableCards from "./BoardPieces/TableCard/TableCards";
 import { useEffect, useState } from "react";
 import TableHands from "./BoardPieces/Hands";
 import MyHand from "./BoardPieces/Hands/MyHand";
 import { updateTransform } from "../../hooks/useTransformCoords";
+import getTableCards from "./BoardPieces/TableCard/getTableCards";
+import { useSelection } from "../../hooks/useSelection";
+import TableCard from "./BoardPieces/TableCard";
 
 interface GameProps {
 	gameState: GameState;
@@ -23,6 +25,7 @@ interface GameProps {
 
 const Game = ({ gameState, gameId, sendMessage, clientId }: GameProps) => {
 	const [isOnRight, setPlayerIsOnRight] = useState(false);
+	const { selection } = useSelection();
 
 	useEffect(() => {
 		if (!gameState.playerMap[clientId]) return;
@@ -30,7 +33,8 @@ const Game = ({ gameState, gameId, sendMessage, clientId }: GameProps) => {
 		setPlayerIsOnRight(gameState.playerMap[clientId].order > 3);
 	}, [clientId, gameState.playerMap, gameState.players]);
 
-	console.log(gameState);
+	// TODO: memoize this. this is pretty bad!
+	const tableCards = getTableCards(gameState.cards, selection);
 
 	return (
 		<div>
@@ -45,7 +49,9 @@ const Game = ({ gameState, gameId, sendMessage, clientId }: GameProps) => {
 				<DragArrow playerGroup={gameState.playerMap[clientId]} />
 				<GameBoardSelection />
 				<TableDecks decks={gameState.decks} />
-				<TableCards cards={gameState.cards} />
+				{tableCards.map((cardProps) => (
+					<TableCard key={cardProps.id} {...cardProps} />
+				))}
 				<TableHands
 					hands={gameState.hands}
 					playerMap={gameState.playerMap}
