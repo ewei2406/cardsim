@@ -25,8 +25,6 @@ const DragArrow = () => {
 	const [startX, startY] = getXY(start);
 	const [endX, endY] = getXY(end);
 
-	console.log(rot);
-
 	if (end.type === "void") {
 		return (
 			<>

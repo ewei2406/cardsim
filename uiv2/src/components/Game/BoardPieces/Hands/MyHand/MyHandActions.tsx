@@ -1,14 +1,14 @@
-import { TbNumber123, TbSpade, TbPlayCardOff, TbX } from "react-icons/tb";
-import { useSelection } from "../../../../hooks/useSelection";
-import { byRank, bySuit, CardOrdering } from "../../../../util/cardOrdering";
+import { TbNumber123, TbSpade, TbX, TbArrowUp } from "react-icons/tb";
+import { useSelection } from "../../../../../hooks/useSelection";
+import { byRank, bySuit, CardOrdering } from "../../../../../util/cardOrdering";
 
 const MyHandActions = ({
 	setShowHand,
-	setCalcPriority,
+	handleSort,
 	ids,
 }: {
 	setShowHand: (v: boolean) => void;
-	setCalcPriority: React.Dispatch<React.SetStateAction<CardOrdering>>;
+	handleSort: (sortFn: CardOrdering) => void;
 	ids: number[];
 }) => {
 	const { deselect } = useSelection();
@@ -27,19 +27,19 @@ const MyHandActions = ({
 			onMouseOver={() => setShowHand(true)}
 		>
 			<div style={{ display: "flex", gap: 5 }}>
-				<button onClick={() => setCalcPriority(() => byRank)}>
+				<button onClick={() => handleSort(byRank)}>
 					<TbNumber123 />
 					By Rank
 				</button>
-				<button onClick={() => setCalcPriority(() => bySuit)}>
+				<button onClick={() => handleSort(bySuit)}>
 					<TbSpade />
 					By Suit
 				</button>
 			</div>
 			<div style={{ display: "flex", gap: 5 }}>
 				<button>
-					<TbPlayCardOff />
-					Dump
+					<TbArrowUp />
+					Play
 				</button>
 				<button disabled={ids.length === 0} onClick={deselect}>
 					<TbX />

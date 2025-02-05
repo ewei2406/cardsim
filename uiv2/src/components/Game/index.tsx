@@ -25,7 +25,6 @@ const Game = ({ gameState, gameId, sendMessage, clientId }: GameProps) => {
 	const [isOnRight, setPlayerIsOnRight] = useState(false);
 
 	useEffect(() => {
-		console.log("here", gameState.playerMap, clientId);
 		if (!gameState.playerMap[clientId]) return;
 		updateTransform(gameState.playerMap[clientId].rot);
 		setPlayerIsOnRight(gameState.playerMap[clientId].order > 3);

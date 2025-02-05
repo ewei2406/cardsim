@@ -15,7 +15,7 @@ class TransformStore {
 	listeners = new Set<() => void>();
 
 	setTransform = (rot: number) => {
-		console.log("setting transform", rot);
+		console.log("setting transform: ", rot);
 		this.rot = rot;
 		switch (rot) {
 			case 0:
