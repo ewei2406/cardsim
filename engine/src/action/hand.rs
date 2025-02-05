@@ -1,9 +1,6 @@
 use std::vec;
 
-use crate::{
-    component::*, connection_manager::ConnectionId, entity::Entity, gamestate::GameState,
-    util::get_id,
-};
+use crate::{component::*, connection_manager::ConnectionId, entity::Entity, gamestate::GameState};
 
 use super::{action::InvalidOutcomeError, Outcome};
 
@@ -48,7 +45,8 @@ pub fn play_hand_cards(
                 faceup,
             };
             let position = gamestate.nearest_empty_position(x, y);
-            Card::add(gamestate, (card, position))
+            Card::add_id(gamestate, (card, position), played_card.id);
+            played_card.id
         })
         .collect();
 
@@ -98,7 +96,7 @@ pub fn play_hand_cards_to_deck(
 
     hand_component.cards = remaining;
     for played_card in played {
-        deck_component.return_card(CardInit(played_card.suit, played_card.rank));
+        deck_component.return_card(CardInit(played_card.suit, played_card.rank, played_card.id));
     }
 
     let mut dstate = GameState::new();
@@ -176,7 +174,7 @@ pub fn draw_card_from_deck(
 
     // Add the card to the hand
     hand_component.cards.push(HandCard {
-        id: get_id(),
+        id: card_init.2,
         suit: card_init.0,
         rank: card_init.1,
         shown: false,
@@ -226,7 +224,7 @@ pub fn draw_cards_from_table(
             None => return Outcome::Invalid(InvalidOutcomeError::EntityNotFound),
         };
         hand_component.cards.push(HandCard {
-            id: get_id(),
+            id: *card,
             suit: card_component.suit.clone(),
             rank: card_component.rank,
             shown: false,

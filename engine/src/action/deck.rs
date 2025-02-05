@@ -4,7 +4,6 @@ use crate::{
     component::{Card, Deck},
     entity::Entity,
     gamestate::GameState,
-    util::get_id,
 };
 
 pub fn create_standard_decks(
@@ -20,12 +19,12 @@ pub fn create_standard_decks(
     for _ in 0..n {
         for suit in suits.iter() {
             for rank in ranks.iter() {
-                card_inits.push(CardInit(suit.clone(), *rank));
+                card_inits.push(CardInit(suit.clone(), *rank, gamestate.get_entity()));
             }
         }
         if jokers {
-            card_inits.push(CardInit(Suit::J, 14));
-            card_inits.push(CardInit(Suit::J, 15));
+            card_inits.push(CardInit(Suit::J, 14, gamestate.get_entity()));
+            card_inits.push(CardInit(Suit::J, 15, gamestate.get_entity()));
         }
     }
     create_deck(gamestate, x, y, card_inits)
@@ -38,7 +37,7 @@ pub fn create_deck(
     card_inits: Vec<CardInit>,
 ) -> Outcome {
     let position = gamestate.nearest_empty_position(x, y);
-    let deck = Deck::new(get_id(), card_inits);
+    let deck = Deck::new(gamestate.get_entity(), card_inits);
     let entity = Deck::add(gamestate, (deck, position));
     let mut dstate = GameState::new();
     dstate.clone_entity_from(gamestate, entity);
@@ -71,11 +70,7 @@ pub fn cut_deck(gamestate: &mut GameState, deck: Entity, n: usize) -> Outcome {
     }
 
     let orig_id = deck_component.deck_id;
-    let new_deck = Deck {
-        deck_id: orig_id,
-        card_inits: flipped,
-        shuffle_ctr: 0,
-    };
+    let new_deck = Deck::new(orig_id, flipped);
 
     let mut deleted = None;
     if deck_component.card_inits.is_empty() {
@@ -95,15 +90,7 @@ pub fn cut_deck(gamestate: &mut GameState, deck: Entity, n: usize) -> Outcome {
     }
 }
 
-pub fn flip_cards_from_deck(
-    gamestate: &mut GameState,
-    deck: Entity,
-    n: usize,
-    faceup: bool,
-) -> Outcome {
-    if n == 0 {
-        return Outcome::None;
-    }
+pub fn flip_card_from_deck(gamestate: &mut GameState, deck: Entity, faceup: bool) -> Outcome {
     let dy = if faceup { 0 } else { -2 };
     let dx = if faceup { 2 } else { 0 };
     let position = match gamestate.positions.get(deck) {
@@ -114,31 +101,25 @@ pub fn flip_cards_from_deck(
         Some(deck) => deck,
         None => return Outcome::None,
     };
-    let mut flipped = Vec::new();
-    for _ in 0..n {
-        match deck_component.draw_card() {
-            Some(card) => flipped.push(card),
-            None => break,
+    let flipped = match deck_component.draw_card() {
+        Some(card) => card,
+        None => {
+            // Remove the deck if it's empty
+            Deck::remove(gamestate, deck);
+            return Outcome::None;
         }
-    }
-    let cards: Vec<Card> = flipped
-        .iter()
-        .map(|card_init| Card {
-            rank: card_init.1,
-            suit: card_init.0.clone(),
-            faceup,
-            deck_id: deck_component.deck_id,
-        })
-        .collect();
+    };
 
-    let card_entities: Vec<Entity> = cards
-        .into_iter()
-        .map(|card| Card::add(gamestate, (card, position.clone())))
-        .collect();
+    let card = Card {
+        rank: flipped.1,
+        suit: flipped.0.clone(),
+        faceup,
+        deck_id: deck_component.deck_id,
+    };
+    Card::add_id(gamestate, (card, position.clone()), flipped.2);
+
     let mut dstate = GameState::new();
-    for entity in card_entities {
-        dstate.clone_entity_from(gamestate, entity);
-    }
+    dstate.clone_entity_from(gamestate, flipped.2);
     dstate.clone_entity_from(gamestate, deck);
     Outcome::Delta {
         changed: Some(dstate),
@@ -170,7 +151,7 @@ pub fn collect_deck(gamestate: &mut GameState, deck_id: DeckId, x1: i64, y1: i64
     orig_entities.iter().for_each(|&entity| {
         if let Some(card) = gamestate.cards.get(entity) {
             if card.deck_id == deck_id {
-                card_inits.push(CardInit(card.suit.clone(), card.rank));
+                card_inits.push(CardInit(card.suit.clone(), card.rank, entity));
                 removed_entities.push(entity);
                 Card::remove(gamestate, entity);
             }
@@ -186,7 +167,7 @@ pub fn collect_deck(gamestate: &mut GameState, deck_id: DeckId, x1: i64, y1: i64
             let mut hand_cards: Vec<HandCard> = Vec::new();
             hand.cards.iter().for_each(|hand_card| {
                 if hand_card.deck_id == deck_id {
-                    card_inits.push(CardInit(hand_card.suit.clone(), hand_card.rank));
+                    card_inits.push(CardInit(hand_card.suit.clone(), hand_card.rank, entity));
                 } else {
                     hand_cards.push(hand_card.clone());
                 }
@@ -207,11 +188,7 @@ pub fn collect_deck(gamestate: &mut GameState, deck_id: DeckId, x1: i64, y1: i64
         return Outcome::None;
     }
 
-    let new_deck = Deck {
-        deck_id,
-        card_inits,
-        shuffle_ctr: 0,
-    };
+    let new_deck = Deck::new(deck_id, card_inits);
     let new_deck = Deck::add(
         gamestate,
         (new_deck, gamestate.nearest_empty_position(x1, y1)),

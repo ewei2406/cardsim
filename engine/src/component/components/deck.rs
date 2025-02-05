@@ -12,7 +12,7 @@ use super::{card::Suit, Position};
 pub type DeckId = usize;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct CardInit(pub Suit, pub u8);
+pub struct CardInit(pub Suit, pub u8, pub Entity);
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Deck {
@@ -65,6 +65,7 @@ impl GroupedComponent for Deck {
 pub struct AnonDeck {
     pub deck_id: DeckId,
     pub card_count: usize,
+    pub next_card: Entity,
     pub shuffle_ctr: usize,
 }
 
@@ -72,6 +73,7 @@ impl Anonymize for Deck {
     type Anon = AnonDeck;
     fn anonymize(&self, _as_entity: Entity, _perspective: Entity) -> Self::Anon {
         AnonDeck {
+            next_card: self.card_inits.last().map(|x| x.2).unwrap_or(0),
             deck_id: self.deck_id,
             card_count: self.card_inits.len(),
             shuffle_ctr: self.shuffle_ctr,

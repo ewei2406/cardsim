@@ -27,13 +27,13 @@ pub struct Card {
 
 impl GroupedComponent for Card {
     type Params = (Card, Position);
-	fn add_id(gamestate: &mut GameState, params: Self::Params, id: Entity) {
-		gamestate.cards.register(id, params.0);
-		gamestate.positions.register(id, params.1);
-	}
+    fn add_id(gamestate: &mut GameState, params: Self::Params, id: Entity) {
+        gamestate.cards.register(id, params.0);
+        gamestate.positions.register(id, params.1);
+    }
     fn add(gamestate: &mut GameState, params: Self::Params) -> Entity {
         let entity = gamestate.get_entity();
-		Self::add_id(gamestate, params, entity);
+        Self::add_id(gamestate, params, entity);
         entity
     }
     fn remove(gamestate: &mut GameState, entity: Entity) {
@@ -45,12 +45,12 @@ impl GroupedComponent for Card {
 #[derive(Serialize, Debug)]
 #[serde(tag = "type")]
 pub enum AnonCard {
-    Card {
+    Visible {
         suit: Suit,
         rank: u8,
         deck_id: DeckId,
     },
-    AnonCard {
+    Hidden {
         deck_id: DeckId,
     },
 }
@@ -59,12 +59,12 @@ impl Anonymize for Card {
     type Anon = AnonCard;
     fn anonymize(&self, _as_entity: Entity, _perspective: Entity) -> Self::Anon {
         match self.faceup {
-            true => AnonCard::Card {
+            true => AnonCard::Visible {
                 suit: self.suit.clone(),
                 rank: self.rank,
                 deck_id: self.deck_id,
             },
-            false => AnonCard::AnonCard {
+            false => AnonCard::Hidden {
                 deck_id: self.deck_id,
             },
         }

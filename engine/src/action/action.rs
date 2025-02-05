@@ -28,10 +28,9 @@ pub enum Action {
         deck: Entity,
         n: usize,
     },
-    FlipCardsFromDeck {
+    FlipCardFromDeck {
         faceup: bool,
         deck: Entity,
-        n: usize,
     },
     ShuffleDeck {
         deck: Entity,
@@ -103,7 +102,7 @@ impl Actionable for GameState {
             CreateDeck { x, y, card_inits } => create_deck(self, x, y, card_inits),
             CreateStandardDecks { x, y, n, jokers } => create_standard_decks(self, x, y, n, jokers),
             CutDeck { deck, n } => cut_deck(self, deck, n),
-            FlipCardsFromDeck { deck, n, faceup } => flip_cards_from_deck(self, deck, n, faceup),
+            FlipCardFromDeck { deck, faceup } => flip_card_from_deck(self, deck, faceup),
             ShuffleDeck { deck } => shuffle_deck(self, deck),
             MoveEntity { entity, x1, y1 } => move_entity(self, entity, x1, y1),
             RemoveEntity { entity } => remove_entity(self, entity),

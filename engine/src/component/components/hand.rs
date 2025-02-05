@@ -45,14 +45,14 @@ impl GroupedComponent for Hand {
 #[derive(Serialize, Debug)]
 #[serde(tag = "type")]
 pub enum AnonHandCard {
-    HandCard {
+    Visible {
         id: HandCardId,
         rank: u8,
         suit: Suit,
         deck_id: DeckId,
         shown: bool,
     },
-    AnonHandCard {
+    Hidden {
         id: HandCardId,
         deck_id: DeckId,
     },
@@ -79,7 +79,7 @@ impl Anonymize for Hand {
                 cards: self
                     .cards
                     .iter()
-                    .map(|c| AnonHandCard::HandCard {
+                    .map(|c| AnonHandCard::Visible {
                         id: c.id,
                         shown: c.shown,
                         rank: c.rank,
@@ -93,14 +93,14 @@ impl Anonymize for Hand {
             .cards
             .iter()
             .map(|card| match card.shown {
-                true => AnonHandCard::HandCard {
+                true => AnonHandCard::Visible {
                     id: card.id,
                     shown: card.shown,
                     rank: card.rank,
                     suit: card.suit.clone(),
                     deck_id: card.deck_id,
                 },
-                false => AnonHandCard::AnonHandCard {
+                false => AnonHandCard::Hidden {
                     id: card.id,
                     deck_id: card.deck_id,
                 },
