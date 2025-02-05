@@ -18,6 +18,7 @@ pub trait Anonymize {
 pub trait GroupedComponent {
     type Params;
     fn add(gamestate: &mut GameState, params: Self::Params) -> Entity;
+    fn add_id(gamestate: &mut GameState, params: Self::Params, id: Entity);
     fn remove(gamestate: &mut GameState, entity: Entity);
 }
 

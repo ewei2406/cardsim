@@ -5,7 +5,6 @@ use crate::{
     component::{component::Anonymize, GroupedComponent},
     connection_manager::ConnectionId,
     entity::Entity,
-    util,
 };
 
 use super::{card::Suit, deck::DeckId};
@@ -25,27 +24,19 @@ pub struct HandCard {
 pub struct Hand {
     pub client_id: ConnectionId,
     pub nickname: String,
-    pub order: usize,
     pub cards: Vec<HandCard>,
 }
 
 impl GroupedComponent for Hand {
-    type Params = (ConnectionId, String);
+    type Params = Hand;
+    fn add_id(gamestate: &mut crate::gamestate::GameState, params: Self::Params, id: Entity) {
+        gamestate.hands.register(id, params);
+    }
     fn add(gamestate: &mut crate::gamestate::GameState, params: Self::Params) -> Entity {
         let entity = gamestate.get_entity();
-        gamestate.hands.register(
-            entity,
-            Hand {
-                client_id: params.0,
-                nickname: params.1,
-                // TODO: replace - this assumes this is always ascending.
-                order: util::get_id(),
-                cards: Vec::new(),
-            },
-        );
+        gamestate.hands.register(entity, params);
         entity
     }
-
     fn remove(gamestate: &mut crate::gamestate::GameState, entity: Entity) {
         gamestate.hands.unregister(entity);
     }
@@ -71,7 +62,6 @@ pub enum AnonHandCard {
 pub struct AnonHand {
     client_id: ConnectionId,
     nickname: String,
-    order: usize,
     cards: Vec<AnonHandCard>,
 }
 
@@ -85,7 +75,6 @@ impl Anonymize for Hand {
         if self.client_id == perspective {
             return AnonHand {
                 nickname: self.nickname.clone(),
-                order: self.order,
                 client_id: self.client_id,
                 cards: self
                     .cards
@@ -119,7 +108,6 @@ impl Anonymize for Hand {
             .collect();
         AnonHand {
             nickname: self.nickname.clone(),
-            order: self.order,
             client_id: self.client_id,
             cards: cards,
         }

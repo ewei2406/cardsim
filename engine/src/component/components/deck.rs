@@ -18,7 +18,7 @@ pub struct CardInit(pub Suit, pub u8);
 pub struct Deck {
     pub deck_id: DeckId,
     pub card_inits: Vec<CardInit>,
-	pub shuffle_ctr: usize,
+    pub shuffle_ctr: usize,
 }
 
 impl Deck {
@@ -26,7 +26,7 @@ impl Deck {
         Self {
             deck_id,
             card_inits,
-			shuffle_ctr: 0,
+            shuffle_ctr: 0,
         }
     }
 
@@ -40,16 +40,19 @@ impl Deck {
 
     pub fn shuffle(&mut self) {
         self.card_inits.shuffle(&mut thread_rng());
-		self.shuffle_ctr += 1;
+        self.shuffle_ctr += 1;
     }
 }
 
 impl GroupedComponent for Deck {
     type Params = (Deck, Position);
+    fn add_id(gamestate: &mut GameState, params: Self::Params, id: Entity) {
+        gamestate.decks.register(id, params.0);
+        gamestate.positions.register(id, params.1);
+    }
     fn add(gamestate: &mut GameState, params: Self::Params) -> Entity {
         let entity = gamestate.get_entity();
-        gamestate.decks.register(entity, params.0);
-        gamestate.positions.register(entity, params.1);
+        Self::add_id(gamestate, params, entity);
         entity
     }
     fn remove(gamestate: &mut GameState, entity: Entity) {
@@ -62,7 +65,7 @@ impl GroupedComponent for Deck {
 pub struct AnonDeck {
     pub deck_id: DeckId,
     pub card_count: usize,
-	pub shuffle_ctr: usize,
+    pub shuffle_ctr: usize,
 }
 
 impl Anonymize for Deck {
@@ -71,7 +74,7 @@ impl Anonymize for Deck {
         AnonDeck {
             deck_id: self.deck_id,
             card_count: self.card_inits.len(),
-			shuffle_ctr: self.shuffle_ctr,
+            shuffle_ctr: self.shuffle_ctr,
         }
     }
 }
