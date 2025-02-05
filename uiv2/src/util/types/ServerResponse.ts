@@ -67,13 +67,13 @@ export type Position = {
 
 export type Card =
 	| {
-			type: "Card";
+			type: "Visible";
 			rank: number;
 			suit: "S" | "H" | "D" | "C" | "J";
 			deck_id: number;
 	  }
 	| {
-			type: "AnonCard";
+			type: "Hidden";
 			deck_id: number;
 	  };
 
@@ -85,7 +85,7 @@ export type Deck = {
 
 export type HandCard =
 	| {
-			type: "HandCard";
+			type: "Visible";
 			id: number;
 			deck_id: number;
 			shown: boolean;
@@ -93,7 +93,7 @@ export type HandCard =
 			suit: "S" | "H" | "D" | "C" | "J";
 	  }
 	| {
-			type: "AnonHandCard";
+			type: "Hidden";
 			id: number;
 			deck_id: number;
 	  };

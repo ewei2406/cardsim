@@ -5,6 +5,7 @@ import { useTransform } from "../../../hooks/useTransformCoords";
 const BoardPiece = (props: {
 	x: number;
 	y: number;
+	rot?: number;
 	dz?: number;
 	children?: ReactNode;
 	onClick?: React.MouseEventHandler<HTMLDivElement>;
@@ -35,7 +36,7 @@ const BoardPiece = (props: {
 				userSelect: "none",
 				transform: `translateX(${x}px) translateY(${y}px) translateZ(${
 					props.dz ?? 0
-				}px)`,
+				}px) rotateZ(${props.rot ?? 0}deg)`,
 				transition: "transform 0.2s ease",
 				pointerEvents: props.disableInteraction ? "none" : undefined,
 				...props.style,

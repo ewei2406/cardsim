@@ -8,7 +8,7 @@ import DragArrow from "./GameBoard/DragArrow";
 import GameBoardSelection from "./GameBoard/GameBoardSelection";
 import BoardActions from "./BoardActions";
 import TableDecks from "./BoardPieces/TableDecks";
-import TableCards from "./BoardPieces/TableCards";
+import TableCards from "./BoardPieces/TableCard/TableCards";
 import { useEffect, useState } from "react";
 import TableHands from "./BoardPieces/Hands";
 import MyHand from "./BoardPieces/Hands/MyHand";
