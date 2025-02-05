@@ -17,12 +17,10 @@ const MyHandActions = ({
 		<div
 			className="column"
 			style={{
-				position: "absolute",
-				bottom: 40,
-				left: 0,
-				right: 0,
 				justifyContent: "center",
 				alignItems: "center",
+				margin: "0 auto",
+				zIndex: 1000,
 			}}
 			onMouseOver={() => setShowHand(true)}
 		>
