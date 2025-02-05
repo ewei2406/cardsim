@@ -4,19 +4,15 @@ import ChatHistory from "../Chat/ChatHistory";
 import LeaveGame from "./LeaveGame";
 import GameBoard from "./GameBoard";
 import GameBoardTiles from "./GameBoard/GameBoardTiles";
-import DragArrow from "./GameBoard/DragArrow";
+import DragArrow from "./BoardPieces/DragArrow";
 import GameBoardSelection from "./GameBoard/GameBoardSelection";
 import BoardActions from "./BoardActions";
 import TableDecks from "./BoardPieces/TableDecks";
 import { useEffect, useState } from "react";
 import MyHand from "./BoardPieces/MyHand";
 import { updateTransform } from "../../hooks/useTransformCoords";
-import getTableCards from "./BoardPieces/TableCard/getTableCards";
-import { useSelection } from "../../hooks/useSelection";
-import TableCard from "./BoardPieces/TableCard";
-import getTableHandCards from "./BoardPieces/TableCard/getTableHandCards";
-import getTableDeckCards from "./BoardPieces/TableCard/getTableDeckCards";
 import Void from "./GameBoard/Void";
+import TableCards from "./BoardPieces/TableCards";
 
 interface GameProps {
 	gameState: GameState;
@@ -27,7 +23,6 @@ interface GameProps {
 
 const Game = ({ gameState, gameId, sendMessage, clientId }: GameProps) => {
 	const [isOnRight, setPlayerIsOnRight] = useState(false);
-	const { selection } = useSelection();
 
 	useEffect(() => {
 		if (!gameState.playerMap[clientId]) return;
@@ -35,35 +30,22 @@ const Game = ({ gameState, gameId, sendMessage, clientId }: GameProps) => {
 		setPlayerIsOnRight(gameState.playerMap[clientId].order > 3);
 	}, [clientId, gameState.playerMap, gameState.players]);
 
-	// TODO: memoize this. this is pretty bad!
-	const tableCards = getTableCards(gameState.cards, selection);
-	const tableHandCards = getTableHandCards(
-		gameState.playerMap,
-		gameState.hands
-	);
-	const tableDeckCards = getTableDeckCards(gameState.decks, selection);
-	const cards = [...tableHandCards, ...tableCards, ...tableDeckCards].sort(
-		(a, b) => a.id - b.id
-	);
-
 	return (
 		<div>
 			<Void />
+			<GameBoard gameId={gameId} isOnRight={isOnRight}>
+				<GameBoardTiles sendMessage={sendMessage} />
+				<GameBoardSelection />
+				<DragArrow playerGroup={gameState.playerMap[clientId]} />
+				<TableCards gameState={gameState} />
+				<TableDecks decks={gameState.decks} />
+			</GameBoard>
 			<MyHand
 				sendMessage={sendMessage}
 				clientId={clientId}
 				hands={gameState.hands}
 				players={gameState.players}
 			/>
-			<GameBoard gameId={gameId} isOnRight={isOnRight}>
-				<GameBoardTiles sendMessage={sendMessage} />
-				<DragArrow playerGroup={gameState.playerMap[clientId]} />
-				<GameBoardSelection />
-				<TableDecks decks={gameState.decks} />
-				{cards.map((cardProps) => (
-					<TableCard key={cardProps.id} {...cardProps} />
-				))}
-			</GameBoard>
 			<BoardActions sendMessage={sendMessage} />
 			<ChatHistory sendMessage={sendMessage} />
 			<LeaveGame sendMessage={sendMessage} />
