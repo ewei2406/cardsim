@@ -1,3 +1,0 @@
-{"command": "JoinGame","game_id": 1,"nickname": "test"}
-{"action":"CreateStandardDecks","x":0,"y":0,"n":1,"jokers":false}
-{"action":"DrawCardFromDeck","deck":6}

@@ -1,5 +1,5 @@
+import { DeckGroup, CardGroup } from "@/util/GameState";
 import { useCallback, useSyncExternalStore } from "react";
-import { DeckGroup, CardGroup } from "../util/GameState";
 
 export type GameSelection =
 	| {

@@ -1,6 +1,6 @@
+import { COLORS } from "@/util/colors";
 import { ReactNode } from "react";
 import { TbX } from "react-icons/tb";
-import { COLORS } from "../../util/colors";
 
 const Modal = (props: {
 	shown: boolean;

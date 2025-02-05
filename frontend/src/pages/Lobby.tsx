@@ -1,6 +1,6 @@
-import Game from "../components/Game";
-import GameSelector from "../components/GameSelector";
-import { useLobby } from "../hooks/useLobby";
+import GameSelector from "@/components/GameSelector";
+import Game from "@/game/Game";
+import { useLobby } from "@/hooks/useLobby";
 
 const Lobby = () => {
 	const { lobbyStatus, availableGames, clientId, sendMessage } = useLobby();

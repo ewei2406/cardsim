@@ -1,5 +1,4 @@
 import { TbJoker } from "react-icons/tb";
-import { COLORS } from "../../util/colors";
 import {
 	BsFillSuitClubFill,
 	BsFillSuitDiamondFill,
@@ -10,7 +9,8 @@ import {
 	BsSuitHeart,
 	BsSuitSpade,
 } from "react-icons/bs";
-import { CARD_FACE_PADDING } from "../../util/constants";
+import { COLORS } from "@/util/colors";
+import { CARD_FACE_PADDING } from "@/util/constants";
 
 const getRank = (rank: number) => {
 	switch (rank) {

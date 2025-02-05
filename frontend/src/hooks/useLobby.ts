@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { GameState } from "../util/GameState";
-import { GameDescription, ServerResponse } from "../util/types/ServerResponse";
 import { logger } from "./useLogger";
-import { ClientRequest } from "../util/types/ClientRequest";
 import { chat } from "./useChat";
 import { DragTarget, useDragFinishObserver } from "./useDrag";
 import { GameSelection, getCardIds, selectionObject } from "./useSelection";
+import { GameState } from "@/util/GameState";
+import { ClientRequest } from "@/util/types/ClientRequest";
+import { GameDescription, ServerResponse } from "@/util/types/ServerResponse";
 
 type LobbyStatus =
 	| {

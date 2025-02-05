@@ -1,5 +1,5 @@
-import { MAX_PLAYER_COUNT } from "../../util/constants";
-import { GameDescription } from "../../util/types/ServerResponse";
+import { MAX_PLAYER_COUNT } from "@/util/constants";
+import { GameDescription } from "@/util/types/ServerResponse";
 
 const GameCard = ({
 	gameDescription,

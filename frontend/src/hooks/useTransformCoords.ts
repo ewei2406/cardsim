@@ -1,10 +1,10 @@
-import { useSyncExternalStore } from "react";
 import {
-	BOARD_HEIGHT,
 	BOARD_WIDTH,
-	TILE_HEIGHT,
 	TILE_WIDTH,
-} from "../util/constants";
+	BOARD_HEIGHT,
+	TILE_HEIGHT,
+} from "@/util/constants";
+import { useSyncExternalStore } from "react";
 
 class TransformStore {
 	transform: (x: number, y: number) => [number, number] = (x, y) => [

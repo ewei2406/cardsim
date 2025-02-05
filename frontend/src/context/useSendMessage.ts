@@ -1,14 +1,13 @@
+import { SendMessage } from "@/util/types/ClientRequest";
 import { createContext, useContext } from "react";
-import { SendMessage } from "../util/types/ClientRequest";
 
 interface SendMessageContextProps {
 	sendMessage: SendMessage;
 }
 
-export const SendMessageContext = createContext<SendMessageContextProps | undefined>(
-	undefined
-);
-
+export const SendMessageContext = createContext<
+	SendMessageContextProps | undefined
+>(undefined);
 
 export const useSendMessage = () => {
 	const context = useContext(SendMessageContext);

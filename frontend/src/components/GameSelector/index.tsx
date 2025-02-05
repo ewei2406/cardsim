@@ -1,15 +1,15 @@
-import GameCard from "./GameCard";
-import { GameDescription } from "../../util/types/ServerResponse";
-import { SendMessage } from "../../util/types/ClientRequest";
+import { SendMessage } from "@/util/types/ClientRequest";
+import { GameDescription } from "@/util/types/ServerResponse";
 import { useCallback, useState } from "react";
 import { TbPlus, TbRefresh } from "react-icons/tb";
+import GameCard from "./GameCard";
 
 const GameSelector = ({
 	availableGames,
 	sendMessage,
 }: {
 	availableGames: GameDescription[];
-	sendMessage: SendMessage
+	sendMessage: SendMessage;
 }) => {
 	const [nickname, setNickname] = useState("");
 

@@ -1,5 +1,5 @@
-import { useLogs } from "../../hooks/useLogger";
-import { COLORS } from "../../util/colors";
+import { useLogs } from "@/hooks/useLogger";
+import { COLORS } from "@/util/colors";
 
 const COLOR_MAP = {
 	success: "green",

@@ -1,6 +1,6 @@
+import { CardOrdering } from "@/util/cardOrdering";
+import { HandCard } from "@/util/types/ServerResponse";
 import { useState, useCallback, useEffect } from "react";
-import { CardOrdering } from "../util/cardOrdering";
-import { HandCard } from "../util/types/ServerResponse";
 
 export const useMyHand = () => {
 	const [handCards, setHandCards] = useState<HandCard[]>([]);

@@ -1,7 +1,7 @@
 import { useCallback, useSyncExternalStore } from "react";
-import { Card, Deck, Position } from "../util/types/ServerResponse";
-import { PlayerGroup } from "../util/GameState";
 import { GameSelection, useSelection } from "./useSelection";
+import { PlayerGroup } from "@/util/GameState";
+import { Position, Deck, Card } from "@/util/types/ServerResponse";
 
 export type DragTarget =
 	| {

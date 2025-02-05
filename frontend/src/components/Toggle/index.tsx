@@ -1,5 +1,5 @@
+import { COLORS } from "@/util/colors";
 import { TbCheck, TbX } from "react-icons/tb";
-import { COLORS } from "../../util/colors";
 
 const Toggle = (props: {
 	checked: boolean;

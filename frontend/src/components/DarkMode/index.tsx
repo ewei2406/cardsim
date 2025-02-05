@@ -1,5 +1,5 @@
+import useDarkMode from "@/hooks/useDarkMode";
 import { TbMoon, TbSun } from "react-icons/tb";
-import useDarkMode from "../../hooks/useDarkMode";
 
 const DarkMode = () => {
 	const { darkMode, toggleDarkMode } = useDarkMode();

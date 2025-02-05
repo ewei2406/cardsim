@@ -1,6 +1,6 @@
+import { CHAT_STALE_MS, CHAT_UPDATE_INTERVAL_MS } from "@/util/constants";
+import { getUUID } from "@/util/id";
 import { useSyncExternalStore } from "react";
-import { getUUID } from "../util/id";
-import { CHAT_STALE_MS, CHAT_UPDATE_INTERVAL_MS } from "../util/constants";
 
 export type ChatMessage = {
 	id: number;

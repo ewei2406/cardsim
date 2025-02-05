@@ -1,4 +1,4 @@
-import { COLORS, hashColor } from "../../util/colors";
+import { hashColor, COLORS } from "@/util/colors";
 
 // from https://projects.verou.me/css3patterns/#seigaiha
 const BG = (color1: string, color2: string) => `

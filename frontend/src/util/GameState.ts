@@ -1,4 +1,4 @@
-import { selectionObject } from "../hooks/useSelection";
+import { selectionObject } from "@/hooks/useSelection";
 import { BOARD_WIDTH, BOARD_HEIGHT } from "./constants";
 import {
 	Card,

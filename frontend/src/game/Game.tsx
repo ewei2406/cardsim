@@ -1,17 +1,17 @@
 import ChatHistory from "@/components/ChatHistory/ChatHistory";
 import { SendMessageContext } from "@/context/useSendMessage";
-import DragArrow from "@/game/BoardPieces/DragArrow";
-import TableCards from "@/game/BoardPieces/TableCards";
-import TableDecks from "@/game/BoardPieces/TableDecks";
-import GameBoard from "@/game/GameBoard";
-import BoardActions from "@/game/GameUI/Actions";
-import LeaveGame from "@/game/GameUI/LeaveGame";
-import MyHand from "@/game/GameUI/MyHand";
-import Void from "@/game/GameUI/Void";
 import { updateTransform } from "@/hooks/useTransformCoords";
 import { GameState } from "@/util/GameState";
 import { SendMessage } from "@/util/types/ClientRequest";
 import { useState, useEffect } from "react";
+import DragArrow from "./BoardPieces/DragArrow";
+import TableCards from "./BoardPieces/TableCards";
+import TableDecks from "./BoardPieces/TableDecks";
+import GameBoard from "./GameBoard";
+import BoardActions from "./GameUI/Actions";
+import LeaveGame from "./GameUI/LeaveGame";
+import MyHand from "./GameUI/MyHand";
+import Void from "./GameUI/Void";
 
 interface GameProps {
 	gameState: GameState;

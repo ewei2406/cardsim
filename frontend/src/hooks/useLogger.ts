@@ -1,5 +1,5 @@
+import { LOG_STALE_MS, LOG_CLEAR_INTERVAL_MS } from "@/util/constants";
 import { useSyncExternalStore } from "react";
-import { LOG_CLEAR_INTERVAL_MS, LOG_STALE_MS } from "../util/constants";
 
 export type Log = {
 	message: string;

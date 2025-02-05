@@ -1,9 +1,9 @@
+import { useSendMessage } from "@/context/useSendMessage";
+import { useChatHistory } from "@/hooks/useChat";
+import { hashColor, COLORS } from "@/util/colors";
+import { getHHMM } from "@/util/date";
 import { useCallback, useRef, useState } from "react";
-import { useChatHistory } from "../../hooks/useChat";
-import { COLORS, hashColor } from "../../util/colors";
-import { getHHMM } from "../../util/date";
 import { TbSend } from "react-icons/tb";
-import { useSendMessage } from "../../context/useSendMessage";
 
 const ChatHistory = () => {
 	const sendMessage = useSendMessage();
