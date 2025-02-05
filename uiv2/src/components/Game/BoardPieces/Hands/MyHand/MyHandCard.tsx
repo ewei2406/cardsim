@@ -36,7 +36,7 @@ const MyHandCard = ({
 
 	const [hover, setHover] = useState(false);
 
-	if (card.type === "AnonHandCard") {
+	if (card.type === "Hidden") {
 		return (
 			<CardBack
 				deck_id={card.deck_id}
@@ -62,7 +62,7 @@ const MyHandCard = ({
 
 	const theta = ((n + 0.5) / nMax - 0.5) * thetaMax;
 
-	if (card.type === "HandCard") {
+	if (card.type === "Visible") {
 		return (
 			<div
 				onMouseEnter={(e) => {

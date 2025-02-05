@@ -37,7 +37,7 @@ export const useMyHand = () => {
 		(sortFn: CardOrdering) => {
 			const newCardsOrder = new Map<number, number>();
 			handCards.forEach((card) => {
-				if (card.type === "AnonHandCard") return;
+				if (card.type === "Hidden") return;
 				newCardsOrder.set(card.id, sortFn(card));
 			});
 			const asArray = Array.from(newCardsOrder.entries()).sort(

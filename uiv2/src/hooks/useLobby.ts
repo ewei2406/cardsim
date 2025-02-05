@@ -58,6 +58,7 @@ export const useLobby = () => {
 						gameId: res.game_id,
 						game: new GameState(res),
 					};
+					console.log("Applying delta", res);
 					setGameUpdates((prev) => prev + 1);
 					break;
 				case "AvailableGames":

@@ -25,6 +25,7 @@ const BoardPiece = (props: {
 		<div
 			style={{
 				zIndex: x + y,
+				border: "5px solid red",
 				position: "absolute",
 				width: TILE_WIDTH,
 				height: TILE_HEIGHT,

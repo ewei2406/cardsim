@@ -97,6 +97,7 @@ export class GameState {
 	applyChanged = (changed: GameECS) => {
 		changed.entities.forEach((entityId) => {
 			this.entities.add(entityId);
+			console.log("applying card", entityId);
 			if (changed.cards[entityId] && changed.positions[entityId]) {
 				this.cards[entityId] = {
 					card: changed.cards[entityId],

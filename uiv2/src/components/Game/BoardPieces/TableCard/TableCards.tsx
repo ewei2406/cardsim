@@ -17,7 +17,7 @@ const TableCardWrapper = ({
 
 	return (
 		<TableCard
-			key={card.id}
+			id={card.id}
 			tableCard={card.card}
 			x={card.position.x}
 			y={card.position.y}
@@ -63,13 +63,12 @@ const TableCards = ({ cards }: { cards: { [id: EntityId]: CardGroup } }) => {
 
 	const ids =
 		selection.type === "cards" ? selection.cards.map((c) => c.id) : [];
-
 	return (
 		<>
 			{Object.values(cards).map((card) => (
 				<TableCardWrapper
 					card={card}
-					key={card.id}
+					key={card.id + "123"}
 					selected={ids.includes(card.id)}
 				/>
 			))}

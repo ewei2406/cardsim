@@ -30,6 +30,8 @@ const Game = ({ gameState, gameId, sendMessage, clientId }: GameProps) => {
 		setPlayerIsOnRight(gameState.playerMap[clientId].order > 3);
 	}, [clientId, gameState.playerMap, gameState.players]);
 
+	console.log(gameState);
+
 	return (
 		<div>
 			<MyHand

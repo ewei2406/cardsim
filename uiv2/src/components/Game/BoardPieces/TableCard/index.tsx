@@ -6,6 +6,7 @@ import BoardPiece from "../BoardPiece";
 
 const TableCard = (props: {
 	tableCard: Card;
+	id: number;
 	selected?: boolean;
 	hovered?: boolean;
 	x: number;
@@ -21,7 +22,7 @@ const TableCard = (props: {
 	style?: React.CSSProperties;
 }) => {
 	return (
-		<BoardPiece {...props} dz={props.hovered ? 5 : 0}>
+		<BoardPiece {...props} dz={props.hovered ? 5 : 0} key={props.id}>
 			<div
 				style={{
 					position: "absolute",
@@ -32,27 +33,28 @@ const TableCard = (props: {
 					backfaceVisibility: "hidden",
 				}}
 			>
+				{props.id}
 				<CardBack
 					width={CARD_WIDTH}
 					deck_id={props.tableCard.deck_id}
 					selected={props.selected}
 				/>
 			</div>
-
 			<div
 				style={{
 					position: "absolute",
 					transform: `translate(-50%, -50%) rotateY(${
 						props.tableCard.type === "Hidden" ? 180 : 0
 					}deg)`,
-					transition: "transform 0.2s ease",
+					transition: "transform 2s ease",
 					backfaceVisibility: "hidden",
 				}}
 			>
 				<CardFront
 					width={CARD_WIDTH}
 					deck_id={props.tableCard.deck_id}
-					rank={props.tableCard.type === "Hidden" ? 0 : props.tableCard.rank}
+					// rank={props.tableCard.type === "Hidden" ? 0 : props.tableCard.rank}
+					rank={props.id}
 					suit={props.tableCard.type === "Hidden" ? "S" : props.tableCard.suit}
 					selected={props.selected}
 				/>

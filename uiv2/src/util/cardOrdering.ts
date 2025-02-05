@@ -26,7 +26,7 @@ const RANK_ORDER: Record<number, number> = {
 	15: 14,
 };
 
-export type CardOrdering = (card: HandCard & { type: "HandCard" }) => number;
+export type CardOrdering = (card: HandCard & { type: "Visible" }) => number;
 export const byRank: CardOrdering = (card) => {
 	return (RANK_ORDER[card.rank] << 3) + SUIT_ORDER[card.suit];
 };
