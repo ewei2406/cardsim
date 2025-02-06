@@ -81,7 +81,7 @@ impl ConnectionManager {
             .write()
             .await
             .insert(client_id, Arc::new(Mutex::new(tx)));
-        log::info!("{} has been assigned ID {}.", client_addr, client_id);
+        log::debug!("{} has been assigned ID {}.", client_addr, client_id);
 
         Ok((client_id, rx))
     }
@@ -90,7 +90,7 @@ impl ConnectionManager {
         &self,
         connection: tokio::net::TcpStream,
     ) -> Result<(ConnectionId, SplitStream<WebSocketStream<TcpStream>>), String> {
-        log::info!(
+        log::debug!(
             "New connection: {}",
             match connection.peer_addr() {
                 Ok(addr) => addr.to_string(),

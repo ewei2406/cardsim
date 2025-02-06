@@ -43,7 +43,7 @@ impl GameController {
             match request {
                 ClientRequest::Action(action) => {
                     if let Some(game_id) = self.get_client_game_id(client_id).await {
-                        log::info!(
+                        log::debug!(
                             "Client {} sent (to game {}) the game action: {:?}",
                             client_id,
                             game_id,
@@ -51,7 +51,7 @@ impl GameController {
                         );
                         let _ = self.update_game_and_sync(game_id, action, client_id).await;
                     } else {
-                        log::warn!(
+                        log::debug!(
                             "Client {} tried to send a game action but is not in a game.",
                             client_id
                         );
@@ -60,12 +60,12 @@ impl GameController {
                     }
                 }
                 ClientRequest::Command(action) => {
-                    log::info!("Client {} sent command: {:?}", client_id, action);
+                    log::debug!("Client {} sent command: {:?}", client_id, action);
                     self.apply_command(client_id, action).await;
                 }
             }
         } else {
-            log::warn!("Client {} sent invalid message: {:?}", client_id, message);
+            log::debug!("Client {} sent invalid message: {:?}", client_id, message);
             self.error(client_id, format!("Invalid message: {:?}", message))
                 .await;
         }
@@ -111,7 +111,7 @@ impl GameController {
     pub async fn create_game(&self, client_id: usize, nickname: String) -> Result<GameId, String> {
         // Host can't be in a game already
         if let Some(game_id) = self.get_client_game_id(client_id).await {
-            log::warn!(
+            log::debug!(
                 "Client {} tried to create a new game, but is already in game {}.",
                 client_id,
                 game_id
@@ -135,7 +135,7 @@ impl GameController {
             .write()
             .await
             .insert(game_id, Arc::new(Mutex::new(game)));
-        log::info!("Game {} created by client {}.", game_id, client_id);
+        log::debug!("Game {} created by client {}.", game_id, client_id);
 
         self.join_game(game_id, client_id, nickname).await;
         Ok(game_id)
@@ -144,7 +144,7 @@ impl GameController {
     async fn join_game(&self, game_id: GameId, client_id: usize, nickname: String) {
         // Host can't be in a game already
         if let Some(old_id) = self.get_client_game_id(client_id).await {
-            log::warn!(
+            log::debug!(
                 "Client {} tried to join game {}, but is already in game {}.",
                 client_id,
                 game_id,
@@ -159,7 +159,7 @@ impl GameController {
         let game = match self.get_game(game_id).await {
             Some(game) => game,
             None => {
-                log::info!(
+                log::debug!(
                     "Client {} tried to join non-existant game {}.",
                     client_id,
                     game_id
@@ -173,7 +173,7 @@ impl GameController {
 
         // Game can't be full
         if game.game_state.players.len() >= MAX_PLAYERS {
-            log::info!("Client {} tried to join full game {}.", client_id, game_id);
+            log::debug!("Client {} tried to join full game {}.", client_id, game_id);
             return self
                 .error(client_id, format!("Game {} is full.", game_id))
                 .await;
@@ -218,7 +218,7 @@ impl GameController {
 
         // Update game record
         self.client_map.write().await.insert(client_id, game_id);
-        log::info!("Client {} joined game {}.", client_id, game_id);
+        log::debug!("Client {} joined game {}.", client_id, game_id);
     }
 
     pub async fn leave_game(&self, client_id: usize) {
@@ -226,7 +226,7 @@ impl GameController {
         let game = match self.get_client_game(client_id).await {
             Some(game) => game,
             None => {
-                log::info!(
+                log::debug!(
                     "Client {} tried to leave game, but is not in a game.",
                     client_id
                 );
@@ -265,14 +265,14 @@ impl GameController {
 
         // Update records
         self.client_map.write().await.remove(&client_id);
-        log::info!("Client {} left game {}.", client_id, game.game_id);
+        log::debug!("Client {} left game {}.", client_id, game.game_id);
     }
 
     async fn chat_message(&self, client_id: usize, message: String) {
         let game_id = match self.get_client_game_id(client_id).await {
             Some(game_id) => game_id,
             None => {
-                log::info!(
+                log::debug!(
                     "Client {} tried to send chat message, but is not in a game.",
                     client_id
                 );
@@ -283,7 +283,7 @@ impl GameController {
         };
         self.send_to_game_clients(game_id, &ServerResponse::ChatMessage { client_id, message })
             .await;
-        log::info!(
+        log::debug!(
             "Client {} sent a chat message to game {}.",
             client_id,
             game_id

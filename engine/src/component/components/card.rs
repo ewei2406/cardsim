@@ -35,7 +35,6 @@ impl GroupedComponent for Card {
     fn add(gamestate: &mut GameState, params: Self::Params) -> Entity {
         let entity = gamestate.get_entity();
         Self::add_id(gamestate, params, entity);
-        log::error!("Added card with id {}", entity);
         entity
     }
     fn remove(gamestate: &mut GameState, entity: Entity) {

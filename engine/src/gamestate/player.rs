@@ -45,7 +45,7 @@ impl GameState {
         let player = match self.players.iter().position(|x| x.client_id == client_id) {
             Some(player) => player,
             None => {
-                log::warn!(
+                log::debug!(
                     "Tried to remove {} but they are not in the game.",
                     client_id
                 );
@@ -57,7 +57,7 @@ impl GameState {
         let hand_component = match self.hands.get(hand) {
             Some(hand) => hand,
             None => {
-                log::warn!(
+                log::debug!(
                     "Tried to remove {} but their hand is not in the game.",
                     client_id
                 );

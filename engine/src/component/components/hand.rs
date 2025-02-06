@@ -1,4 +1,3 @@
-use log::info;
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -70,7 +69,7 @@ pub struct AnonHand {
 impl Anonymize for Hand {
     type Anon = AnonHand;
     fn anonymize(&self, as_entity: Entity, perspective: Entity) -> Self::Anon {
-        info!(
+        log::debug!(
             "Anonymizing hand: {:?} as {:?} from {:?}",
             self, as_entity, perspective
         );
