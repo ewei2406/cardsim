@@ -2,6 +2,7 @@ import { TbCards, TbX } from "react-icons/tb";
 import { selectionObject } from "@/hooks/useSelection";
 import { COLORS } from "@/util/colors";
 import { GetActions } from "..";
+import { HOTKEYS } from "@/util/hotkeys";
 
 const getGameBoardActions: GetActions<{ type: "gameBoard" }> = (
 	_selection,
@@ -9,19 +10,16 @@ const getGameBoardActions: GetActions<{ type: "gameBoard" }> = (
 	openModal
 ) => [
 	{
-		label: "New Deck...",
+		...HOTKEYS.GAMEBOARD.NEW_DECK,
 		icon: TbCards,
 		onClick: () => openModal("newDeck"),
 		backgroundColor: COLORS.SECONDARY,
-		hotKey: "d",
-		underlineIndex: 4,
 	},
 	{
-		label: "Deselect",
+		...HOTKEYS.GAMEBOARD.DESELECT,
 		icon: TbX,
 		onClick: selectionObject.deselect,
 		backgroundColor: COLORS.DARK,
-		hotKey: "Escape",
 	},
 ];
 

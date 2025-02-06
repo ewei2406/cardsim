@@ -23,7 +23,7 @@ export const getDeckActions: GetActions<{ type: "deck" }> = (
 
 	return [
 		{
-			label: "Draw",
+			...HOTKEYS.DECK.DRAW,
 			icon: TbArrowUp,
 			onClick: () => {
 				sendMessage({
@@ -32,11 +32,9 @@ export const getDeckActions: GetActions<{ type: "deck" }> = (
 					deck: selection.deck.id,
 				});
 			},
-			hotKey: HOTKEYS.DECK.DRAW,
-			underlineIndex: 0,
 		},
 		{
-			label: "Flip",
+			...HOTKEYS.DECK.FLIP,
 			icon: TbArrowForwardUp,
 			onClick: () => {
 				sendMessage({
@@ -46,11 +44,9 @@ export const getDeckActions: GetActions<{ type: "deck" }> = (
 					deck: selection.deck.id,
 				});
 			},
-			hotKey: HOTKEYS.DECK.FLIP,
-			underlineIndex: 0,
 		},
 		{
-			label: "Burn",
+			...HOTKEYS.DECK.BURN,
 			icon: RiFireLine,
 			onClick: () => {
 				sendMessage({
@@ -60,11 +56,9 @@ export const getDeckActions: GetActions<{ type: "deck" }> = (
 					deck: selection.deck.id,
 				});
 			},
-			hotKey: HOTKEYS.DECK.BURN,
-			underlineIndex: 0,
 		},
 		{
-			label: "Shuffle",
+			...HOTKEYS.DECK.SHUFFLE,
 			icon: TbArrowsShuffle,
 			onClick: () => {
 				sendMessage({
@@ -74,11 +68,9 @@ export const getDeckActions: GetActions<{ type: "deck" }> = (
 				});
 			},
 			disabled: isSingleCard,
-			hotKey: HOTKEYS.DECK.SHUFFLE,
-			underlineIndex: 0,
 		},
 		{
-			label: "Deal One",
+			...HOTKEYS.DECK.DEAL_ONE,
 			icon: TbArrowFork,
 			onClick: () => {
 				sendMessage({
@@ -87,11 +79,9 @@ export const getDeckActions: GetActions<{ type: "deck" }> = (
 					deck: selection.deck.id,
 				});
 			},
-			hotKey: HOTKEYS.DECK.DEAL_ONE,
-			underlineIndex: 1,
 		},
 		{
-			label: "Deal All",
+			...HOTKEYS.DECK.DEAL_ALL,
 			icon: TbArrowFork,
 			onClick: () => {
 				sendMessage({
@@ -101,11 +91,15 @@ export const getDeckActions: GetActions<{ type: "deck" }> = (
 				});
 				selectionObject.deselect();
 			},
-			hotKey: HOTKEYS.DECK.DEAL_ALL,
-			underlineIndex: 5,
 		},
 		{
-			label: "Regroup All",
+			...HOTKEYS.DECK.CUT,
+			icon: TbScissors,
+			onClick: () => openModal("cutDeck"),
+			disabled: isSingleCard,
+		},
+		{
+			...HOTKEYS.DECK.REGROUP_ALL,
 			icon: IoLayersOutline,
 			onClick: () => {
 				sendMessage({
@@ -116,11 +110,10 @@ export const getDeckActions: GetActions<{ type: "deck" }> = (
 					y1: selection.deck.position.y,
 				});
 			},
-			hotKey: HOTKEYS.DECK.REGROUP_ALL,
-			underlineIndex: 0,
+			backgroundColor: COLORS.SECONDARY,
 		},
 		{
-			label: "Return Hand",
+			...HOTKEYS.DECK.RETURN_HAND,
 			icon: TbHandStop,
 			onClick: () => {
 				sendMessage({
@@ -129,26 +122,16 @@ export const getDeckActions: GetActions<{ type: "deck" }> = (
 					deck: selection.deck.id,
 				});
 			},
-			hotKey: HOTKEYS.DECK.RETURN_HAND,
-			underlineIndex: 7,
+			backgroundColor: COLORS.SECONDARY,
 		},
 		{
-			label: "Cut...",
-			icon: TbScissors,
-			onClick: () => openModal("cutDeck"),
-			disabled: isSingleCard,
-			hotKey: HOTKEYS.DECK.CUT,
-			underlineIndex: 0,
-		},
-		{
-			label: "Deselect",
+			...HOTKEYS.DECK.DESELECT,
 			icon: TbX,
 			onClick: selectionObject.deselect,
 			backgroundColor: COLORS.DARK,
-			hotKey: HOTKEYS.DECK.DESELECT,
 		},
 		{
-			label: "Delete",
+			...HOTKEYS.DECK.DELETE,
 			icon: TbX,
 			onClick: () => {
 				sendMessage({
@@ -159,7 +142,6 @@ export const getDeckActions: GetActions<{ type: "deck" }> = (
 				selectionObject.deselect();
 			},
 			backgroundColor: COLORS.DANGER,
-			hotKey: HOTKEYS.DECK.DELETE,
 		},
 	];
 };

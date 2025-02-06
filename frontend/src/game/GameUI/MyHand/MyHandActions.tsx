@@ -13,6 +13,7 @@ import {
 import { COLORS } from "@/util/colors";
 import { CSSProperties, useEffect } from "react";
 import ActionButton from "../Actions/ActionButton";
+import { HOTKEYS } from "@/util/hotkeys";
 
 const keyMap: Record<string, number> = {
 	"1": 0,
@@ -50,7 +51,6 @@ const MyHandActions = ({
 	const { start, end } = useDragObserver();
 
 	useEffect(() => {
-		console.log(reverseCardsOrder);
 		const handleKeyDown = (event: KeyboardEvent) => {
 			if (keyMap[event.key] !== undefined) {
 				const index = keyMap[event.key];
@@ -139,47 +139,37 @@ const MyHandActions = ({
 			{!showHand && "Hand Actions"}
 			<div style={groupStyle}>
 				<ActionButton
-					label="Play (w)"
+					{...HOTKEYS.HAND.PLAY}
 					icon={TbArrowUp}
 					onClick={() => handlePlayCards(true)}
 					disabled={ids.length === 0}
-					hotKey="w"
-					underlineIndex={6}
 				/>
 				<ActionButton
-					label="Facedown"
+					{...HOTKEYS.HAND.FACEDOWN}
 					icon={TbEyeOff}
 					onClick={() => handlePlayCards(false)}
 					disabled={ids.length === 0}
-					hotKey="f"
-					underlineIndex={0}
 				/>
 			</div>
 			<div style={groupStyle}>
 				<ActionButton
-					label="By Rank"
+					{...HOTKEYS.HAND.BY_RANK}
 					icon={TbNumber123}
 					onClick={() => handleSort(byRank)}
-					hotKey="r"
-					underlineIndex={3}
 					backgroundColor={COLORS.SECONDARY}
 				/>
 				<ActionButton
-					label="By Suit"
+					{...HOTKEYS.HAND.BY_SUIT}
 					icon={TbSpade}
 					onClick={() => handleSort(bySuit)}
-					hotKey="s"
-					underlineIndex={3}
 					backgroundColor={COLORS.SECONDARY}
 				/>
 			</div>
 			<div style={groupStyle}>
 				<ActionButton
-					label={"Select All"}
+					{...HOTKEYS.HAND.SELECT_ALL}
 					icon={isAllSelected ? TbX : TbPlus}
 					onClick={handleSelectAll}
-					hotKey="a"
-					underlineIndex={7}
 					backgroundColor={isAllSelected ? COLORS.DARK : undefined}
 				/>
 			</div>

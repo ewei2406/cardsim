@@ -6,6 +6,8 @@ import { TbCards } from "react-icons/tb";
 import Modal from "@/components/Modal";
 import { ActionModalComponent } from "..";
 import ActionButton from "../ActionButton";
+import { HOTKEYS } from "@/util/hotkeys";
+import { COLORS } from "@/util/colors";
 
 export type DeckProps =
 	| {
@@ -103,11 +105,10 @@ const NewDeck: ActionModalComponent = ({ close }) => {
 				}}
 			>
 				<ActionButton
-					label="New Deck"
+					{...HOTKEYS.GAMEBOARD.NEW_DECK}
 					icon={TbCards}
 					onClick={handleCreate}
-					hotKey="d"
-					underlineIndex={4}
+					backgroundColor={COLORS.SECONDARY}
 					highPriority
 				/>
 			</div>

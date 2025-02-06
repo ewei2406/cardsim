@@ -68,7 +68,7 @@ const BoardActions = () => {
 			}}
 		>
 			<div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-				Actions
+				{actions.length > 0 && "Actions"}
 				{actions.map((action) => (
 					<ActionButton key={action.label} {...action} />
 				))}

@@ -19,7 +19,7 @@ export const getCardActions: GetActions<{ type: "cards" }> = (
 
 	return [
 		{
-			label: "Draw",
+			...HOTKEYS.CARD.DRAW,
 			icon: TbHandStop,
 			onClick: () => {
 				sendMessage({
@@ -29,11 +29,9 @@ export const getCardActions: GetActions<{ type: "cards" }> = (
 				});
 				selectionObject.deselect();
 			},
-			hotKey: HOTKEYS.CARD.DRAW,
-			underlineIndex: 0,
 		},
 		{
-			label: "Flip",
+			...HOTKEYS.CARD.FLIP,
 			icon: TbArrowCapsule,
 			onClick: () => {
 				sendMessage({
@@ -42,11 +40,9 @@ export const getCardActions: GetActions<{ type: "cards" }> = (
 					cards: selection.cards.map((card) => card.id),
 				});
 			},
-			hotKey: HOTKEYS.CARD.FLIP,
-			underlineIndex: 0,
 		},
 		{
-			label: "Regroup All",
+			...HOTKEYS.CARD.REGROUP_ALL,
 			icon: IoLayersOutline,
 			onClick: () => {
 				if (!regroupId) {
@@ -62,20 +58,18 @@ export const getCardActions: GetActions<{ type: "cards" }> = (
 				selectionObject.deselect();
 			},
 			disabled: !regroupId,
-			hotKey: HOTKEYS.CARD.REGROUP_ALL,
-			underlineIndex: 0,
+			backgroundColor: COLORS.SECONDARY,
 		},
 		{
-			label: "Deselect",
+			...HOTKEYS.CARD.DESELECT,
 			icon: TbX,
 			onClick: () => {
 				selectionObject.deselect();
 			},
 			backgroundColor: COLORS.DARK,
-			hotKey: HOTKEYS.CARD.DESELECT,
 		},
 		{
-			label: "Delete",
+			...HOTKEYS.CARD.DELETE,
 			icon: TbX,
 			onClick: () => {
 				sendMessage({
@@ -86,7 +80,6 @@ export const getCardActions: GetActions<{ type: "cards" }> = (
 				selectionObject.deselect();
 			},
 			backgroundColor: COLORS.DANGER,
-			hotKey: HOTKEYS.CARD.DELETE,
 		},
 	];
 };
