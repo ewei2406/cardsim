@@ -1,14 +1,34 @@
 import { COLORS } from "@/util/colors";
-import { ReactNode } from "react";
+import { ACTION_FREQ_SPACING_MS } from "@/util/constants";
+import { ReactNode, useEffect } from "react";
 import { TbX } from "react-icons/tb";
 
-const Modal = (props: {
-	shown: boolean;
+const Modal = ({
+	children,
+	title,
+	close,
+}: {
 	children: ReactNode;
 	title: ReactNode;
 	close: () => void;
 }) => {
-	if (!props.shown) return <></>;
+	useEffect(() => {
+		const handleKeyDown = (event: KeyboardEvent) => {
+			if (event.key === "Escape") {
+				close();
+			}
+			event.stopPropagation();
+		};
+
+		document.addEventListener("keydown", handleKeyDown, { capture: true });
+		return () => {
+			setTimeout(() => {
+				document.removeEventListener("keydown", handleKeyDown, {
+					capture: true,
+				});
+			}, ACTION_FREQ_SPACING_MS);
+		};
+	}, [close]);
 
 	return (
 		<div
@@ -25,7 +45,7 @@ const Modal = (props: {
 				WebkitBackdropFilter: "blur(5px)",
 				justifyContent: "center",
 			}}
-			onClick={props.close}
+			onClick={close}
 		>
 			<div
 				className="card"
@@ -41,15 +61,12 @@ const Modal = (props: {
 						marginBottom: 5,
 					}}
 				>
-					<h2>{props.title}</h2>
-					<button
-						style={{ backgroundColor: COLORS.DANGER }}
-						onClick={props.close}
-					>
+					<h2>{title}</h2>
+					<button style={{ backgroundColor: COLORS.DANGER }} onClick={close}>
 						<TbX />
 					</button>
 				</div>
-				{props.children}
+				{children}
 			</div>
 		</div>
 	);

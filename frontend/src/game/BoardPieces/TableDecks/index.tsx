@@ -2,7 +2,7 @@ import { useState } from "react";
 import CardCount from "./CardCount";
 import CardBack from "@/components/Card/CardBack";
 import { useDrag } from "@/hooks/useDrag";
-import { useSelect, useSelection } from "@/hooks/useSelection";
+import { selectionObject, useSelection } from "@/hooks/useSelection";
 import { CARD_WIDTH } from "@/util/constants";
 import { DeckGroup, EntityId } from "@/util/GameState";
 import BoardPiece from "../BoardPiece";
@@ -15,7 +15,6 @@ const TableDeck = ({
 	selected?: boolean;
 }) => {
 	const { startDrag, hoverDrag, finishDrag } = useDrag();
-	const { addSelection } = useSelect();
 	const [showCount, setShowCount] = useState(false);
 
 	const stackHeight =
@@ -56,7 +55,7 @@ const TableDeck = ({
 				}
 			}}
 			onClick={(e) => {
-				addSelection({
+				selectionObject.addSelection({
 					type: "deck",
 					deck,
 				});
@@ -91,7 +90,7 @@ const TableDeck = ({
 };
 
 const TableDecks = ({ decks }: { decks: { [id: EntityId]: DeckGroup } }) => {
-	const { selection } = useSelection();
+	const selection = useSelection();
 	return (
 		<>
 			{Object.values(decks).map((deck) => (

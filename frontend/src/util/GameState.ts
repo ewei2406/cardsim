@@ -104,6 +104,7 @@ export class GameState {
 					position: changed.positions[entityId],
 					id: entityId,
 				};
+				selectionObject.refresh();
 				return;
 			}
 			if (changed.decks[entityId] && changed.positions[entityId]) {
@@ -112,6 +113,7 @@ export class GameState {
 					position: changed.positions[entityId],
 					id: entityId,
 				};
+				selectionObject.refresh();
 				return;
 			}
 			if (changed.hands[entityId]) {
@@ -119,6 +121,7 @@ export class GameState {
 					hand: changed.hands[entityId],
 					id: entityId,
 				};
+				selectionObject.refresh();
 				return;
 			}
 			console.error("Unknown entity: ", entityId);

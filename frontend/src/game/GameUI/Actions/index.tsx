@@ -1,21 +1,59 @@
 import { useSendMessage } from "@/context/useSendMessage";
 import { GameSelection, useSelection } from "@/hooks/useSelection";
 import { SendMessage } from "@/util/types/ClientRequest";
-import CardActions from "./CardActions";
-import DeckActions from "./DeckActions";
-import GameBoardActions from "./GameBoardActions";
-import { IconType } from "react-icons";
+import ActionButton, { ActionProps } from "./ActionButton";
+import { getCardActions } from "./CardActions/getCardActions";
+import { getDeckActions } from "./DeckActions/getDeckActions";
+import DeckSelector from "./GameBoardActions/NewDeck";
+import { ReactNode, useEffect, useState } from "react";
+import getGameBoardActions from "./GameBoardActions/getGameBoardActions";
+import CutDeck from "./DeckActions/CutDeck";
 
-type ActionProps = {
-	icon: IconType;
-	label: string;
-	onClick: React.MouseEventHandler<HTMLButtonElement>;
-	underlineIndex?: number;
-	hotKey?: string;
-	disabled?: boolean;
+export type GetActions<T = unknown> = (
+	selection: GameSelection & T,
+	sendMessage: SendMessage,
+	openModal: (modal: ActionModal) => void
+) => ActionProps[];
+
+const getActions: GetActions = (selection, sendMessage, openModal) => {
+	const actions = [];
+	switch (selection.type) {
+		case "cards":
+			actions.push(...getCardActions(selection, sendMessage, openModal));
+			break;
+		case "deck":
+			actions.push(...getDeckActions(selection, sendMessage, openModal));
+			break;
+		case "gameBoard":
+			actions.push(...getGameBoardActions(selection, sendMessage, openModal));
+			break;
+		default:
+			return [];
+	}
+	return actions;
 };
 
-const BoardActionsWrapper = (props: { children: React.ReactNode }) => {
+export type ActionModal = "newDeck" | "cutDeck" | "none";
+export type ActionModalComponent = (props: { close: () => void }) => ReactNode;
+
+const BoardActions = () => {
+	const sendMessage = useSendMessage();
+	const selection = useSelection();
+
+	const [curModal, setCurModal] = useState<ActionModal>("none");
+	const [actions, setActions] = useState<ActionProps[]>(
+		getActions(selection, sendMessage, setCurModal)
+	);
+
+	useEffect(() => {
+		setActions(getActions(selection, sendMessage, setCurModal));
+		setCurModal("none");
+	}, [selection, sendMessage]);
+
+	const closeModal = () => {
+		setCurModal("none");
+	};
+
 	return (
 		<div
 			style={{
@@ -30,34 +68,21 @@ const BoardActionsWrapper = (props: { children: React.ReactNode }) => {
 			}}
 		>
 			<div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-				{props.children ? "Actions" : ""}
-				{props.children}
+				Actions
+				{actions.map((action) => (
+					<ActionButton key={action.label} {...action} />
+				))}
 			</div>
+
+			{curModal === "cutDeck" ? (
+				<CutDeck close={closeModal} />
+			) : curModal === "newDeck" ? (
+				<DeckSelector close={closeModal} />
+			) : (
+				<></>
+			)}
 		</div>
 	);
-};
-
-const getActions = (selection: GameSelection, sendMessage: SendMessage) => {
-	switch (selection.type) {
-		case "gameBoard":
-			return (
-				<GameBoardActions selection={selection} sendMessage={sendMessage} />
-			);
-		case "deck":
-			return <DeckActions selection={selection} sendMessage={sendMessage} />;
-		case "cards":
-			return <CardActions selection={selection} sendMessage={sendMessage} />;
-		default:
-			return;
-	}
-};
-
-const BoardActions = () => {
-	const sendMessage = useSendMessage();
-	const { selection } = useSelection();
-	const actions = getActions(selection, sendMessage);
-
-	return <BoardActionsWrapper>{actions}</BoardActionsWrapper>;
 };
 
 export default BoardActions;

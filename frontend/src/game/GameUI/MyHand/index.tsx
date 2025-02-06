@@ -20,12 +20,13 @@ const MyHandContent = ({
 	hand: HandGroup;
 	sendMessage: SendMessage;
 }) => {
-	const { selection } = useSelection();
+	const selection = useSelection();
 	const ids = selection.type === "handCards" ? selection.handCardIds : [];
 	const [showHand, setShowHand] = useState(false);
 	const {
 		setHandCards,
 		cardsOrder,
+		reverseCardsOrder,
 		draggingCard,
 		setDraggingCard,
 		handleDragOver,
@@ -43,55 +44,62 @@ const MyHandContent = ({
 	);
 
 	return (
-		<div
-			style={{
-				zIndex: 1001,
-				position: "fixed",
-				bottom: MY_HAND_CARD_SIZE,
-				left: 0,
-				right: 0,
-				height: 0,
-				display: "flex",
-				flexDirection: "column",
-				alignContent: "center",
-				transition: "transform 0.2s ease",
-				transform: `translateY(${showHand ? 0 : MY_HAND_CARD_SIZE}px)`,
-			}}
-		>
+		<div>
+			{hand.hand.cards.length && (
+				<MyHandActions
+					reverseCardsOrder={reverseCardsOrder}
+					cardIds={hand.hand.cards.map((c) => c.id)}
+					setShowHand={setShowHand}
+					sendMessage={sendMessage}
+					showHand={showHand}
+					ids={ids}
+					handleSort={handleSort}
+				/>
+			)}
 			<div
-				className="center-content"
 				style={{
-					position: "relative",
-					width: "100%",
+					zIndex: 1001,
+					position: "fixed",
+					bottom: MY_HAND_CARD_SIZE,
+					left: 0,
+					right: 0,
 					height: 0,
-					transform: `translateY(${MY_HAND_CARD_SIZE * 1.5}px)`,
+					display: "flex",
+					flexDirection: "column",
+					alignContent: "center",
+					transition: "transform 0.2s ease",
+					transform: `translateY(${showHand ? 0 : MY_HAND_CARD_SIZE}px)`,
 				}}
-				onMouseLeave={() => {
-					setDraggingCard(null);
-				}}
-				onMouseOver={(e) => e.stopPropagation()}
 			>
-				{hand.hand.cards.map((card) => (
-					<MyHandCard
-						key={card.id}
-						handleDragOver={handleDragOver}
-						setDraggingCard={setDraggingCard}
-						setShowHand={setShowHand}
-						draggingCard={draggingCard}
-						n={cardsOrder.get(card.id) ?? 0}
-						nMax={nMax}
-						thetaMax={thetaMax}
-						card={card}
-						selected={ids.includes(card.id)}
-					/>
-				))}
+				<div
+					className="center-content"
+					style={{
+						position: "relative",
+						width: "100%",
+						height: 0,
+						transform: `translateY(${MY_HAND_CARD_SIZE * 1.5}px)`,
+					}}
+					onMouseLeave={() => {
+						setDraggingCard(null);
+					}}
+					onMouseOver={(e) => e.stopPropagation()}
+				>
+					{hand.hand.cards.map((card) => (
+						<MyHandCard
+							key={card.id}
+							handleDragOver={handleDragOver}
+							setDraggingCard={setDraggingCard}
+							setShowHand={setShowHand}
+							draggingCard={draggingCard}
+							n={cardsOrder.get(card.id) ?? 0}
+							nMax={nMax}
+							thetaMax={thetaMax}
+							card={card}
+							selected={ids.includes(card.id)}
+						/>
+					))}
+				</div>
 			</div>
-			<MyHandActions
-				sendMessage={sendMessage}
-				setShowHand={setShowHand}
-				ids={ids}
-				handleSort={handleSort}
-			/>
 		</div>
 	);
 };

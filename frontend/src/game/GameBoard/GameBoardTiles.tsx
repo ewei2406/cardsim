@@ -1,7 +1,7 @@
 import { useSendMessage } from "@/context/useSendMessage";
 import BoardPiece from "@/game/BoardPieces/BoardPiece";
 import { useDrag } from "@/hooks/useDrag";
-import { useSelect } from "@/hooks/useSelection";
+import { selectionObject } from "@/hooks/useSelection";
 import { COLORS } from "@/util/colors";
 import { BOARD_WIDTH, BOARD_HEIGHT } from "@/util/constants";
 import { SendMessage } from "@/util/types/ClientRequest";
@@ -15,7 +15,6 @@ const GBTile = ({
 	j: number;
 	sendMessage: SendMessage;
 }) => {
-	const { addSelection } = useSelect();
 	const { hoverDrag, finishDrag } = useDrag();
 	const x = i - BOARD_WIDTH / 2;
 	const y = BOARD_HEIGHT / 2 - j;
@@ -23,7 +22,7 @@ const GBTile = ({
 		<BoardPiece
 			onClick={(e) => {
 				e.stopPropagation();
-				addSelection({
+				selectionObject.addSelection({
 					type: "gameBoard",
 					x,
 					y,

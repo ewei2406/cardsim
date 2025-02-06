@@ -107,7 +107,7 @@ document.addEventListener("mouseup", () => {
 });
 
 export const useDragFinishObserver = () => {
-	const { selection } = useSelection();
+	const selection = useSelection();
 
 	const onFinish = useCallback(
 		(

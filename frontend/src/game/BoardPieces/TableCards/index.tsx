@@ -6,7 +6,7 @@ import TableCard from "./TableCard";
 import { GameState } from "@/util/GameState";
 
 const TableCards = ({ gameState }: { gameState: GameState }) => {
-	const { selection } = useSelection();
+	const selection = useSelection();
 	const tableCards = getTableCards(gameState.cards, selection);
 	const tableHandCards = getTableHandCards(
 		gameState.playerMap,

@@ -1,9 +1,8 @@
 import { useDrag } from "@/hooks/useDrag";
-import { useSelect } from "@/hooks/useSelection";
+import { selectionObject } from "@/hooks/useSelection";
 
 const Void = () => {
 	const { hoverDrag, finishDrag } = useDrag();
-	const { deselect } = useSelect();
 
 	return (
 		<div
@@ -15,13 +14,11 @@ const Void = () => {
 				right: 0,
 			}}
 			onClick={(e) => {
-				deselect();
+				selectionObject.deselect();
 				e.stopPropagation();
 			}}
 			onMouseEnter={(e) => {
-				if (e.buttons === 1) {
-					hoverDrag({ type: "void" });
-				}
+				hoverDrag({ type: "void" });
 				e.stopPropagation();
 			}}
 			onMouseUp={(e) => {

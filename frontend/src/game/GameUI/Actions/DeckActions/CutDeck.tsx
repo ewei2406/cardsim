@@ -1,47 +1,66 @@
-import { DeckGroup } from "@/util/GameState";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TbScissors } from "react-icons/tb";
+import { ActionModalComponent } from "..";
+import { useSelection } from "@/hooks/useSelection";
+import { useSendMessage } from "@/context/useSendMessage";
+import Modal from "@/components/Modal";
+import ActionButton from "../ActionButton";
 
-const CutDeck = ({
-	deck,
-	handleCut,
-}: {
-	deck: DeckGroup;
-	handleCut: (n: number) => void;
-}) => {
-	const [cutPosition, setCutPosition] = useState(
-		Math.floor(deck.deck.card_count / 2)
-	);
+const CutDeck: ActionModalComponent = ({ close }) => {
+	const sendMessage = useSendMessage();
+	const selection = useSelection();
+	const [cutPosition, setCutPosition] = useState(1);
+	useEffect(() => {
+		setCutPosition(1);
+	}, [selection]);
+
+	if (selection.type !== "deck") return <></>;
+
+	const handleCut = () => {
+		sendMessage({
+			type: "Action",
+			action: "CutDeck",
+			deck: selection.deck.id,
+			n: cutPosition,
+		});
+		close();
+	};
 
 	return (
-		<div>
+		<Modal close={close} title="Cut Deck">
 			<div style={{ marginBottom: 10 }}>
 				<div className="row">
 					<label htmlFor="cutPosition">Cut Depth:</label>
 					<div className="row">
-						{cutPosition}/{deck.deck.card_count}
+						{cutPosition}/{selection.deck.deck.card_count}
 						<input
 							type="range"
 							id="cutPosition"
 							name="cutPosition"
 							min={1}
-							max={deck.deck.card_count - 1}
+							max={selection.deck.deck.card_count - 1}
 							value={cutPosition}
 							onChange={(e) => setCutPosition(parseInt(e.target.value))}
 						/>
 					</div>
 				</div>
 			</div>
-			<button
-				style={{ marginLeft: "auto" }}
-				onClick={() => {
-					handleCut(cutPosition);
+			<div
+				style={{
+					display: "flex",
+					justifyContent: "flex-end",
 				}}
 			>
-				<TbScissors />
-				Cut
-			</button>
-		</div>
+				<ActionButton
+					label="Cut Deck"
+					icon={TbScissors}
+					onClick={handleCut}
+					hotKey="c"
+					underlineIndex={0}
+					highPriority
+				/>
+			</div>
+		</Modal>
 	);
 };
 

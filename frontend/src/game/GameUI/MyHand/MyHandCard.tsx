@@ -1,9 +1,12 @@
 import CardBack from "@/components/Card/CardBack";
 import CardFront from "@/components/Card/CardFront";
 import { useDrag } from "@/hooks/useDrag";
-import { useSelect } from "@/hooks/useSelection";
+import { selectionObject } from "@/hooks/useSelection";
 import { COLORS } from "@/util/colors";
-import { MY_HAND_CARD_SIZE, MY_HAND_CARDS_SPACING_DIST } from "@/util/constants";
+import {
+	MY_HAND_CARD_SIZE,
+	MY_HAND_CARDS_SPACING_DIST,
+} from "@/util/constants";
 import { HandCard } from "@/util/types/ServerResponse";
 import { useState } from "react";
 
@@ -28,7 +31,6 @@ const MyHandCard = ({
 	setDraggingCard: (card: HandCard | null) => void;
 	selected?: boolean;
 }) => {
-	const { addSelection } = useSelect();
 	const { hoverDrag, startDrag, finishDrag } = useDrag();
 
 	const [hover, setHover] = useState(false);
@@ -97,7 +99,7 @@ const MyHandCard = ({
 					e.stopPropagation();
 				}}
 				onClick={(e) => {
-					addSelection({
+					selectionObject.addSelection({
 						type: "handCard",
 						handCardId: card.id,
 					});

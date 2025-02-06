@@ -30,3 +30,5 @@ export const BOARD_LIFT = -50;
 export const BOARD_DISTANCE = -120;
 
 export const MAX_PLAYER_COUNT = 8;
+
+export const ACTION_FREQ_SPACING_MS = 100;

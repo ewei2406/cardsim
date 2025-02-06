@@ -5,7 +5,7 @@ import { TILE_WIDTH } from "@/util/constants";
 import { TbArrowBadgeDownFilled } from "react-icons/tb";
 
 const GameBoardSelection = () => {
-	const { selection } = useSelection();
+	const selection = useSelection();
 
 	if (selection.type !== "gameBoard") return <></>;
 

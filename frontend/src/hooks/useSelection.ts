@@ -65,13 +65,25 @@ class SelectionStore {
 		return this.selection;
 	};
 
-	setSelection(newSelection: GameSelection) {
+	setSelection = (newSelection: GameSelection) => {
 		this.onChange(this.selection, newSelection);
+		if (
+			(newSelection.type === "cards" && newSelection.cards.length === 0) ||
+			(newSelection.type === "handCards" &&
+				newSelection.handCardIds.length === 0)
+		) {
+			newSelection = { type: "none" };
+		}
 		this.selection = newSelection;
 		this.notify();
-	}
+	};
 
-	removeEntities(entityIds: number[]) {
+	refresh = () => {
+		this.selection = { ...this.selection };
+		this.notify();
+	};
+
+	removeEntities = (entityIds: number[]) => {
 		const entityIdSet = new Set(entityIds);
 		switch (this.selection.type) {
 			case "cards":
@@ -101,9 +113,9 @@ class SelectionStore {
 			default:
 				break;
 		}
-	}
+	};
 
-	addSelection(addSelection: AddSelection) {
+	addSelection = (addSelection: AddSelection) => {
 		let cards: CardGroup[] = [];
 		switch (addSelection.type) {
 			case "none":
@@ -196,15 +208,17 @@ class SelectionStore {
 			default:
 				break;
 		}
-	}
+	};
 }
 
 export const selectionStore = new SelectionStore();
 
 export const selectionObject = {
-	getCurSelection: selectionStore.getSelection.bind(selectionStore),
-	addSelection: selectionStore.addSelection.bind(selectionStore),
-	removeEntities: selectionStore.removeEntities.bind(selectionStore),
+	getCurSelection: selectionStore.getSelection,
+	addSelection: selectionStore.addSelection,
+	removeEntities: selectionStore.removeEntities,
+	refresh: selectionStore.refresh,
+	setSelection: selectionStore.setSelection,
 	deselect: () => {
 		selectionStore.setSelection({ type: "none" });
 	},
@@ -216,9 +230,7 @@ export const useSelection = () => {
 		selectionStore.getSelection
 	);
 
-	const { addSelection, deselect } = useSelect();
-
-	return { selection, addSelection, deselect };
+	return selection;
 };
 
 export const useSelectionChangeObserver = () => {
@@ -230,18 +242,6 @@ export const useSelectionChangeObserver = () => {
 	);
 
 	return onFinish;
-};
-
-export const useSelect = () => {
-	const addSelection = (addSelection: AddSelection) => {
-		selectionStore.addSelection(addSelection);
-	};
-
-	const deselect = () => {
-		selectionStore.setSelection({ type: "none" });
-	};
-
-	return { addSelection, deselect };
 };
 
 export const getCardIds = (

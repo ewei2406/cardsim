@@ -59,10 +59,17 @@ type ActionRequest =
 	| RemoveEntitiesRequest
 	| PlayHandCardsRequest
 	| PlayHandCardsToDeckRequest
+	| PlayAllHandCardsToDeckRequest
 	| ReturnCardsToDeckRequest
 	| ShowHandCardsRequest
 	| DealDeckSingleRequest
 	| DealDeckAllRequest;
+
+interface PlayAllHandCardsToDeckRequest {
+	type: "Action";
+	action: "PlayAllHandCardsToDeck";
+	deck: number;
+}
 
 interface MoveEntitiesRequest {
 	type: "Action";
@@ -101,7 +108,6 @@ interface FlipCardsRequest {
 	type: "Action";
 	action: "FlipCards";
 	cards: number[];
-	faceup: boolean;
 }
 
 interface CreateDeckRequest {

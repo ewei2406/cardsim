@@ -4,8 +4,19 @@ import { useState, useCallback, useEffect } from "react";
 
 export const useMyHand = () => {
 	const [handCards, setHandCards] = useState<HandCard[]>([]);
+	const [reverseCardsOrder, setReverseCardsOrder] = useState<
+		Map<number, number>
+	>(new Map());
 	const [cardsOrder, setCardsOrder] = useState<Map<number, number>>(new Map());
 	const [draggingCard, setDraggingCard] = useState<HandCard | null>(null);
+
+	useEffect(() => {
+		const newReverseCardsOrder = new Map<number, number>();
+		cardsOrder.forEach((idx, id) => {
+			newReverseCardsOrder.set(idx, id);
+		});
+		setReverseCardsOrder(newReverseCardsOrder);
+	}, [cardsOrder]);
 
 	const handleDragOver = useCallback(
 		(card: HandCard) => {
@@ -83,9 +94,10 @@ export const useMyHand = () => {
 	}, [cardsOrder, handCards]);
 
 	return {
-		setHandCards,
+		reverseCardsOrder,
 		cardsOrder,
 		draggingCard,
+		setHandCards,
 		setDraggingCard,
 		handleDragOver,
 		handleSort,

@@ -6,6 +6,7 @@ export const COLORS = {
 	LIGHTER: "var(--lighter-color)",
 	LIGHTEST: "var(--lightest-color)",
 	PRIMARY: "var(--primary-color)",
+	SECONDARY: "var(--secondary-color)",
 	PRIMARY_DARKER: "var(--primary-color-darker)",
 	DANGER: "var(--danger-color)",
 	SELECTION: "var(--selection-color)",
