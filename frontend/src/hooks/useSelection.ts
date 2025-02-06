@@ -1,4 +1,5 @@
-import { DeckGroup, CardGroup } from "@/util/GameState";
+import { BOARD_WIDTH } from "@/util/constants";
+import { DeckGroup, CardGroup, GameState } from "@/util/GameState";
 import { useCallback, useSyncExternalStore } from "react";
 
 export type GameSelection =
@@ -46,6 +47,7 @@ export type AddSelection =
 	  };
 
 class SelectionStore {
+	gameState: GameState | null = null;
 	selection: GameSelection = { type: "none" };
 	listeners = new Set<() => void>();
 	onChange: (start: GameSelection, end: GameSelection) => void = () => {};
@@ -209,11 +211,54 @@ class SelectionStore {
 				break;
 		}
 	};
+
+	bfsSelect = (card: CardGroup) => {
+		if (!this.gameState) return;
+		// make a map of card positions from game state
+		const cardPos = new Map<number, CardGroup>();
+		const hashPos = (c: CardGroup) => c.position.x + c.position.y * BOARD_WIDTH;
+		Object.values(this.gameState.cards).forEach((c) => {
+			cardPos.set(hashPos(c), c);
+		});
+
+		const queue: CardGroup[] = [card];
+		const visited = new Set<number>();
+		const cards: CardGroup[] = [];
+		let index = 0;
+		while (index < queue.length) {
+			const current = queue[index++];
+			if (!current) continue;
+			const posHash = hashPos(current);
+			if (visited.has(posHash)) continue;
+			visited.add(posHash);
+
+			// Add the current card to the selection
+			cards.push(current);
+
+			// Check adjacent positions
+			const adjacentPositions = [
+				{ x: current.position.x + 1, y: current.position.y },
+				{ x: current.position.x - 1, y: current.position.y },
+				{ x: current.position.x, y: current.position.y + 1 },
+				{ x: current.position.x, y: current.position.y - 1 },
+			];
+
+			adjacentPositions.forEach((pos) => {
+				const adjacentCard = cardPos.get(pos.x + pos.y * BOARD_WIDTH);
+				if (adjacentCard && !visited.has(hashPos(adjacentCard))) {
+					queue.push(adjacentCard);
+				}
+			});
+		}
+
+		this.setSelection({ type: "cards", cards });
+	};
 }
 
 export const selectionStore = new SelectionStore();
 
 export const selectionObject = {
+	bfsSelect: selectionStore.bfsSelect,
 	getCurSelection: selectionStore.getSelection,
 	addSelection: selectionStore.addSelection,
 	removeEntities: selectionStore.removeEntities,

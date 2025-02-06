@@ -86,17 +86,16 @@ pub fn play_hand_cards_to_deck(
         Some(deck) => deck,
         None => return Outcome::Invalid(InvalidOutcomeError::EntityNotFound),
     };
-    let cards_set: std::collections::HashSet<HandCardId> = cards.iter().cloned().collect();
 
+    let cards_set: std::collections::HashSet<HandCardId> = cards.iter().cloned().collect();
     let mut remaining = Vec::new();
     let mut played = Vec::new();
-    hand_component
-        .cards
-        .iter()
-        .for_each(|hand_card| match cards_set.contains(&hand_card.id) {
+    hand_component.cards.iter().for_each(|hand_card| {
+        match hand_card.deck_id == deck_component.deck_id && cards_set.contains(&hand_card.id) {
             true => played.push(hand_card.clone()),
             false => remaining.push(hand_card.clone()),
-        });
+        }
+    });
 
     hand_component.cards = remaining;
     for played_card in played {
@@ -111,6 +110,26 @@ pub fn play_hand_cards_to_deck(
         deleted: None,
         players: None,
     }
+}
+
+pub fn play_all_hand_cards_to_deck(
+    gamestate: &mut GameState,
+    client_id: ConnectionId,
+    deck: Entity,
+) -> Outcome {
+    let hand = match gamestate.players.iter().find(|x| x.client_id == client_id) {
+        Some(x) => x.hand,
+        None => return Outcome::Invalid(InvalidOutcomeError::EntityNotFound),
+    };
+
+    let hand_component = match gamestate.hands.get_mut(hand) {
+        Some(hand) => hand,
+        None => return Outcome::Invalid(InvalidOutcomeError::EntityNotFound),
+    };
+
+    let cards = hand_component.cards.iter().map(|x| x.id).collect();
+
+    play_hand_cards_to_deck(gamestate, client_id, cards, deck)
 }
 
 pub fn return_cards_to_deck(
@@ -135,6 +154,9 @@ pub fn return_cards_to_deck(
             Some(card) => card,
             None => continue,
         };
+        if card_component.deck_id != deck_component.deck_id {
+            continue;
+        }
         deck_component.return_card(CardInit(
             card_component.suit.clone(),
             card_component.rank,
@@ -287,26 +309,6 @@ pub fn draw_cards_from_table(
     Outcome::Delta {
         changed: Some(dstate),
         deleted: Some(cards),
-        players: None,
-    }
-}
-
-pub fn flip_cards(gamestate: &mut GameState, cards: Vec<Entity>, faceup: bool) -> Outcome {
-    for card in &cards {
-        let card_component = match gamestate.cards.get_mut(*card) {
-            Some(card) => card,
-            None => return Outcome::Invalid(InvalidOutcomeError::EntityNotFound),
-        };
-        card_component.faceup = faceup;
-    }
-
-    let mut dstate = GameState::new();
-    for entity in &cards {
-        dstate.clone_entity_from(gamestate, *entity);
-    }
-    Outcome::Delta {
-        changed: Some(dstate),
-        deleted: None,
         players: None,
     }
 }

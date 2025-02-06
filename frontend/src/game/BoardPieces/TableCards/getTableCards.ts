@@ -41,6 +41,10 @@ const getTableCardWrapper = (
 				e.stopPropagation();
 			}
 		},
+		onDoubleClick: (e) => {
+			e.stopPropagation();
+			selectionObject.bfsSelect(card);
+		},
 	};
 };
 

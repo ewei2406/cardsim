@@ -16,6 +16,7 @@ const BoardPiece = (props: {
 	onMouseOver?: React.MouseEventHandler<HTMLDivElement>;
 	onMouseEnter?: React.MouseEventHandler<HTMLDivElement>;
 	onMouseLeave?: React.MouseEventHandler<HTMLDivElement>;
+	onDoubleClick?: React.MouseEventHandler<HTMLDivElement>;
 	disableInteraction?: boolean;
 	style?: React.CSSProperties;
 }) => {
@@ -46,6 +47,7 @@ const BoardPiece = (props: {
 			onMouseEnter={props.onMouseEnter}
 			onMouseLeave={props.onMouseLeave}
 			onMouseOver={props.onMouseOver}
+			onDoubleClick={props.onDoubleClick}
 		>
 			<div style={{ position: "relative" }}>{props.children}</div>
 		</div>

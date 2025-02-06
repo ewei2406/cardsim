@@ -7,7 +7,7 @@ use crate::{
     gamestate::{GameState, PlayerDescription},
 };
 
-use super::{deck::*, entity::*, hand::*};
+use super::{card::*, deck::*, entity::*, hand::*};
 use crate::Action::*;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -45,7 +45,6 @@ pub enum Action {
     },
     FlipCards {
         cards: Vec<Entity>,
-        faceup: bool,
     },
     DrawCardFromDeck {
         deck: Entity,
@@ -71,6 +70,9 @@ pub enum Action {
         x: i64,
         y: i64,
         faceup: bool,
+    },
+    PlayAllHandCardsToDeck {
+        deck: Entity,
     },
     PlayHandCardsToDeck {
         cards: Vec<HandCardId>,
@@ -135,11 +137,12 @@ impl Actionable for GameState {
                 y,
                 faceup,
             } => play_hand_cards(self, client_id, cards, x, y, faceup),
-            FlipCards { cards, faceup } => flip_cards(self, cards, faceup),
+            FlipCards { cards } => flip_cards(self, cards),
             ShowHandCards { cards, shown } => show_hand_cards(self, client_id, cards, shown),
             PlayHandCardsToDeck { cards, deck } => {
                 play_hand_cards_to_deck(self, client_id, cards, deck)
             }
+            PlayAllHandCardsToDeck { deck } => play_all_hand_cards_to_deck(self, client_id, deck),
             ReturnCardsToDeck { cards, deck } => return_cards_to_deck(self, cards, deck),
             DealDeckSingle { deck } => deal_deck_single(self, deck),
             DealDeckAll { deck } => deal_deck_all(self, deck),

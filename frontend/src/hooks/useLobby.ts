@@ -2,7 +2,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { logger } from "./useLogger";
 import { chat } from "./useChat";
 import { DragTarget, useDragFinishObserver } from "./useDrag";
-import { GameSelection, getCardIds, selectionObject } from "./useSelection";
+import {
+	GameSelection,
+	getCardIds,
+	selectionObject,
+	selectionStore,
+} from "./useSelection";
 import { GameState } from "@/util/GameState";
 import { ClientRequest } from "@/util/types/ClientRequest";
 import { GameDescription, ServerResponse } from "@/util/types/ServerResponse";
@@ -58,6 +63,7 @@ export const useLobby = () => {
 						gameId: res.game_id,
 						game: new GameState(res),
 					};
+					selectionStore.gameState = lobbyStatusRef.current.game;
 					console.log("Applying delta", res);
 					setGameUpdates((prev) => prev + 1);
 					break;

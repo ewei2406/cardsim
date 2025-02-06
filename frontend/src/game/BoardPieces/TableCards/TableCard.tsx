@@ -20,6 +20,7 @@ export type TableCardProps = {
 	onMouseOver?: React.MouseEventHandler<HTMLDivElement>;
 	onMouseEnter?: React.MouseEventHandler<HTMLDivElement>;
 	onMouseLeave?: React.MouseEventHandler<HTMLDivElement>;
+	onDoubleClick?: React.MouseEventHandler<HTMLDivElement>;
 	disableInteraction?: boolean;
 	style?: React.CSSProperties;
 };
