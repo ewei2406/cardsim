@@ -45,7 +45,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .fallback_service(get_service(ServeDir::new("dist")))
         .layer(
             tower_http::set_header::SetResponseHeaderLayer::if_not_present(
-                header::HeaderName::from_static("CDN-Cache-Control"),
+                header::HeaderName::from_static("cdn-cache-control"),
                 header::HeaderValue::from_static("no-store"),
             ),
         )
