@@ -24,11 +24,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let connection_manager = std::sync::Arc::new(ConnectionManager::new());
     let game_controller = std::sync::Arc::new(GameController::new(Arc::clone(&connection_manager)));
-    let port = std::env::var("ENGINE_PORT").unwrap_or_else(|_| {
-        panic!("ENGINE_PORT environment variable is not set");
+    let port = std::env::var("PORT").unwrap_or_else(|_| {
+        panic!("PORT environment variable is not set");
     });
-    let listener = TcpListener::bind(format!("127.0.0.1:{}", port)).await?;
-    log::info!("Listening on {}", format!("127.0.0.1:{}", port));
+    let listener = TcpListener::bind(format!("0.0.0.0:{}", port)).await?;
+    log::info!("Listening on {}", format!("0.0.0.0:{}", port));
 
     let gc = Arc::clone(&game_controller);
     tokio::spawn(async move {
