@@ -2,7 +2,7 @@ import { useSyncExternalStore } from "react";
 
 class UISettingsStore {
 	settings = {
-		miniTableCards: true,
+		miniTableCards: false,
 	};
 	listeners = new Set<() => void>();
 

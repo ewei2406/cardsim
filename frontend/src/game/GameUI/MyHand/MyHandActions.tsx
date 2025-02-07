@@ -133,6 +133,7 @@ const MyHandActions = ({
 				alignItems: "center",
 				margin: "0 auto",
 				zIndex: 1010,
+				userSelect: "none",
 				...style,
 			}}
 		>
