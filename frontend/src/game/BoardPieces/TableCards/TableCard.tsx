@@ -23,6 +23,7 @@ export type TableCardProps = {
 	onDoubleClick?: React.MouseEventHandler<HTMLDivElement>;
 	disableInteraction?: boolean;
 	style?: React.CSSProperties;
+	mini?: boolean;
 };
 
 const TableCard = (props: TableCardProps) => {
@@ -43,6 +44,7 @@ const TableCard = (props: TableCardProps) => {
 					width={CARD_WIDTH}
 					deck_id={props.tableCard.deck_id}
 					selected={props.selected}
+					mini={props.mini}
 				/>
 			</div>
 			<div
@@ -61,6 +63,7 @@ const TableCard = (props: TableCardProps) => {
 					rank={props.tableCard.type === "Hidden" ? 0 : props.tableCard.rank}
 					suit={props.tableCard.type === "Hidden" ? "S" : props.tableCard.suit}
 					selected={props.selected}
+					mini={props.mini}
 				/>
 			</div>
 		</BoardPiece>

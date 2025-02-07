@@ -11,6 +11,7 @@ import {
 } from "react-icons/bs";
 import { COLORS } from "@/util/colors";
 import { CARD_FACE_PADDING } from "@/util/constants";
+import CardBase from "./CardBase";
 
 const getRank = (rank: number) => {
 	switch (rank) {
@@ -95,30 +96,39 @@ const CardFront = (props: {
 	suit: "H" | "D" | "C" | "S" | "J";
 	selected?: boolean;
 	style?: React.CSSProperties;
+	mini?: boolean;
 }) => {
 	const displayRank = getRank(props.rank);
 	const displaySuit = getSuit(props.suit);
 	const bgSuit = getSuitBg(props.suit);
 	const color = getColor(props.suit, props.rank);
 
+	if (props.mini) {
+		return (
+			<CardBase
+				width={props.width}
+				height={props.width}
+				selected={props.selected}
+				style={props.style}
+			>
+				<div
+					className="row"
+					style={{
+						fontSize: props.fontSize ?? props.width / 2.5,
+						color,
+						gap: 1,
+						margin: "auto",
+					}}
+				>
+					{displayRank}
+					{displaySuit}
+				</div>
+			</CardBase>
+		);
+	}
+
 	return (
-		<div
-			style={{
-				userSelect: "none",
-				WebkitUserSelect: "none",
-				position: "relative",
-				boxSizing: "border-box",
-				display: "flex",
-				width: props.width,
-				height: props.width * 1.5,
-				borderRadius: 10,
-				padding: 5,
-				color: color,
-				border: `1px solid ${props.selected ? COLORS.SELECTION : COLORS.LIGHT}`,
-				backgroundColor: props.selected ? COLORS.SELECTION : COLORS.LIGHTEST,
-				...props.style,
-			}}
-		>
+		<CardBase width={props.width} selected={props.selected} style={props.style}>
 			<div
 				className="column-center"
 				style={{
@@ -126,6 +136,7 @@ const CardFront = (props: {
 					position: "absolute",
 					top: CARD_FACE_PADDING,
 					left: CARD_FACE_PADDING,
+					color,
 				}}
 			>
 				{displayRank}
@@ -134,13 +145,14 @@ const CardFront = (props: {
 			<div
 				style={{
 					position: "absolute",
-					fontSize: props.width / 2.5,
+					fontSize: props.width / 3.2,
 					fontWeight: 800,
 					whiteSpace: "nowrap",
 					top: "50%",
 					right: "50%",
 					transform: "translate(50%, -50%)",
-					opacity: 0.25,
+					opacity: 0.1,
+					color,
 				}}
 			>
 				{displayRank}
@@ -148,12 +160,13 @@ const CardFront = (props: {
 			<div
 				style={{
 					position: "absolute",
-					fontSize: props.width / 1.1,
+					fontSize: props.width / 1.5,
 					whiteSpace: "nowrap",
 					top: "50%",
 					right: "50%",
 					transform: "translate(50%, -40%)",
-					opacity: 0.15,
+					opacity: 0.1,
+					color,
 				}}
 			>
 				{bgSuit}
@@ -167,12 +180,13 @@ const CardFront = (props: {
 					bottom: CARD_FACE_PADDING,
 					right: CARD_FACE_PADDING,
 					transform: "rotateZ(180deg)",
+					color,
 				}}
 			>
 				{displayRank}
 				{displaySuit}
 			</div>
-		</div>
+		</CardBase>
 	);
 };
 

@@ -1,4 +1,4 @@
-import DarkMode from "./components/DarkMode";
+import UISettings from "./components/UISettings";
 import Logger from "./components/Logger";
 import Lobby from "./pages/Lobby";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -8,7 +8,7 @@ import "./App.css";
 const App = () => {
 	return (
 		<>
-			<DarkMode />
+			<UISettings />
 			<Logger />
 			<Lobby />
 		</>

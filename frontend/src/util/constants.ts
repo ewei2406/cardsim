@@ -1,3 +1,8 @@
+export const WS_ENDPOINT =
+	window.location.hostname === "localhost"
+		? "ws://localhost:8080/ws"
+		: `ws://${window.location.host}/ws`;
+
 export const LOG_CLEAR_INTERVAL_MS = 250;
 export const LOG_STALE_MS = 4000;
 

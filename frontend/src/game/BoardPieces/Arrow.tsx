@@ -31,7 +31,7 @@ export const Arrow = ({
 				style={{
 					overflow: "visible",
 					display: "block",
-					transform: `rotateZ(${rot}deg)`,
+					transform: `rotateZ(${rot}deg) translateZ(10px)`,
 				}}
 				xmlns="http://www.w3.org/2000/svg"
 			>

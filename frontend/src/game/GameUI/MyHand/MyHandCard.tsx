@@ -119,7 +119,7 @@ const MyHandCard = ({
 			>
 				<CardFront
 					deck_id={card.deck_id}
-					fontSize={MY_HAND_CARD_SIZE / 6}
+					fontSize={MY_HAND_CARD_SIZE / 5}
 					width={MY_HAND_CARD_SIZE}
 					rank={card.rank}
 					suit={card.suit}

@@ -1,4 +1,5 @@
 import { hashColor, COLORS } from "@/util/colors";
+import CardBase from "./CardBase";
 
 // from https://projects.verou.me/css3patterns/#seigaiha
 const BG = (color1: string, color2: string) => `
@@ -13,22 +14,14 @@ const CardBack = (props: {
 	width: number;
 	deck_id: number;
 	selected?: boolean;
+	mini?: boolean;
 }) => {
 	const backColor = hashColor(props.deck_id);
 	return (
-		<div
-			style={{
-				userSelect: "none",
-				WebkitUserSelect: "none",
-				position: "relative",
-				boxSizing: "border-box",
-				display: "flex",
-				width: props.width,
-				height: props.width * 1.5,
-				borderRadius: 10,
-				border: `1px solid ${props.selected ? COLORS.SELECTION : COLORS.LIGHT}`,
-				backgroundColor: props.selected ? COLORS.SELECTION : COLORS.LIGHTEST,
-			}}
+		<CardBase
+			width={props.width}
+			selected={props.selected}
+			height={props.mini ? props.width : undefined}
 		>
 			<div
 				style={{
@@ -40,7 +33,7 @@ const CardBack = (props: {
 					borderRadius: 5,
 				}}
 			></div>
-		</div>
+		</CardBase>
 	);
 };
 

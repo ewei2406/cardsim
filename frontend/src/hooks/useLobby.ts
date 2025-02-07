@@ -11,6 +11,7 @@ import {
 import { GameState } from "@/util/GameState";
 import { ClientRequest } from "@/util/types/ClientRequest";
 import { GameDescription, ServerResponse } from "@/util/types/ServerResponse";
+import { WS_ENDPOINT } from "@/util/constants";
 
 type LobbyStatus =
 	| {
@@ -42,7 +43,7 @@ export const useLobby = () => {
 	const onDragFinish = useDragFinishObserver();
 
 	useEffect(() => {
-		const ws = new WebSocket("ws://localhost:8080");
+		const ws = new WebSocket(WS_ENDPOINT);
 		ws.addEventListener("open", () => {
 			console.log("connected");
 			setWsStatus({ status: "connected", ws });

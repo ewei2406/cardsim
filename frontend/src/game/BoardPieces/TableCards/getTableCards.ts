@@ -5,7 +5,8 @@ import { TableCardProps } from "./TableCard";
 
 const getTableCardWrapper = (
 	card: CardGroup,
-	selected: boolean
+	selected: boolean,
+	mini: boolean
 ): TableCardProps => {
 	const { startDrag, hoverDrag, finishDrag } = dragObject;
 	const { addSelection } = selectionObject;
@@ -45,17 +46,19 @@ const getTableCardWrapper = (
 			e.stopPropagation();
 			selectionObject.bfsSelect(card);
 		},
+		mini,
 	};
 };
 
 const getTableCards = (
 	cards: { [id: EntityId]: CardGroup },
-	selection: GameSelection
+	selection: GameSelection,
+	mini: boolean
 ) => {
 	const ids =
 		selection.type === "cards" ? selection.cards.map((c) => c.id) : [];
 	return Object.values(cards).map((card) =>
-		getTableCardWrapper(card, ids.includes(card.id))
+		getTableCardWrapper(card, ids.includes(card.id), mini)
 	);
 };
 

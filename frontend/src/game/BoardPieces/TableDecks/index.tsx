@@ -1,4 +1,3 @@
-import { useState } from "react";
 import CardCount from "./CardCount";
 import CardBack from "@/components/Card/CardBack";
 import { useDrag } from "@/hooks/useDrag";
@@ -15,7 +14,6 @@ const TableDeck = ({
 	selected?: boolean;
 }) => {
 	const { startDrag, hoverDrag, finishDrag } = useDrag();
-	const [showCount, setShowCount] = useState(false);
 
 	const stackHeight =
 		deck.deck.card_count > 4
@@ -34,7 +32,6 @@ const TableDeck = ({
 			}}
 			onMouseEnter={(e) => {
 				if (e.button === 0) {
-					setShowCount(true);
 					hoverDrag({ type: "deck", ...deck });
 					e.stopPropagation();
 				}
@@ -44,9 +41,6 @@ const TableDeck = ({
 					hoverDrag({ type: "deck", ...deck });
 					e.stopPropagation();
 				}
-			}}
-			onMouseLeave={() => {
-				setShowCount(false);
 			}}
 			onMouseUp={(e) => {
 				if (e.button === 0) {
@@ -82,9 +76,7 @@ const TableDeck = ({
 				</div>
 			))}
 
-			{(showCount || selected) && (
-				<CardCount count={deck.deck.card_count} height={3 * stackHeight} />
-			)}
+			<CardCount count={deck.deck.card_count} height={3 * stackHeight} />
 		</BoardPiece>
 	);
 };

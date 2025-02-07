@@ -4,10 +4,12 @@ import getTableDeckCards from "./getTableDeckCards";
 import getTableHandCards from "./getTableHandCards";
 import TableCard from "./TableCard";
 import { GameState } from "@/util/GameState";
+import { useUISettings } from "@/hooks/useUISettings";
 
 const TableCards = ({ gameState }: { gameState: GameState }) => {
 	const selection = useSelection();
-	const tableCards = getTableCards(gameState.cards, selection);
+	const { miniTableCards } = useUISettings();
+	const tableCards = getTableCards(gameState.cards, selection, miniTableCards);
 	const tableHandCards = getTableHandCards(
 		gameState.playerMap,
 		gameState.hands
