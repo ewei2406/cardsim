@@ -1,10 +1,11 @@
 name: Build Docker Image
 
 on:
-  push:
-    branches:
-      - master
   workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag for the Docker image"
+        required: true
 
 env:
   REGISTRY: ghcr.io
@@ -34,7 +35,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: latest
+          tags: ${{ github.event.inputs.tag }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
