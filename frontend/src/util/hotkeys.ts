@@ -18,7 +18,7 @@ export const HOTKEYS = {
 		FLIP: { hotKey: "f", label: "flip", underlineIndex: 0 },
 		BURN: { hotKey: "b", label: "burn", underlineIndex: 0 },
 		SHUFFLE: { hotKey: "S", label: "Shuffle", underlineIndex: 0 },
-		DEAL_ONE: { hotKey: "D", label: "Deal one", underlineIndex: 5 },
+		DEAL_ONE: { hotKey: "D", label: "Deal one", underlineIndex: 0 },
 		DEAL_ALL: { hotKey: "A", label: "Deal All", underlineIndex: 5 },
 		REGROUP_ALL: { hotKey: "R", label: "Regroup all", underlineIndex: 0 },
 		RETURN_HAND: { hotKey: "h", label: "Return hand", underlineIndex: 7 },
