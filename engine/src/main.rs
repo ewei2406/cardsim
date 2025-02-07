@@ -3,6 +3,7 @@ use std::sync::Arc;
 use action::Action;
 use axum::{
     extract::{State, WebSocketUpgrade},
+    http::header,
     response::IntoResponse,
     routing::{get, get_service},
     Router,
@@ -42,6 +43,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .route("/ws", get(websocket_handler))
         .route("/healthz", get(|| async { "OK" }))
         .fallback_service(get_service(ServeDir::new("dist")))
+        .layer(
+            tower_http::set_header::SetResponseHeaderLayer::if_not_present(
+                header::HeaderName::from_static("CDN-Cache-Control"),
+                header::HeaderValue::from_static("no-store"),
+            ),
+        )
         .with_state((
             Arc::clone(&connection_manager),
             Arc::clone(&game_controller),
