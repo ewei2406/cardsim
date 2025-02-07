@@ -2,16 +2,20 @@ ARG RUST_VERSION=1.81.0
 FROM rust:${RUST_VERSION}-slim-bullseye AS build-backend
 WORKDIR /app
 
-RUN --mount=type=bind,source=engine/src,target=src \
-    --mount=type=bind,source=engine/Cargo.toml,target=Cargo.toml \
-    --mount=type=bind,source=engine/Cargo.lock,target=Cargo.lock \
-    --mount=type=cache,target=/app/target/ \
-    --mount=type=cache,target=/usr/local/cargo/registry/ \
-    <<EOF
-set -e
-cargo build --locked --release
-cp ./target/release/engine /bin/server
-EOF
+# Cache dependencies
+COPY engine/Cargo.toml engine/Cargo.lock ./
+RUN mkdir src && echo "fn main() {}" > src/main.rs
+RUN cargo fetch
+RUN cargo build --release
+RUN rm -rf src/main.rs
+
+# Copy the actual source code and build
+COPY engine/src ./src/
+RUN touch src/main.rs
+RUN cargo build --release
+
+# Move the compiled binary to /bin
+RUN mv ./target/release/engine /bin/server
 
 FROM node:20-alpine AS build-frontend
 WORKDIR /app

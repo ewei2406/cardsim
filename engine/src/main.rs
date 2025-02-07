@@ -65,11 +65,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     });
 
-    // while let Ok((stream, _)) = listener.accept().await {
-    //     let cm = Arc::clone(&connection_manager);
-    //     let gc = Arc::clone(&game_controller);
-    //     handle_stream(stream, cm, gc);
-    // }
     Ok(())
 }
 
