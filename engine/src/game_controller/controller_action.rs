@@ -1,8 +1,5 @@
 use std::sync::Arc;
 
-use tokio::sync::Mutex;
-use tokio_tungstenite::tungstenite::Message;
-
 use crate::{
     action::*,
     connection_manager::ConnectionId,
@@ -11,6 +8,8 @@ use crate::{
     gamestate::*,
     util,
 };
+use axum::extract::ws::Message;
+use tokio::sync::Mutex;
 
 use super::{
     requests::{ClientRequest, Command},
@@ -39,7 +38,17 @@ impl GameController {
     }
 
     pub async fn handle_message(&self, client_id: ConnectionId, message: Message) {
-        if let Ok(request) = serde_json::from_str::<ClientRequest>(&message.to_string()) {
+        let message = match message {
+            Message::Text(text) => text,
+            _ => {
+                log::debug!("Client {} sent invalid message: {:?}", client_id, message);
+                self.error(client_id, format!("Invalid message: {:?}", message))
+                    .await;
+                return;
+            }
+        };
+
+        if let Ok(request) = serde_json::from_str::<ClientRequest>(&message) {
             match request {
                 ClientRequest::Action(action) => {
                     if let Some(game_id) = self.get_client_game_id(client_id).await {

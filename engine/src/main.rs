@@ -1,11 +1,18 @@
 use std::sync::Arc;
 
 use action::Action;
+use axum::{
+    extract::{State, WebSocketUpgrade},
+    response::IntoResponse,
+    routing::{get, get_service},
+    Router,
+};
 use connection_manager::ConnectionManager;
 use constants::CLEANUP_STALE_INTERVAL_SECONDS;
 use futures_util::StreamExt;
 use game_controller::GameController;
 use tokio::net::TcpListener;
+use tower_http::services::ServeDir;
 mod action;
 mod component;
 mod connection_manager;
@@ -30,7 +37,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         log::warn!("HOST environment variable is not set, using default of 127.0.0.1.");
         "127.0.0.1".to_string()
     });
-    let listener = TcpListener::bind(format!("{}:{}", host, port)).await?;
+
+    let app = Router::new()
+        .route("/ws", get(websocket_handler))
+        .fallback_service(get_service(ServeDir::new("dist")))
+        .with_state((
+            Arc::clone(&connection_manager),
+            Arc::clone(&game_controller),
+        ));
+
+    let listener = TcpListener::bind(format!("{}:{}", host, port))
+        .await
+        .unwrap();
+
+    axum::serve(listener, app).await.unwrap();
     log::info!("Listening on {}", format!("{}:{}", host, port));
 
     let gc = Arc::clone(&game_controller);
@@ -44,22 +64,23 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     });
 
-    while let Ok((stream, _)) = listener.accept().await {
-        let cm = Arc::clone(&connection_manager);
-        let gc = Arc::clone(&game_controller);
-        handle_stream(stream, cm, gc);
-    }
+    // while let Ok((stream, _)) = listener.accept().await {
+    //     let cm = Arc::clone(&connection_manager);
+    //     let gc = Arc::clone(&game_controller);
+    //     handle_stream(stream, cm, gc);
+    // }
     Ok(())
 }
 
-fn handle_stream(
-    stream: tokio::net::TcpStream,
-    cm: Arc<ConnectionManager>,
-    gc: Arc<GameController>,
-) {
-    // Handle the stream
-    tokio::spawn(async move {
-        match cm.handle_connection(stream).await {
+async fn websocket_handler(
+    ws: WebSocketUpgrade,
+    State((cm, gc)): State<(Arc<ConnectionManager>, Arc<GameController>)>,
+) -> impl IntoResponse {
+    ws.on_upgrade(move |socket| async move {
+        let cm = Arc::clone(&cm);
+        let gc = Arc::clone(&gc);
+
+        match cm.handle_connection(socket).await {
             Ok((client_id, mut rx)) => {
                 log::info!("Client {} connected.", client_id);
                 // Handle messages from the client
@@ -82,5 +103,5 @@ fn handle_stream(
                 log::info!("Client ID setup failed.");
             }
         }
-    });
+    })
 }

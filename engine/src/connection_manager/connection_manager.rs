@@ -1,12 +1,10 @@
+use axum::extract::ws::WebSocket;
 use futures_util::stream::{SplitSink, SplitStream};
 use futures_util::{SinkExt, StreamExt};
 use log;
 use std::collections::HashMap;
 use std::sync::Arc;
-use tokio::net::TcpStream;
 use tokio::sync::{Mutex, RwLock};
-use tokio_tungstenite::tungstenite::protocol::Message;
-use tokio_tungstenite::WebSocketStream;
 
 use crate::game_controller::ServerResponse;
 use crate::util;
@@ -15,7 +13,12 @@ pub type ConnectionId = usize;
 
 pub struct ConnectionManager {
     connections: Arc<
-        RwLock<HashMap<ConnectionId, Arc<Mutex<SplitSink<WebSocketStream<TcpStream>, Message>>>>>,
+        RwLock<
+            HashMap<
+                ConnectionId,
+                Arc<Mutex<SplitSink<axum::extract::ws::WebSocket, axum::extract::ws::Message>>>,
+            >,
+        >,
     >,
 }
 
@@ -51,21 +54,15 @@ impl ConnectionManager {
         }
     }
 
-    async fn create_client(
+    pub async fn handle_connection(
         &self,
-        stream: WebSocketStream<TcpStream>,
-    ) -> Result<(ConnectionId, SplitStream<WebSocketStream<TcpStream>>), String> {
-        let client_addr = stream.get_ref().peer_addr().map_err(|e| e.to_string())?;
-        let client_addr = client_addr.ip().to_string();
+        stream: WebSocket,
+    ) -> Result<(ConnectionId, SplitStream<WebSocket>), String> {
         let (mut tx, rx) = stream.split();
 
         let client_id = util::get_id();
         if self.connections.read().await.contains_key(&client_id) {
-            log::error!(
-                "ID {} requested by {} already in use.",
-                client_id,
-                client_addr
-            );
+            log::error!("ID {} requested is already in use.", client_id,);
             return Err(format!("ID {} already in use.", client_id));
         }
 
@@ -81,31 +78,8 @@ impl ConnectionManager {
             .write()
             .await
             .insert(client_id, Arc::new(Mutex::new(tx)));
-        log::debug!("{} has been assigned ID {}.", client_addr, client_id);
+        log::debug!("Client with ID {} added.", client_id);
 
         Ok((client_id, rx))
-    }
-
-    pub async fn handle_connection(
-        &self,
-        connection: tokio::net::TcpStream,
-    ) -> Result<(ConnectionId, SplitStream<WebSocketStream<TcpStream>>), String> {
-        log::debug!(
-            "New connection: {}",
-            match connection.peer_addr() {
-                Ok(addr) => addr.to_string(),
-                Err(_) => "Unknown".to_string(),
-            }
-        );
-
-        let ws_stream = match tokio_tungstenite::accept_async(connection).await {
-            Ok(ws_stream) => ws_stream,
-            Err(e) => {
-                log::warn!("Error during WebSocket handshake: {:?}", e);
-                return Err(format!("Error during WebSocket handshake: {:?}", e));
-            }
-        };
-
-        self.create_client(ws_stream).await
     }
 }
