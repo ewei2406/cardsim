@@ -40,6 +40,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let app = Router::new()
         .route("/ws", get(websocket_handler))
+        .route("/healthz", get(|| async { "OK" }))
         .fallback_service(get_service(ServeDir::new("dist")))
         .with_state((
             Arc::clone(&connection_manager),

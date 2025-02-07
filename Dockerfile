@@ -1,50 +1,46 @@
-FROM alpine:latest
+ARG RUST_VERSION=1.81.0
+FROM rust:${RUST_VERSION}-slim-bullseye AS build-backend
+WORKDIR /app
 
-CMD ["echo", "Hello, World!"]
+RUN --mount=type=bind,source=engine/src,target=src \
+    --mount=type=bind,source=engine/Cargo.toml,target=Cargo.toml \
+    --mount=type=bind,source=engine/Cargo.lock,target=Cargo.lock \
+    --mount=type=cache,target=/app/target/ \
+    --mount=type=cache,target=/usr/local/cargo/registry/ \
+    <<EOF
+set -e
+cargo build --locked --release
+cp ./target/release/engine /bin/server
+EOF
 
-# ARG RUST_VERSION=1.81.0
-# FROM rust:${RUST_VERSION}-slim-bullseye AS build-backend
-# WORKDIR /app
+FROM node:20-alpine AS build-frontend
+WORKDIR /app
 
-# RUN --mount=type=bind,source=engine/src,target=src \
-#     --mount=type=bind,source=engine/Cargo.toml,target=Cargo.toml \
-#     --mount=type=bind,source=engine/Cargo.lock,target=Cargo.lock \
-#     --mount=type=cache,target=/app/target/ \
-#     --mount=type=cache,target=/usr/local/cargo/registry/ \
-#     <<EOF
-# set -e
-# cargo build --locked --release
-# cp ./target/release/engine /bin/server
-# EOF
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm install
 
-# FROM node:20-alpine AS build-frontend
-# WORKDIR /app
+COPY frontend/ ./
+RUN npm run build
 
-# COPY frontend/package.json frontend/package-lock.json ./
-# RUN npm install
+FROM debian:bullseye-slim AS runtime
 
-# COPY frontend/ ./
-# RUN npm run build
+ARG UID=10001
+RUN adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "/nonexistent" \
+    --shell "/sbin/nologin" \
+    --no-create-home \
+    --uid "${UID}" \
+    appuser
+USER appuser
 
-# FROM debian:bullseye-slim AS runtime
+COPY --from=build-backend /bin/server /bin/
+COPY --from=build-frontend /app/dist /bin/dist
 
-# ARG UID=10001
-# RUN adduser \
-#     --disabled-password \
-#     --gecos "" \
-#     --home "/nonexistent" \
-#     --shell "/sbin/nologin" \
-#     --no-create-home \
-#     --uid "${UID}" \
-#     appuser
-# USER appuser
-
-# COPY --from=build-backend /bin/server /bin/
-# COPY --from=build-frontend /app/dist /bin/dist
-
-# EXPOSE 8080
-# ENV PORT=8080
-# ENV HOST=0.0.0.0
-# ENV RUST_LOG=debug
-# WORKDIR /bin
-# CMD ["./server"]
+EXPOSE 8080
+ENV PORT=8080
+ENV HOST=0.0.0.0
+ENV RUST_LOG=debug
+WORKDIR /bin
+CMD ["./server"]
