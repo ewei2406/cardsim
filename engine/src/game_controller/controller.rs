@@ -109,7 +109,7 @@ impl GameController {
         game_descs
     }
 
-    pub async fn delete_game(&self, game_id: GameId) {
+    pub async fn _delete_game(&self, game_id: GameId) {
         {
             // Get the game
             let mut games = self.games.write().await;

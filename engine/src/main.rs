@@ -1,14 +1,11 @@
-use std::io::Write;
 use std::sync::Arc;
 
 use action::Action;
 use connection_manager::ConnectionManager;
 use constants::CLEANUP_STALE_INTERVAL_SECONDS;
 use futures_util::StreamExt;
-use game_controller::{GameController, ServerResponse};
-use tokio::io::{self, AsyncBufReadExt};
+use game_controller::GameController;
 use tokio::net::TcpListener;
-use util::get_id;
 mod action;
 mod component;
 mod connection_manager;
@@ -24,11 +21,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let connection_manager = std::sync::Arc::new(ConnectionManager::new());
     let game_controller = std::sync::Arc::new(GameController::new(Arc::clone(&connection_manager)));
+
     let port = std::env::var("PORT").unwrap_or_else(|_| {
-        panic!("PORT environment variable is not set");
+        log::warn!("PORT environment variable is not set, using default of 8080.");
+        "8080".to_string()
     });
-    let listener = TcpListener::bind(format!("0.0.0.0:{}", port)).await?;
-    log::info!("Listening on {}", format!("0.0.0.0:{}", port));
+    let host = std::env::var("HOST").unwrap_or_else(|_| {
+        log::warn!("HOST environment variable is not set, using default of 127.0.0.1.");
+        "127.0.0.1".to_string()
+    });
+    let listener = TcpListener::bind(format!("{}:{}", host, port)).await?;
+    log::info!("Listening on {}", format!("{}:{}", host, port));
 
     let gc = Arc::clone(&game_controller);
     tokio::spawn(async move {
@@ -40,9 +43,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             gc.cleanup_stale_games().await;
         }
     });
-
-    let gc = Arc::clone(&game_controller);
-    use_cli(gc);
 
     while let Ok((stream, _)) = listener.accept().await {
         let cm = Arc::clone(&connection_manager);
@@ -81,118 +81,6 @@ fn handle_stream(
             Err(_) => {
                 log::info!("Client ID setup failed.");
             }
-        }
-    });
-}
-
-fn use_cli(gc: Arc<GameController>) {
-    tokio::spawn(async move {
-        let stdin = io::stdin();
-        let mut reader = io::BufReader::new(stdin).lines();
-        print!("> ");
-        std::io::stdout().flush().unwrap();
-        while let Some(line) = reader.next_line().await.unwrap_or(None) {
-            match line.as_str() {
-                "list" => {
-                    let games = gc.list_games().await;
-                    println!("Found {} games: ", games.len());
-                    for game_desc in games {
-                        println!("- {:?}", game_desc);
-                    }
-                }
-                "message" => {
-                    print!("Enter game ID to message: ");
-                    std::io::stdout().flush().unwrap();
-                    if let Some(game_id) = reader.next_line().await.unwrap_or(None) {
-                        match game_id.parse::<usize>() {
-                            Ok(game_id) => {
-                                print!("Enter message: ");
-                                std::io::stdout().flush().unwrap();
-                                if let Some(message) = reader.next_line().await.unwrap_or(None) {
-                                    gc.send_to_game_clients(
-                                        game_id,
-                                        &ServerResponse::ChatMessage {
-                                            client_id: 0,
-                                            message,
-                                        },
-                                    )
-                                    .await;
-                                    println!("Message sent to game {}.", game_id);
-                                } else {
-                                    println!("Failed to read message.");
-                                }
-                            }
-                            Err(_) => {
-                                println!("Invalid game ID.")
-                            }
-                        };
-                    } else {
-                        println!("Failed to read game ID.");
-                    }
-                }
-                "get" => {
-                    print!("Enter game ID to get: ");
-                    std::io::stdout().flush().unwrap();
-                    if let Some(game_id) = reader.next_line().await.unwrap_or(None) {
-                        match game_id.parse::<usize>() {
-                            Ok(game_id) => {
-                                let game = gc.get_game(game_id).await;
-                                match game {
-                                    Some(game) => {
-                                        println!("Game {} found: {:?}", game_id, game.lock().await);
-                                    }
-                                    None => {
-                                        println!("Game {} not found.", game_id);
-                                    }
-                                }
-                            }
-                            Err(_) => {
-                                println!("Invalid game ID.")
-                            }
-                        };
-                    } else {
-                        println!("Failed to read game ID.");
-                    }
-                }
-                "create" => {
-                    println!("Creating game...");
-                    match gc.create_game(get_id(), "SYSTEM".into()).await {
-                        Ok(game_id) => {
-                            println!("Game {} created.", game_id)
-                        }
-                        Err(err) => {
-                            println!("Failed to create game: {}", err)
-                        }
-                    };
-                }
-                "delete" => {
-                    print!("Enter game ID to delete: ");
-                    std::io::stdout().flush().unwrap();
-                    if let Some(game_id) = reader.next_line().await.unwrap_or(None) {
-                        match game_id.parse::<usize>() {
-                            Ok(game_id) => {
-                                println!("Deleting game {}...", game_id);
-                                gc.delete_game(game_id).await;
-                                println!("Game {} deleted.", game_id)
-                            }
-                            Err(_) => {
-                                println!("Invalid game ID.")
-                            }
-                        };
-                    } else {
-                        println!("Failed to read game ID.");
-                    }
-                }
-                "exit" => {
-                    println!("Exiting...");
-                    std::process::exit(0);
-                }
-                _ => {
-                    println!("Unknown command: {}", line);
-                }
-            }
-            print!("> ");
-            std::io::stdout().flush().unwrap();
         }
     });
 }
